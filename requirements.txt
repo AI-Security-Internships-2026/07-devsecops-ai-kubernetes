@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pyyaml
+requests
+python-dotenv
+subprocess-run
+httpx
