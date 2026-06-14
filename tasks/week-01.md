@@ -9,27 +9,27 @@
 ## Checklist
 
 ### a) Orientation
-- [ ] Read `README.md` in full
-- [ ] Read `docs/proposal.md` in full
-- [ ] Accept the GitHub repository invitation
+- [x] Read `README.md` in full
+- [x] Read `docs/proposal.md` in full
+- [x] Accept the GitHub repository invitation
 
 ### b) Environment setup
-- [ ] Clone the repository:
+- [x] Clone the repository:
   ```bash
   git clone https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes.git
   cd 07-devsecops-ai-kubernetes
   ```
-- [ ] Create a virtual environment:
+- [x] Create a virtual environment:
   ```bash
   python -m venv .venv
   source .venv/bin/activate
   pip install -r requirements.txt
   ```
-- [ ] Run the starter script successfully:
+- [x] Run the starter script successfully:
   ```bash
   python src/main.py
   ```
-- [ ] Create your weekly branch:
+- [x] Create your weekly branch:
   ```bash
   git checkout dev
   git pull origin dev
@@ -37,8 +37,8 @@
   ```
 
 ### c) Documentation
-- [ ] Add your personal introduction in `docs/weekly-progress.md` (Week 1 section)
-- [ ] Fill in your name and GitHub username at the top of `docs/weekly-progress.md`
+- [x] Add your personal introduction in `docs/weekly-progress.md` (Week 1 section)
+- [x] Fill in your name and GitHub username at the top of `docs/weekly-progress.md`
 
 ### d) Literature search
 Identify **5 related papers, tools, or datasets** and add them to `docs/literature-review.md`.
@@ -48,13 +48,13 @@ Suggested search terms:
 - Refine with terms from the technology stack
 
 ### e) First Pull Request
-- [ ] Commit your Week 1 changes:
+- [x] Commit your Week 1 changes:
   ```bash
   git add docs/weekly-progress.md docs/literature-review.md
   git commit -m "[Week 01] Add intro and initial literature notes"
   git push origin your-name-week-01
   ```
-- [ ] Open a Pull Request on GitHub:
+- [x] Open a Pull Request on GitHub:
   - Base branch: `dev`
   - PR title: `[Week 01] Introduction and literature search`
   - Describe what you did and any questions you have for your supervisor
