@@ -15,7 +15,7 @@ Be honest — problems and blockers are normal and help your supervisor support 
 ## Week 1
 
 **Branch:** `abdul-hadi-week-01`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/1
 
 ### Completed this week
 - [x] Read README and proposal
@@ -42,17 +42,26 @@ No major blockers this week. Initial environment setup went smoothly. Spent time
 
 ## Week 2
 
-**Branch:** `your-name-week-02`
+**Branch:** `abdul-hadi-week-02`
 **PR link:** _[Add link after opening PR]_
 
 ### Completed this week
--
+- [x] Added 2 academic papers to literature review (EPSS paper by Jacobs et al. 2023, AgenticVM by Arifin et al. 2026)
+- [x] Drafted proposal sections 2–4 (Problem Statement, Research Questions, Methodology with full architecture)
+- [x] Added PR link to Week 1 section
+- [x] Implemented `src/trivy_scanner.py` — runs Trivy scan and captures JSON output
+- [x] Implemented `src/epss_client.py` — fetches EPSS scores for CVEs from Trivy output
+- [ ] Set up Minikube cluster (in progress)
 
 ### Problems / Blockers
--
+
+Trivy requires Docker to be running for container image scanning. Local development uses `--input` mode with saved image tarballs as a workaround. EPSS API has no authentication but rate limiting may apply at scale — implemented local caching as mitigation.
 
 ### Next week plan
--
+- Set up Minikube with Google Online Boutique (microservices-demo) as test target
+- Implement SSVC decision engine that combines EPSS + K8s context
+- Begin FastAPI server for the triage service
+- Run first end-to-end scan → enrich → triage pipeline
 
 ---
 
