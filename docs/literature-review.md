@@ -153,6 +153,26 @@ Use Google Scholar, IEEE Xplore, ACM DL, arXiv, or USENIX Security.
 
 ---
 
+## Entry 8 — LLMSecConfig (LLM-Based Kubernetes Misconfiguration Repair)
+
+| Field | Content |
+|---|---|
+| **Full title** | LLMSecConfig: An LLM-Based Approach for Fixing Software Container Misconfigurations |
+| **Authors** | Ziyang Ye, Triet Huynh Minh Le, M. Ali Babar |
+| **Year** | 2025 |
+| **Venue** | arXiv preprint (arXiv:2502.02009) — cs.SE, cs.AI, cs.CR |
+| **URL / DOI** | https://doi.org/10.48550/arXiv.2502.02009 |
+| **Method** | Combines Static Analysis Tools (Checkov scanner) with LLMs (Mistral Large 2, GPT-4o-mini) using Retrieval-Augmented Generation (RAG). RAG context includes: Checkov scanner output, policy source code, and Prisma Cloud security documentation. Uses an iterative validation pipeline: syntax check → security validation → two-stage retry mechanism (outer loop max 5 attempts, inner loop max 10 retries). |
+| **Dataset** | 1,000 real-world misconfigured Kubernetes configuration files sourced from the top 1,000 most popular Helm charts on ArtifactHub (official CNCF repository). Helm charts converted to raw K8s YAML, filtered to only files triggering security issues. |
+| **Key result** | Mistral Large 2 achieved 94.3% pass rate for automated security fix generation (vs. 40.2% for GPT-4o-mini). 100% parse success rate. Average only 0.024 new errors introduced per fix. Average 3.06 retry steps to reach a valid fix. |
+| **Limitation** | Evaluated only on Kubernetes configs — may not generalise to other orchestrators. Privilege-related security contexts and advanced network policies remain challenging. Only two LLMs compared — no baseline against non-LLM automated repair tools. |
+| **Relevance to our project** | Directly applicable to our pipeline's remediation stage. After our SSVC triage identifies "Act" findings, we could use a similar LLM+RAG approach to automatically generate fix suggestions for Kubernetes misconfigurations. Their SAT→LLM→validation pipeline mirrors our Trivy→AI→report architecture. The 94.3% success rate proves LLMs can reliably fix container security issues when given proper RAG context — this is the auto-remediation feature we can add as a stretch goal. |
+
+**Notes / Quotes:**
+> LLMSecConfig proves that LLMs with proper RAG context can fix Kubernetes security issues at 94% accuracy. This validates our approach of using AI not just for detection/triage but potentially for automated remediation. Their iterative retry + validation pattern is something we should adopt: never trust LLM output without re-scanning to confirm the fix actually resolves the vulnerability.
+
+---
+
 ## Reference Table (Quick Overview)
 
 | # | Title (short) | Authors / Creator | Year | Type | Key Feature | Relevance |
@@ -164,6 +184,7 @@ Use Google Scholar, IEEE Xplore, ACM DL, arXiv, or USENIX Security.
 | 5 | SSVC | CISA / CMU SEI | 2020+ | Decision Framework | Stakeholder-specific prioritisation | Decision logic for our triage system |
 | 6 | EPSS Paper (Jacobs et al.) | Jacobs, Romanosky, Suciu, Edwards, Sarabi | 2023 | XGBoost ML model | 82% improvement over CVSS for exploit prediction | Foundation for our ML-based scoring |
 | 7 | AgenticVM | Arifin, Ahmad, Zhang, Goel | 2026 | Multi-agent LLM + BERT | 97.9% alert reduction on microservices | Reference architecture for our AI triage |
+| 8 | LLMSecConfig | Ye, Le, Babar | 2025 | LLM + RAG | 94.3% automated K8s misconfiguration fix rate | Auto-remediation approach for our pipeline |
 
 ---
 
