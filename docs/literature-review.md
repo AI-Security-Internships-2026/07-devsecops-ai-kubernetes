@@ -1,7 +1,7 @@
 # Literature Review: DevSecOps AI Pipeline with Kubernetes Security Scanning
 
 **Student:** Abdul Hadi
-**Updated:** 2026-06-14
+**Updated:** 2026-06-21
 
 ---
 
@@ -113,6 +113,66 @@ Use Google Scholar, IEEE Xplore, ACM DL, arXiv, or USENIX Security.
 
 ---
 
+## Entry 6 — EPSS Paper (Jacobs et al., 2023)
+
+| Field | Content |
+|---|---|
+| **Full title** | Enhancing Vulnerability Prioritization: Data-Driven Exploit Predictions with Community-Driven Insights |
+| **Authors** | Jay Jacobs, Sasha Romanosky, Octavian Suciu, Benjamin Edwards, Armin Sarabi |
+| **Year** | 2023 |
+| **Venue** | IEEE European Symposium on Security and Privacy Workshops (EuroS&PW 2023) |
+| **URL / DOI** | DOI: 10.1109/EuroSPW59617.2023.00021 / arXiv: 2302.14172 |
+| **Method** | XGBoost (gradient-boosted decision trees) trained on 1,477 features: published exploit code (Exploit-DB, GitHub, Metasploit), public vulnerability lists (CISA KEV, Google Project Zero), social media mentions (Twitter at 7/30/90 day windows), offensive security tools (Nuclei, sn1per), NVD reference counts, CVSS metrics, CWE classifications, and vendor labels. A transformer-based neural network was tested but underperformed XGBoost (AUC 0.7374 vs 0.7795). |
+| **Dataset** | 192,035 published vulnerabilities (through Dec 2022); 6.4 million exploitation observations covering July 2016–Dec 2022; 12,243 unique exploited CVEs. Ground truth from Fortinet, AlienVault OTX, Shadowserver Foundation, GreyNoise. |
+| **Key result** | 82% improvement in precision-recall AUC: from 0.429 (EPSS v2) to 0.779 (v3). At optimal F1 threshold: Precision 78.5%, Recall 67.8%, F1 = 0.728. Prioritises only 3.5% of all published CVEs. CVSS v3 alone achieved only 0.051 AUC — proving CVSS is a poor predictor of real exploitation. |
+| **Limitation** | Relies on signature-based detection — misses undetected exploits. Biased toward network-based attacks (limited visibility into host-based, IoT, ICS/SCADA). Cannot distinguish researcher scanning from malicious exploitation. Model opacity makes feature contribution interpretation difficult. |
+| **Relevance to our project** | This is the foundational paper behind the EPSS system we will integrate via API. The key insight for our project: CVSS alone (AUC 0.051) is nearly useless for predicting exploitation — we MUST use EPSS scores as a primary feature in our triage model. The XGBoost approach on vulnerability metadata is also a candidate for our own local scoring model if we want to go beyond API-only integration. |
+
+**Notes / Quotes:**
+> "CVSS was never designed to predict exploitation, yet the industry uses it as the primary prioritisation metric. EPSS fills this gap with actual predictive power." Our project directly benefits from this — instead of sorting by CVSS score, we sort by EPSS probability, immediately making our tool more accurate than 90% of existing solutions.
+
+---
+
+## Entry 7 — AgenticVM (Multi-Agent AI for Vulnerability Management)
+
+| Field | Content |
+|---|---|
+| **Full title** | AgenticVM: Agentic AI for Adaptive Software Vulnerability Management |
+| **Authors** | Asrul Arifin, Hussain Ahmad, Yiyao Zhang, Diksha Goel |
+| **Year** | 2026 |
+| **Venue** | arXiv preprint (arXiv:2605.01739), CC-BY-4.0 license |
+| **URL / DOI** | https://doi.org/10.48550/arXiv.2605.01739 |
+| **Method** | Six specialised agents orchestrated via LangGraph: (1) Detection Agent — hybrid rule-based + LLM parsing for scanners (Trivy, Snyk, Grype); (2) Assessment Agent — cross-references findings against project context; (3) Prediction Agent — BERT-small model for CVSS metric inference; (4) Integration Agent — schema validation via Pydantic; (5) Prioritisation Agent — CVSS threshold at 7.0; (6) Recommendation Agent — LLM-driven retrieval-grounded generation. Uses OpenAI gpt-4o-mini with temperature 0.0–0.1. |
+| **Dataset** | 169,883 CVE records from NVD/EUVD (80/10/10 split). Evaluated on 3 microservice applications: Online Boutique (Google K8s demo), Train-Ticket (distributed system), Beer-Shop (go-kratos). |
+| **Key result** | 97.9% alert reduction: Train-Ticket reduced from 3,983 raw findings to 82 prioritised items. CVSS prediction accuracy 89.3% across 8 metrics. Single-agent LLM baseline achieved only 28.5% reduction — proving multi-agent architecture outperforms monolithic approaches. Stable across reruns (8.8 ± 0.4 unique CVEs). |
+| **Limitation** | External LLM dependency affects latency and cost. Dataset may not represent full diversity of real-world vulnerabilities. Workflow-level metrics rather than conventional classifier metrics. No human-centred evaluation of trust calibration yet. |
+| **Relevance to our project** | This is the closest reference architecture to what we are building. Key learnings: (1) Multi-agent beats single-agent for vulnerability triage; (2) They integrate Trivy/Snyk/Grype — same scanner stack as us; (3) They evaluate on Google's Online Boutique which is a standard K8s demo app — we can use the same for benchmarking; (4) 97.9% alert reduction is the performance target for our tool. We can adopt their Detection → Assessment → Prioritisation pipeline and add EPSS + SSVC + Kubernetes context as improvements. |
+
+**Notes / Quotes:**
+> AgenticVM demonstrates that a multi-agent architecture with specialised roles (detect → assess → predict → prioritise → recommend) outperforms monolithic LLM approaches by 70%. This validates our architectural choice: separate agents/modules for scanning, enrichment, scoring, and reporting rather than a single prompt-based system.
+
+---
+
+## Entry 8 — LLMSecConfig (LLM-Based Kubernetes Misconfiguration Repair)
+
+| Field | Content |
+|---|---|
+| **Full title** | LLMSecConfig: An LLM-Based Approach for Fixing Software Container Misconfigurations |
+| **Authors** | Ziyang Ye, Triet Huynh Minh Le, M. Ali Babar |
+| **Year** | 2025 |
+| **Venue** | arXiv preprint (arXiv:2502.02009) — cs.SE, cs.AI, cs.CR |
+| **URL / DOI** | https://doi.org/10.48550/arXiv.2502.02009 |
+| **Method** | Combines Static Analysis Tools (Checkov scanner) with LLMs (Mistral Large 2, GPT-4o-mini) using Retrieval-Augmented Generation (RAG). RAG context includes: Checkov scanner output, policy source code, and Prisma Cloud security documentation. Uses an iterative validation pipeline: syntax check → security validation → two-stage retry mechanism (outer loop max 5 attempts, inner loop max 10 retries). |
+| **Dataset** | 1,000 real-world misconfigured Kubernetes configuration files sourced from the top 1,000 most popular Helm charts on ArtifactHub (official CNCF repository). Helm charts converted to raw K8s YAML, filtered to only files triggering security issues. |
+| **Key result** | Mistral Large 2 achieved 94.3% pass rate for automated security fix generation (vs. 40.2% for GPT-4o-mini). 100% parse success rate. Average only 0.024 new errors introduced per fix. Average 3.06 retry steps to reach a valid fix. |
+| **Limitation** | Evaluated only on Kubernetes configs — may not generalise to other orchestrators. Privilege-related security contexts and advanced network policies remain challenging. Only two LLMs compared — no baseline against non-LLM automated repair tools. |
+| **Relevance to our project** | Directly applicable to our pipeline's remediation stage. After our SSVC triage identifies "Act" findings, we could use a similar LLM+RAG approach to automatically generate fix suggestions for Kubernetes misconfigurations. Their SAT→LLM→validation pipeline mirrors our Trivy→AI→report architecture. The 94.3% success rate proves LLMs can reliably fix container security issues when given proper RAG context — this is the auto-remediation feature we can add as a stretch goal. |
+
+**Notes / Quotes:**
+> LLMSecConfig proves that LLMs with proper RAG context can fix Kubernetes security issues at 94% accuracy. This validates our approach of using AI not just for detection/triage but potentially for automated remediation. Their iterative retry + validation pattern is something we should adopt: never trust LLM output without re-scanning to confirm the fix actually resolves the vulnerability.
+
+---
+
 ## Reference Table (Quick Overview)
 
 | # | Title (short) | Authors / Creator | Year | Type | Key Feature | Relevance |
@@ -122,6 +182,9 @@ Use Google Scholar, IEEE Xplore, ACM DL, arXiv, or USENIX Security.
 | 3 | Wiz | Wiz Inc. (Google) | 2020+ | Commercial Platform | Attack path analysis, AI agents | Gold standard for contextual risk |
 | 4 | EPSS | FIRST.org (Jacobs et al.) | 2023+ | ML Framework | Exploit probability prediction (0–1) | Direct integration via free API |
 | 5 | SSVC | CISA / CMU SEI | 2020+ | Decision Framework | Stakeholder-specific prioritisation | Decision logic for our triage system |
+| 6 | EPSS Paper (Jacobs et al.) | Jacobs, Romanosky, Suciu, Edwards, Sarabi | 2023 | XGBoost ML model | 82% improvement over CVSS for exploit prediction | Foundation for our ML-based scoring |
+| 7 | AgenticVM | Arifin, Ahmad, Zhang, Goel | 2026 | Multi-agent LLM + BERT | 97.9% alert reduction on microservices | Reference architecture for our AI triage |
+| 8 | LLMSecConfig | Ye, Le, Babar | 2025 | LLM + RAG | 94.3% automated K8s misconfiguration fix rate | Auto-remediation approach for our pipeline |
 
 ---
 
