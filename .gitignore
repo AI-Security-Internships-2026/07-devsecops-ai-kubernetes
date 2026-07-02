@@ -56,6 +56,7 @@ logs/
 # Secrets and credentials — NEVER commit these
 .env
 .env.*
+!.env.example
 secrets/
 credentials/
 *.key
