@@ -7,4 +7,5 @@ subprocess-run
 httpx
 langgraph>=0.2.0
 langchain-core>=0.3.0
+langchain-groq>=0.2.0
 langchain-google-genai>=2.0.0
