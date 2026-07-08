@@ -65,4 +65,58 @@ Trivy requires Docker to be running for container image scanning. Local developm
 
 ---
 
+## Week 3–4
+
+**Branch:** `abdul-hadi-week-04`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week
+- [x] Implemented `src/triage_agent.py` — LangGraph triage agent (3-node StateGraph as per AgenticVM pattern)
+- [x] Integrated CISA KEV catalog lookup (real-time fetch of known exploited vulnerabilities)
+- [x] SSVC decision tree: CRITICAL/Act, HIGH/Attend, MEDIUM/Track*, LOW/Track
+- [x] Per-CVE LLM-powered risk explanations and recommended actions (Groq/Llama-3.1 or Gemini)
+- [x] Structured per-CVE output matching supervisor's expected format
+- [x] Markdown + JSON triage report output
+- [x] Added LangGraph, LangChain, langchain-groq, langchain-google-genai to `requirements.txt`
+- [x] Created `.env.example` for API key configuration (Groq primary, Gemini fallback)
+- [x] Created sample enriched data for testing (`experiments/results/epss_enriched_sample.json`)
+- [x] Ran full end-to-end pipeline on VM: Trivy → EPSS → Triage Agent on `nginx:latest`
+- [x] Achieved 93% alert reduction (272 CVEs → 19 actionable, 2 CRITICAL)
+
+### Technical Details
+
+The triage agent implements a 3-node LangGraph StateGraph:
+1. **ingest_node** — reads EPSS-prioritized CVE JSON + fetches CISA KEV catalog
+2. **analysis_node** — applies SSVC classification + LLM per-CVE risk explanation
+3. **report_node** — outputs structured triage report (Markdown + JSON)
+
+Per-CVE output format:
+```json
+{
+  "cve": "CVE-2024-1234",
+  "epss_score": 0.94,
+  "priority": "CRITICAL",
+  "explanation": "Plain-English risk explanation...",
+  "recommended_action": "Patch within 24h or isolate container"
+}
+```
+
+Decision thresholds (CISA SSVC):
+- **CRITICAL / Act**: EPSS ≥ 0.1 OR in CISA KEV
+- **HIGH / Attend**: EPSS ≥ 0.01 AND (CVSS ≥ 7.0 OR CRITICAL/HIGH severity)
+- **MEDIUM / Track***: EPSS ≥ 0.01 (moderate risk, lower impact)
+- **LOW / Track**: EPSS < 0.01 (safe to defer)
+
+### Problems / Blockers
+
+EPSS-only triage can over-prioritize old, well-known CVEs (e.g., CVE-2011-3389 BEAST attack — EPSS 0.73 due to automated scanning, but mitigated by TLS 1.2+ in practice). This validates the need for K8s deployment context to refine decisions. LLM explanations require an API key (Groq is free) but the agent works without one using static explanations.
+
+### Next week plan
+- Test pipeline against real-world K8s networking images (SR-IOV, Multus, Prometheus)
+- Research DirtyClone (CVE-2026-43503) and test intentional vulnerability injection
+- Add Kubernetes context enrichment (pod exposure, namespace)
+- Begin FastAPI wrapper for the pipeline
+
+---
+
 _(Add a new section each week)_

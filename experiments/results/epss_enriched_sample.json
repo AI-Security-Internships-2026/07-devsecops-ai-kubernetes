@@ -1,0 +1,134 @@
+[
+  {
+    "cve_id": "CVE-2011-3389",
+    "severity": "HIGH",
+    "cvss_score": 0.0,
+    "package": "libgnutls30",
+    "installed_version": "3.7.1-5+deb11u3",
+    "fixed_version": "",
+    "title": "BEAST attack on SSL/TLS",
+    "epss_score": 0.73,
+    "epss_percentile": 0.97
+  },
+  {
+    "cve_id": "CVE-2023-44487",
+    "severity": "HIGH",
+    "cvss_score": 7.5,
+    "package": "nghttp2",
+    "installed_version": "1.43.0-1+deb11u1",
+    "fixed_version": "1.43.0-1+deb11u2",
+    "title": "HTTP/2 Rapid Reset Attack",
+    "epss_score": 0.82,
+    "epss_percentile": 0.98
+  },
+  {
+    "cve_id": "CVE-2024-21626",
+    "severity": "CRITICAL",
+    "cvss_score": 8.6,
+    "package": "runc",
+    "installed_version": "1.1.5",
+    "fixed_version": "1.1.12",
+    "title": "runc container breakout via fd leak",
+    "epss_score": 0.45,
+    "epss_percentile": 0.96
+  },
+  {
+    "cve_id": "CVE-2023-6246",
+    "severity": "HIGH",
+    "cvss_score": 7.8,
+    "package": "glibc",
+    "installed_version": "2.31-13+deb11u7",
+    "fixed_version": "2.31-13+deb11u8",
+    "title": "glibc heap buffer overflow in __vsyslog_internal",
+    "epss_score": 0.052,
+    "epss_percentile": 0.92
+  },
+  {
+    "cve_id": "CVE-2024-3094",
+    "severity": "CRITICAL",
+    "cvss_score": 10.0,
+    "package": "xz-utils",
+    "installed_version": "5.2.5-2.1~deb11u1",
+    "fixed_version": "5.2.5-2.1~deb11u2",
+    "title": "XZ Utils backdoor (supply chain)",
+    "epss_score": 0.18,
+    "epss_percentile": 0.95
+  },
+  {
+    "cve_id": "CVE-2023-52425",
+    "severity": "HIGH",
+    "cvss_score": 7.5,
+    "package": "libexpat1",
+    "installed_version": "2.2.10-2+deb11u5",
+    "fixed_version": "2.2.10-2+deb11u6",
+    "title": "libexpat XML parsing DoS",
+    "epss_score": 0.035,
+    "epss_percentile": 0.88
+  },
+  {
+    "cve_id": "CVE-2023-4911",
+    "severity": "HIGH",
+    "cvss_score": 7.8,
+    "package": "glibc",
+    "installed_version": "2.31-13+deb11u7",
+    "fixed_version": "2.31-13+deb11u8",
+    "title": "Looney Tunables - glibc ld.so buffer overflow",
+    "epss_score": 0.12,
+    "epss_percentile": 0.94
+  },
+  {
+    "cve_id": "CVE-2024-0567",
+    "severity": "MEDIUM",
+    "cvss_score": 5.9,
+    "package": "libgnutls30",
+    "installed_version": "3.7.1-5+deb11u3",
+    "fixed_version": "3.7.1-5+deb11u4",
+    "title": "GnuTLS certificate verification bypass",
+    "epss_score": 0.008,
+    "epss_percentile": 0.72
+  },
+  {
+    "cve_id": "CVE-2023-39804",
+    "severity": "LOW",
+    "cvss_score": 3.3,
+    "package": "tar",
+    "installed_version": "1.34+dfsg-1",
+    "fixed_version": "",
+    "title": "tar incorrectly handles extended headers",
+    "epss_score": 0.004,
+    "epss_percentile": 0.55
+  },
+  {
+    "cve_id": "CVE-2023-50495",
+    "severity": "MEDIUM",
+    "cvss_score": 6.5,
+    "package": "ncurses",
+    "installed_version": "6.2+20201114-2+deb11u2",
+    "fixed_version": "",
+    "title": "ncurses segfault via crafted input",
+    "epss_score": 0.002,
+    "epss_percentile": 0.45
+  },
+  {
+    "cve_id": "CVE-2022-29155",
+    "severity": "LOW",
+    "cvss_score": 3.7,
+    "package": "openldap",
+    "installed_version": "2.4.57+dfsg-3+deb11u1",
+    "fixed_version": "",
+    "title": "OpenLDAP SQL injection via filter string",
+    "epss_score": 0.001,
+    "epss_percentile": 0.30
+  },
+  {
+    "cve_id": "CVE-2023-31484",
+    "severity": "LOW",
+    "cvss_score": 4.3,
+    "package": "perl",
+    "installed_version": "5.32.1-4+deb11u3",
+    "fixed_version": "",
+    "title": "perl CPAN.pm does not verify TLS certs",
+    "epss_score": 0.0008,
+    "epss_percentile": 0.22
+  }
+]
