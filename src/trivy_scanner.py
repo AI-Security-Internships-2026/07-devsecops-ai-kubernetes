@@ -48,7 +48,7 @@ def run_trivy_scan(image: str, output_file: str | None = None) -> dict:
         )
     except FileNotFoundError:
         print("[!] Error: Trivy is not installed or not in PATH.")
-        print("[!] Install Trivy: https://aquasecurity.github.io/trivy/latest/getting-started/installation/")
+        print("[!] Install Trivy: https://trivy.dev/docs/latest/getting-started/installation/")
         sys.exit(1)
     except subprocess.TimeoutExpired:
         print("[!] Error: Trivy scan timed out after 300 seconds.")
