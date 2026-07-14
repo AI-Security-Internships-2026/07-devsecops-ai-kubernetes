@@ -3,7 +3,6 @@ uvicorn
 pyyaml
 requests
 python-dotenv
-subprocess-run
 httpx
 langgraph>=0.2.0
 langchain-core>=0.3.0
