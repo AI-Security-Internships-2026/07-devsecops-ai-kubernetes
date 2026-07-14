@@ -6,8 +6,8 @@ The EPSS API (https://api.first.org/data/v1/epss) provides daily-updated
 exploit probability scores (0-1) for all published CVEs.
 
 Usage:
-    python src/epss_client.py <trivy_json_file>
-    python src/epss_client.py experiments/results/trivy_nginx_latest.json
+    python run.py enrich <trivy_json_file>
+    python -m src.enrichment.epss_client experiments/results/trivy_nginx_latest.json
 """
 
 import json
@@ -16,10 +16,12 @@ from pathlib import Path
 
 import httpx
 
+from src import config
+
 
 EPSS_API_URL = "https://api.first.org/data/v1/epss"
 BATCH_SIZE = 100  # EPSS API accepts up to 100 CVEs per request
-OUTPUT_DIR = Path("experiments/results")
+OUTPUT_DIR = config.RESULTS_DIR
 
 
 def fetch_epss_scores(cve_ids: list[str]) -> dict[str, dict]:
@@ -174,41 +176,45 @@ def print_enriched_report(enriched_cves: list[dict]) -> None:
     print(f"[*] Focus on: {high_epss + med_epss} out of {total} CVEs ({(high_epss+med_epss)/max(total,1)*100:.1f}%)")
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python src/epss_client.py <trivy_json_file>")
-        print("Example: python src/epss_client.py experiments/results/trivy_nginx_latest.json")
-        sys.exit(1)
+def run(trivy_json_path: str, save: bool = True) -> tuple[list[dict], Path | None]:
+    """
+    Enrich a Trivy JSON with EPSS scores.
 
-    trivy_json_path = sys.argv[1]
-
-    # Step 1: Load CVEs from Trivy output
+    Returns (enriched_cves, output_path). output_path is None if save=False or
+    there were no CVEs. Reusable by the pipeline orchestrator and the CLI.
+    """
     print(f"[*] Loading Trivy results from: {trivy_json_path}")
     cves = load_trivy_cves(trivy_json_path)
     print(f"[+] Found {len(cves)} CVEs in scan results")
 
     if not cves:
         print("[!] No CVEs found in the Trivy output.")
-        sys.exit(0)
+        return [], None
 
-    # Step 2: Fetch EPSS scores
     unique_cve_ids = list(set(c["cve_id"] for c in cves))
     print(f"[*] Fetching EPSS scores for {len(unique_cve_ids)} unique CVEs...")
     epss_scores = fetch_epss_scores(unique_cve_ids)
     print(f"[+] Got EPSS scores for {len(epss_scores)} CVEs")
 
-    # Step 3: Enrich and sort
     enriched = enrich_with_epss(cves, epss_scores)
-
-    # Step 4: Print report
     print_enriched_report(enriched)
 
-    # Step 5: Save enriched output
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    input_name = Path(trivy_json_path).stem
-    output_path = OUTPUT_DIR / f"epss_enriched_{input_name}.json"
-    output_path.write_text(json.dumps(enriched, indent=2))
-    print(f"\n[+] Enriched results saved to: {output_path}")
+    output_path = None
+    if save:
+        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        input_name = Path(trivy_json_path).stem
+        output_path = OUTPUT_DIR / f"epss_enriched_{input_name}.json"
+        output_path.write_text(json.dumps(enriched, indent=2), encoding="utf-8")
+        print(f"\n[+] Enriched results saved to: {output_path}")
+
+    return enriched, output_path
+
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python run.py enrich <trivy_json_file>")
+        sys.exit(1)
+    run(sys.argv[1])
 
 
 if __name__ == "__main__":
