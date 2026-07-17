@@ -47,7 +47,7 @@ def cmd_triage(args):
 
 def cmd_pipeline(args):
     from src.pipeline import run_pipeline
-    run_pipeline(args.image)
+    run_pipeline(args.image, use_k8s_context=not args.no_k8s)
 
 
 def _print_triage_summary(report_json: dict) -> None:
@@ -82,6 +82,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     pl = sub.add_parser("pipeline", help="Full pipeline: scan -> enrich -> triage")
     pl.add_argument("image", help="e.g. nginx:latest")
+    pl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
     pl.set_defaults(func=cmd_pipeline)
 
     return p
