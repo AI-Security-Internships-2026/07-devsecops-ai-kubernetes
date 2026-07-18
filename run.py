@@ -72,6 +72,11 @@ def cmd_db_poll(args):
         poll_osv()
 
 
+def cmd_watch(args):
+    from src.database.watcher_agent import run_watch
+    run_watch()
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -119,6 +124,9 @@ def build_parser() -> argparse.ArgumentParser:
     dp.add_argument("--source", choices=["nvd", "osv", "all"], default="all")
     dp.add_argument("--hours", type=int, default=24, help="NVD: look back this many hours")
     dp.set_defaults(func=cmd_db_poll)
+
+    w = sub.add_parser("watch", help="Run the CVE-intelligence watcher (fresh-CVE alerts)")
+    w.set_defaults(func=cmd_watch)
 
     return p
 
