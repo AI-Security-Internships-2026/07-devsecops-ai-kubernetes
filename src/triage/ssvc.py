@@ -5,8 +5,8 @@ Kept free of LangGraph / network so it can be unit-tested in isolation.
 
 Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Two optional
 refinements plug in here without changing callers:
-  - apply_context()  — Kubernetes deployment context (P3)
-  - apply_exploit()  — public-exploit-exists signal for SSVC "Automatable" (P4)
+  - apply_context()  — Kubernetes deployment context
+  - apply_exploit()  — public-exploit-exists signal for SSVC "Automatable"
 """
 
 # Priority <-> SSVC decision label
@@ -116,35 +116,36 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
 
     epss = cve.get("epss_score", 0.0)
     in_kev = cve.get("in_kev", False)
+    exposed = bool(context.get("exposed"))
+    privileged = bool(context.get("privileged") or context.get("sa_privileged"))
 
+    # Not deployed in this cluster -> not actionable here.
     if context.get("deployed") is False:
         if priority != "LOW":
             return "LOW", f"de-escalated {priority}->LOW: image not deployed in cluster"
         return priority, None
 
-    note = None
-    new_p = priority
+    # Context adjusts a finding by AT MOST ONE level (no stacking), and only in
+    # ways that keep the actionable set meaningful. Escalation NEVER touches the
+    # MEDIUM/LOW tiers, so deployment context can re-rank urgency within the
+    # already-actionable set but never invents new actionable work.
 
-    if context.get("exposed") and epss >= 0.01:
-        stepped = _step(new_p, +1)
-        if stepped != new_p:
-            note = f"escalated {new_p}->{stepped}: internet-facing ({context.get('exposure_type', 'exposed')})"
-            new_p = stepped
+    # ESCALATE (+1): an already-actionable, genuinely-exploitable HIGH finding
+    # (EPSS >= 0.05) becomes urgent on an internet-facing or privileged pod.
+    if priority == "HIGH" and epss >= 0.05 and (exposed or privileged):
+        reason = "internet-facing" if exposed else "privileged pod"
+        return "CRITICAL", f"escalated HIGH->CRITICAL: {reason} + EPSS {epss:.3f}"
 
-    if context.get("privileged") or context.get("sa_privileged"):
-        stepped = _step(new_p, +1)
-        if stepped != new_p:
-            reason = "privileged pod" if context.get("privileged") else "cluster-admin service account"
-            note = f"escalated {new_p}->{stepped}: {reason}"
-            new_p = stepped
-
+    # DE-ESCALATE (-1, noise reduction): a borderline CRITICAL driven by moderate
+    # EPSS (0.1-0.2), not confirmed-exploited, on an internal-only non-privileged
+    # pod is not actually urgent here.
     if (
-        new_p == "CRITICAL"
+        priority == "CRITICAL"
+        and not exposed
+        and not privileged
         and not in_kev
-        and epss < 0.3
-        and context.get("exposed") is False
+        and epss < 0.2
     ):
-        note = "de-escalated CRITICAL->HIGH: internal-only, not KEV, moderate EPSS"
-        new_p = "HIGH"
+        return "HIGH", f"de-escalated CRITICAL->HIGH: internal-only, not in CISA KEV (EPSS {epss:.3f})"
 
-    return new_p, note
+    return priority, None
