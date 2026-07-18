@@ -1,5 +1,5 @@
 """
-Kubernetes deployment-context extractor (P3) — cluster-optional.
+Kubernetes deployment-context extractor — cluster-optional.
 
 If the `kubernetes` package is missing or no cluster is reachable, everything
 degrades to {"available": False} and triage proceeds unchanged.
