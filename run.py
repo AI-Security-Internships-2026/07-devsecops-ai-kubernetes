@@ -56,6 +56,11 @@ def cmd_db_setup(args):
     print(f"[+] CVE intelligence database ready at: {path}")
 
 
+def cmd_sbom(args):
+    from src.database.sbom import generate_and_store
+    generate_and_store(args.image)
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -94,6 +99,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     ds = sub.add_parser("db-setup", help="Initialise the CVE intelligence database")
     ds.set_defaults(func=cmd_db_setup)
+
+    sb = sub.add_parser("sbom", help="Generate + store a CycloneDX SBOM for an image")
+    sb.add_argument("image", help="e.g. nginx:latest")
+    sb.set_defaults(func=cmd_sbom)
 
     return p
 
