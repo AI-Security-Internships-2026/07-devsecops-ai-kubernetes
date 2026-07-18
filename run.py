@@ -61,6 +61,17 @@ def cmd_sbom(args):
     generate_and_store(args.image)
 
 
+def cmd_db_poll(args):
+    from src.database import db
+    db.init_db()
+    if args.source in ("nvd", "all"):
+        from src.database.pollers.nvd_poller import poll_nvd
+        poll_nvd(hours=args.hours)
+    if args.source in ("osv", "all"):
+        from src.database.pollers.osv_poller import poll_osv
+        poll_osv()
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -103,6 +114,11 @@ def build_parser() -> argparse.ArgumentParser:
     sb = sub.add_parser("sbom", help="Generate + store a CycloneDX SBOM for an image")
     sb.add_argument("image", help="e.g. nginx:latest")
     sb.set_defaults(func=cmd_sbom)
+
+    dp = sub.add_parser("db-poll", help="Pull latest CVEs into the database (NVD/OSV)")
+    dp.add_argument("--source", choices=["nvd", "osv", "all"], default="all")
+    dp.add_argument("--hours", type=int, default=24, help="NVD: look back this many hours")
+    dp.set_defaults(func=cmd_db_poll)
 
     return p
 
