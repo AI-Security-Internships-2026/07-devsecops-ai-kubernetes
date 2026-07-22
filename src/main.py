@@ -20,9 +20,12 @@ def main() -> None:
     print(f"Status  : {STATUS}")
     print("=" * 60)
     print()
-    print("Replace this file with your implementation.")
-    print("See docs/proposal.md for research objectives.")
-    print("See tasks/week-01.md for your first tasks.")
+    print("Use the unified CLI (from the repo root):")
+    print("  python run.py scan <image>       # Trivy scan")
+    print("  python run.py enrich <trivy.json># add EPSS scores")
+    print("  python run.py triage <epss.json> # SSVC + LLM triage report")
+    print("  python run.py pipeline <image>   # scan -> enrich -> triage")
+    print("  python run.py --help             # all commands")
 
 
 if __name__ == "__main__":

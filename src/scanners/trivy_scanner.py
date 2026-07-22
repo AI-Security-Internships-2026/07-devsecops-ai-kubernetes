@@ -3,9 +3,8 @@ Trivy Scanner Module
 Runs Trivy vulnerability scans on container images and captures JSON output.
 
 Usage:
-    python src/trivy_scanner.py <image_name>
-    python src/trivy_scanner.py nginx:latest
-    python src/trivy_scanner.py python:3.11-slim
+    python run.py scan <image_name>
+    python -m src.scanners.trivy_scanner nginx:latest
 """
 
 import json
@@ -13,20 +12,27 @@ import subprocess
 import sys
 from pathlib import Path
 
+from src import config
 
-OUTPUT_DIR = Path("experiments/results")
+OUTPUT_DIR = config.RESULTS_DIR
 
 
-def run_trivy_scan(image: str, output_file: str | None = None) -> dict:
+def scan_output_path(image: str) -> Path:
+    """Default JSON output path for a scanned image."""
+    safe_name = image.replace("/", "_").replace(":", "_")
+    return OUTPUT_DIR / f"trivy_{safe_name}.json"
+
+
+def run_trivy_scan(image: str, output_file: str | None = None) -> tuple[dict, Path]:
     """
-    Run Trivy scan on a container image and return JSON results.
+    Run Trivy scan on a container image.
 
     Args:
         image: Container image name (e.g., "nginx:latest", "python:3.11-slim")
         output_file: Optional path to save JSON output
 
     Returns:
-        Dict containing Trivy scan results with vulnerabilities
+        (scan_results dict, output_path)
     """
     cmd = [
         "trivy",
@@ -48,7 +54,7 @@ def run_trivy_scan(image: str, output_file: str | None = None) -> dict:
         )
     except FileNotFoundError:
         print("[!] Error: Trivy is not installed or not in PATH.")
-        print("[!] Install Trivy: https://aquasecurity.github.io/trivy/latest/getting-started/installation/")
+        print("[!] Install Trivy: https://trivy.dev/docs/latest/getting-started/installation/")
         sys.exit(1)
     except subprocess.TimeoutExpired:
         print("[!] Error: Trivy scan timed out after 300 seconds.")
@@ -60,18 +66,12 @@ def run_trivy_scan(image: str, output_file: str | None = None) -> dict:
 
     scan_results = json.loads(result.stdout)
 
-    if output_file:
-        output_path = Path(output_file)
-    else:
-        safe_name = image.replace("/", "_").replace(":", "_")
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-        output_path = OUTPUT_DIR / f"trivy_{safe_name}.json"
-
+    output_path = Path(output_file) if output_file else scan_output_path(image)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(scan_results, indent=2))
+    output_path.write_text(json.dumps(scan_results, indent=2), encoding="utf-8")
     print(f"[+] Scan results saved to: {output_path}")
 
-    return scan_results
+    return scan_results, output_path
 
 
 def extract_cves(scan_results: dict) -> list[dict]:
@@ -139,22 +139,19 @@ def print_summary(cves: list[dict]) -> None:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python src/trivy_scanner.py <image_name>")
-        print("Example: python src/trivy_scanner.py nginx:latest")
+        print("Usage: python run.py scan <image_name>")
         sys.exit(1)
 
     image = sys.argv[1]
     output_file = sys.argv[2] if len(sys.argv) > 2 else None
 
-    scan_results = run_trivy_scan(image, output_file)
+    scan_results, output_path = run_trivy_scan(image, output_file)
     cves = extract_cves(scan_results)
     print_summary(cves)
 
-    cve_ids = [c["cve_id"] for c in cves if c["cve_id"].startswith("CVE-")]
-    unique_cves = list(set(cve_ids))
-
+    unique_cves = {c["cve_id"] for c in cves if c["cve_id"].startswith("CVE-")}
     print(f"\n[*] {len(unique_cves)} unique CVE IDs extracted.")
-    print(f"[*] Run EPSS enrichment: python src/epss_client.py experiments/results/trivy_*.json")
+    print(f"[*] Run EPSS enrichment: python run.py enrich {output_path}")
 
 
 if __name__ == "__main__":

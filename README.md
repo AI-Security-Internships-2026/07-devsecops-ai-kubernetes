@@ -93,8 +93,45 @@ git checkout dev
 git pull origin dev
 git checkout -b your-name-week-01
 
-# 5. Run the starter script
-python src/main.py
+# 5. See available commands
+python run.py --help
+```
+
+---
+
+## Usage (CLI)
+
+All functionality is exposed through a single entry point, `run.py`:
+
+```bash
+python run.py scan nginx:latest                                        # Stage 1: Trivy scan -> JSON
+python run.py enrich experiments/results/trivy_nginx_latest.json       # Stage 2: add EPSS scores
+python run.py triage experiments/results/epss_enriched_trivy_nginx_latest.json  # Stage 3: SSVC + LLM triage
+python run.py pipeline nginx:latest                                    # Stages 1-3 in one command
+```
+
+`triage` and `pipeline` also write a compact machine-readable
+`experiments/results/triage_run.json` (image, CVE, CVSS, EPSS, KEV status, SSVC
+decision, rationale, timestamp, errors).
+
+Optional LLM explanations use **Groq** or **Google Gemini** — set
+`GROQ_API_KEY` or `GOOGLE_API_KEY` in `.env` (see `.env.example`). The pipeline
+works without a key (deterministic explanations).
+
+## Project Structure
+
+```
+run.py              # unified CLI entry point
+src/
+  config.py         # repo-relative paths
+  pipeline.py       # scan -> enrich -> triage orchestrator
+  scanners/         # trivy_scanner.py
+  enrichment/       # epss_client.py, kev_client.py
+  triage/           # ssvc.py (decisions), engine.py (analysis), explain.py (LLM),
+                    # report.py (grouped reports), compact.py (triage_run.json),
+                    # triage_agent.py (LangGraph)
+experiments/results/  # scan outputs + committed triage_run.json
+docs/               # weekly-progress.md, proposal.md, literature-review.md
 ```
 
 ---

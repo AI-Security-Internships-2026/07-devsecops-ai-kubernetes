@@ -66,3 +66,10 @@ credentials/
 # Results that can be reproduced
 experiments/results/*.png
 experiments/results/*.pdf
+experiments/results/*.json
+experiments/results/*.md
+
+!experiments/results/epss_enriched_samples.json
+
+# Week-5 deliverable: committed real end-to-end triage output
+!experiments/results/triage_run.json

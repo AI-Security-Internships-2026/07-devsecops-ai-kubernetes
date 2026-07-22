@@ -119,4 +119,59 @@ EPSS-only triage can over-prioritize old, well-known CVEs (e.g., CVE-2011-3389 B
 
 ---
 
+## Week 5
+
+**Branch:** `abdul-hadi-week-05`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week (this PR)
+- [x] Restructured the codebase into a proper Python package with a single CLI entry point (`run.py`)
+- [x] Split the triage core into reusable modules: `triage/ssvc.py` (decisions), `triage/engine.py` (shared analysis loop), `triage/explain.py` (LLM/static), `triage/report.py` (grouped reports), `triage/compact.py` (machine-readable output)
+- [x] **Fixed the duplicate-CVE bug** — findings are grouped by CVE ID with affected packages aggregated (multus scan: 883 per-package rows → 406 unique CVEs)
+- [x] `src/pipeline.py` — one-command `scan → enrich → triage` orchestrator
+- [x] Committed a **real end-to-end triage output** (`experiments/results/triage_run.json`) from a real Trivy scan
+
+### End-to-End Result (committed)
+
+Real Trivy scan of `ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.3`:
+
+| Metric | Value |
+|--------|-------|
+| Unique CVEs analyzed | 406 |
+| CRITICAL / Act | 17 |
+| HIGH / Attend | 84 |
+| MEDIUM / Track* | 54 |
+| LOW / Track | 251 |
+| Alert reduction | **75.1%** |
+
+Top finding: CVE-2023-50387 (KeyTrap DNSSEC), EPSS 0.99995 → Act.
+
+### Validation commands
+
+Run from the repo root (see `README.md` for full usage):
+
+```bash
+# End-to-end run (Trivy -> EPSS -> CISA KEV -> SSVC/LangGraph triage)
+python run.py pipeline ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.3
+#   -> writes experiments/results/triage_run.json (the committed sample)
+
+# Or stage by stage:
+python run.py scan   <image>
+python run.py enrich experiments/results/trivy_<image>.json
+python run.py triage experiments/results/epss_enriched_trivy_<image>.json --image <image>
+```
+
+`triage_run.json` fields: container image, CVE ID, CVSS severity, EPSS score,
+KEV status, SSVC decision, decision rationale, execution timestamp, and any
+scanner/enrichment errors.
+
+*(A test suite will be added in a later week; scripts are verified manually for now.)*
+
+### Next week plan
+- Submit the Kubernetes-context + CVE-intelligence-DB + MCP work in a follow-up PR
+- Evaluation vs raw-CVSS baseline using CISA KEV as ground truth
+- Add an automated test suite
+
+---
+
 _(Add a new section each week)_
