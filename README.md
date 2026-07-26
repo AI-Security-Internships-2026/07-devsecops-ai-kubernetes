@@ -136,6 +136,24 @@ docs/               # weekly-progress.md, proposal.md, literature-review.md
 
 ---
 
+## Roadmap to September 8, 2026
+
+**Current state:** 18 commits of real, substantial work (CVE watcher agent, NVD/OSV pollers, SBOM ingestion, Exploit-DB lookup, K8s context, SQLite schema) sitting unsubmitted on `abdul-hadi-week-06` — not behind on work, behind on process (issue #7).
+
+**Novel contribution target:** fuse SBOM component matching with *live* exploit-availability signals and Kubernetes runtime reachability — most SSVC-style triage tools score CVEs in the abstract; scoring by whether the vulnerable component is actually reachable/running in a live cluster is a genuinely current, under-addressed angle in DevSecOps triage.
+
+| Date | Milestone |
+|---|---|
+| **Aug 2 (urgent)** | Open the PR for the 18 pending commits now; commit a fresh `experiments/results/triage_run.json` |
+| Aug 9 | Fuse SBOM + live CVE feed + Exploit-DB signals into a single SSVC score |
+| Aug 16 | Add Kubernetes-runtime-reachability weighting — is the vulnerable component actually live in the cluster? |
+| Aug 23 | Benchmark the fused, reachability-aware score against CVSS-only and EPSS-only baselines on labeled incidents |
+| Aug 30 | Full write-up |
+| Sep 6 | Paper draft |
+| **Sep 8** | **Final submission** |
+
+---
+
 ## Supervisor Note
 
 This repository is managed by **CNIT/PNTLab Pisa, TECIP, Scuola Superiore Sant'Anna**.
