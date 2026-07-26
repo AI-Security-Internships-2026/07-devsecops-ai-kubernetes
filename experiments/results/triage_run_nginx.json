@@ -1,0 +1,2492 @@
+{
+  "execution_timestamp": "2026-07-26T04:16:02Z",
+  "container_image": "nginx:latest",
+  "source_scan": "epss_enriched_trivy_nginx_latest.json",
+  "pipeline": {
+    "scan": "trivy",
+    "enrichment": [
+      "epss",
+      "cisa_kev"
+    ],
+    "decision": "ssvc",
+    "agent": "langgraph"
+  },
+  "summary": {
+    "total_cves": 167,
+    "critical_act": 0,
+    "high_attend": 0,
+    "medium_track_star": 0,
+    "low_track": 167,
+    "alert_reduction_pct": 100.0
+  },
+  "errors": [],
+  "findings": [
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2011-3389",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.73327,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated CRITICAL->LOW: image not deployed in cluster | HTTPS: block-wise chosen-plaintext attack against SSL/TLS (BEAST) in libgnutls30t64 has very low exploit probability (EPSS 0.7333). Safe to defer.",
+      "affected_packages": [
+        "libgnutls30t64@3.8.9-3+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2009-4487",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.29516,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "public exploit code exists; de-escalated CRITICAL->LOW: image not deployed in cluster | nginx: Absent sanitation of escape sequences in web server log in nginx has very low exploit probability (EPSS 0.2952). Safe to defer.",
+      "affected_packages": [
+        "nginx@1.31.3-1~trixie"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2017-17740",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.07022,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | openldap: contrib/slapd-modules/nops/nops.c attempts to free stack buffer allowing remote attackers to cause a denial of service in libldap2 has very low exploit probability (EPSS 0.0702). Safe to defer.",
+      "affected_packages": [
+        "libldap2@2.6.10+dfsg-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2018-20796",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.05804,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c in libc-bin has very low exploit probability (EPSS 0.0580). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2017-16232",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.05367,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | libtiff: Memory leaks in tif_open.c, tif_lzw.c, and tif_aux.c in libtiff6 has very low exploit probability (EPSS 0.0537). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2015-3276",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.05269,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | openldap: incorrect multi-keyword mode cipherstring parsing in libldap2 has very low exploit probability (EPSS 0.0527). Safe to defer.",
+      "affected_packages": [
+        "libldap2@2.6.10+dfsg-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2005-2541",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.03992,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | tar: does not properly warn the user when extracting setuid or setgid files in tar has very low exploit probability (EPSS 0.0399). Safe to defer.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2019-1010022",
+      "cvss_severity": "LOW",
+      "cvss_score": 9.8,
+      "epss_score": 0.03249,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | glibc: stack guard protection bypass in libc-bin has very low exploit probability (EPSS 0.0325). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2019-1010024",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.0322,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | glibc: ASLR bypass using cache of thread stack and heap in libc-bin has very low exploit probability (EPSS 0.0322). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2019-1010023",
+      "cvss_severity": "LOW",
+      "cvss_score": 8.8,
+      "epss_score": 0.03069,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | glibc: running ldd on malicious ELF leads to code execution because of wrong size computation in libc-bin has very low exploit probability (EPSS 0.0307). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2017-9937",
+      "cvss_severity": "LOW",
+      "cvss_score": 6.5,
+      "epss_score": 0.02962,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | libtiff: memory malloc failure in tif_jbig.c could cause DOS. in libjbig0 has very low exploit probability (EPSS 0.0296). Safe to defer.",
+      "affected_packages": [
+        "libjbig0@2.1-6.1+b2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-42533",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.02791,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | nginx: NGINX: Arbitrary code execution via crafted HTTP requests in nginx has very low exploit probability (EPSS 0.0279). Safe to defer.",
+      "affected_packages": [
+        "nginx@1.31.3-1~trixie"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2010-4756",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.02633,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | glibc: glob implementation can cause excessive CPU and memory consumption due to crafted glob expressions in libc-bin has very low exploit probability (EPSS 0.0263). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2020-15719",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.2,
+      "epss_score": 0.02515,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | openldap: Certificate validation incorrectly matches name against CN-ID in libldap2 has very low exploit probability (EPSS 0.0251). Safe to defer.",
+      "affected_packages": [
+        "libldap2@2.6.10+dfsg-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2019-9192",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.02447,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c in libc-bin has very low exploit probability (EPSS 0.0245). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2015-9019",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.02393,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | libxslt: math.random() in xslt uses unseeded randomness in libxslt1.1 has very low exploit probability (EPSS 0.0239). Safe to defer.",
+      "affected_packages": [
+        "libxslt1.1@1.1.35-1.2+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2019-1010025",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.02286,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | glibc: information disclosure of heap addresses of pthread_created thread in libc-bin has very low exploit probability (EPSS 0.0229). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2013-0337",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.02195,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | The default configuration of nginx, possibly 1.3.13 and earlier, uses  ... in nginx has very low exploit probability (EPSS 0.0220). Safe to defer.",
+      "affected_packages": [
+        "nginx@1.31.3-1~trixie"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2018-5709",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.02067,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | krb5: integer overflow in dbentry->n_key_data in kadmin/dbutil/dump.c in libgssapi-krb5-2 has very low exploit probability (EPSS 0.0207). Safe to defer.",
+      "affected_packages": [
+        "libgssapi-krb5-2@1.21.3-5+deb13u1",
+        "libk5crypto3@1.21.3-5+deb13u1",
+        "libkrb5-3@1.21.3-5+deb13u1",
+        "libkrb5support0@1.21.3-5+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2018-10126",
+      "cvss_severity": "LOW",
+      "cvss_score": 6.5,
+      "epss_score": 0.0187,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | libtiff: NULL pointer dereference in the jpeg_fdct_16x16 function in jfdctint.c in libtiff6 has very low exploit probability (EPSS 0.0187). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2022-1210",
+      "cvss_severity": "LOW",
+      "cvss_score": 6.5,
+      "epss_score": 0.01851,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | tiff: Malicious file leads to a denial of service in TIFF File Handler in libtiff6 has very low exploit probability (EPSS 0.0185). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2018-6829",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.01777,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | libgcrypt: ElGamal implementation doesn't have semantic security due to incorrectly encoded plaintexts possibly allowing to obtain sensitive information in libgcrypt20 has very low exploit probability (EPSS 0.0178). Safe to defer.",
+      "affected_packages": [
+        "libgcrypt20@1.11.0-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2021-45346",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.3,
+      "epss_score": 0.01614,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | sqlite: crafted SQL query allows a malicious user to obtain sensitive information in libsqlite3-0 has very low exploit probability (EPSS 0.0161). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-59375",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.01279,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated HIGH->LOW: image not deployed in cluster | firefox: thunderbird: expat: libexpat in Expat allows attackers to trigger large dynamic memory allocations via a small document that is submitted for parsing in libexpat1 has very low exploit probability (EPSS 0.0128). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2011-3374",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.7,
+      "epss_score": 0.01191,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | It was found that apt-key in apt, all versions, do not correctly valid ... in apt has very low exploit probability (EPSS 0.0119). Safe to defer.",
+      "affected_packages": [
+        "apt@3.0.3",
+        "libapt-pkg7.0@3.0.3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-26461",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.01128,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | krb5: Memory leak at /krb5/src/lib/gssapi/krb5/k5sealv3.c in libgssapi-krb5-2 has very low exploit probability (EPSS 0.0113). Safe to defer.",
+      "affected_packages": [
+        "libgssapi-krb5-2@1.21.3-5+deb13u1",
+        "libk5crypto3@1.21.3-5+deb13u1",
+        "libkrb5-3@1.21.3-5+deb13u1",
+        "libkrb5support0@1.21.3-5+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-2236",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.01114,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "de-escalated MEDIUM->LOW: image not deployed in cluster | libgcrypt: vulnerable to Marvin Attack in libgcrypt20 has very low exploit probability (EPSS 0.0111). Safe to defer.",
+      "affected_packages": [
+        "libgcrypt20@1.11.0-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2007-5686",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00942,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "initscripts in rPath Linux 1 sets insecure permissions for the /var/lo ... in login.defs has very low exploit probability (EPSS 0.0094). Safe to defer.",
+      "affected_packages": [
+        "login.defs@1:4.17.4-2",
+        "passwd@1:4.17.4-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-26458",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00815,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "krb5: Memory leak at /krb5/src/lib/rpc/pmap_rmt.c in libgssapi-krb5-2 has very low exploit probability (EPSS 0.0081). Safe to defer.",
+      "affected_packages": [
+        "libgssapi-krb5-2@1.21.3-5+deb13u1",
+        "libk5crypto3@1.21.3-5+deb13u1",
+        "libkrb5-3@1.21.3-5+deb13u1",
+        "libkrb5support0@1.21.3-5+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-60005",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0071,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "NGINX Plus and NGINX Open Source have a vulnerability in the ngx_http_ ... in nginx has very low exploit probability (EPSS 0.0071). Safe to defer.",
+      "affected_packages": [
+        "nginx@1.31.3-1~trixie"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-11856",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00604,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Information disclosure via incorrect Digest authentication header reuse in curl has very low exploit probability (EPSS 0.0060). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-9079",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00584,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl: libcurl: Information disclosure due to failure to clear proxy authentication credentials in curl has very low exploit probability (EPSS 0.0058). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8924",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0056,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Cookie injection via malicious HTTP server using super cookies in curl has very low exploit probability (EPSS 0.0056). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2011-4116",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.3,
+      "epss_score": 0.0052,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl: File:: Temp insecure temporary file handling in perl-base has very low exploit probability (EPSS 0.0052). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32740",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00514,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Arbitrary code execution or denial of service via crafted HEIF/AVIF file in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56209",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00511,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libaom: libaom: arbitrary address write via SVC layer context OOB and cyclic refresh map pointer hijack in libaom3 has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "libaom3@3.12.1-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-10536",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00507,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl: libcurl: Use-after-free vulnerability leading to Denial of Service in curl has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2021-4214",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.5,
+      "epss_score": 0.00505,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libpng: hardcoded value leads to heap-overflow in libpng16-16t64 has very low exploit probability (EPSS 0.0050). Safe to defer.",
+      "affected_packages": [
+        "libpng16-16t64@1.6.48-1+deb13u5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-5450",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00502,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "glibc: glibc: Heap Buffer Overflow in `scanf` with `%mc` format specifier and large width in libc-bin has very low exploit probability (EPSS 0.0050). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2013-4392",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00472,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "systemd: TOCTOU race condition when updating file permissions and SELinux security contexts in libsystemd0 has very low exploit probability (EPSS 0.0047). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.13-1~deb13u1",
+        "libudev1@257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-15079",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00457,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: Host verification bypass during SSH transfers in curl has very low exploit probability (EPSS 0.0046). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56434",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0045,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "NGINX Plus and NGINX Open Source have a vulnerability in the ngx_http_ ... in nginx has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "nginx@1.31.3-1~trixie"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-38950",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00449,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "Heap Buffer Overflow vulnerability in Libde265 v1.0.15 allows attacker ... in libde265-0 has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-69720",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.8,
+      "epss_score": 0.00447,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution. in libtinfo6 has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "libtinfo6@6.5+20250216-2",
+        "ncurses-base@6.5+20250216-2",
+        "ncurses-bin@6.5+20250216-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-45186",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00443,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: denial of service via crafted XML input in libexpat1 has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8927",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.0044,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: Information disclosure due to uncleared proxy authentication state in curl has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-38949",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00437,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "Heap Buffer Overflow vulnerability in Libde265 v1.0.15 allows attacker ... in libde265-0 has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-9538",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00437,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-Archive-Tar: perl-Archive-Tar: Denial of Service via crafted tar header with large entry size in perl-base has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-3184",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00436,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "util-linux: util-linux: Access control bypass due to improper hostname canonicalization in bsdutils has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-13221",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.1,
+      "epss_score": 0.00432,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "Perl versions through 5.43.9 produce silently incorrect regular expres ... in perl-base has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-42496",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.1,
+      "epss_score": 0.0043,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access in perl-base has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2022-0563",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.5,
+      "epss_score": 0.00427,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline in bsdutils has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-42497",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00417,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-Archive-Tar: perl-Archive-Tar: Arbitrary file modification via crafted hardlinks during archive extraction in perl-base has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56211",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00414,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libaom: libaom: remote code execution via SVC layer context handling with attacker-controlled frames in libaom3 has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "libaom3@3.12.1-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-15224",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00413,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: libssh key passphrase bypass without agent set in curl has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-47247",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00409,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. Prior to v ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2024-56433",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00408,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "shadow-utils: Default subordinate ID configuration in /etc/login.defs could lead to compromise in login.defs has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "login.defs@1:4.17.4-2",
+        "passwd@1:4.17.4-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-41080",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00398,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: expat: libexpat: Denial of Service via hash flooding with crafted XML in libexpat1 has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8376",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "epss_score": 0.00398,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds in perl-base has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8932",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00396,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl: libcurl: Security feature bypass due to improper mTLS connection reuse in curl has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-10966",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.0039,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: Curl missing SFTP host verification with wolfSSH backend in curl has very low exploit probability (EPSS 0.0039). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-12087",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00389,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-Socket: perl-Socket: Information Disclosure due to Out-of-Bounds Read in perl-base has very low exploit probability (EPSS 0.0039). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8926",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00376,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Information disclosure via incorrect .netrc password lookup in curl has very low exploit probability (EPSS 0.0038). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-48959",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00373,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-IO-Compress: perl-IO-Compress: CPU exhaustion via per-byte read loop in fastForward in perl-base has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-5704",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00372,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "tar: tar: Hidden file injection via crafted archives in tar has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-5928",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00369,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "glibc: glibc: Information disclosure or denial of service via ungetwc function with specific wide character encodings in libc-bin has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-6238",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00358,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "glibc: glibc: Application crash or uninitialized memory read via crafted DNS response in libc-bin has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-57433",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 0.0,
+      "epss_score": 0.00357,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "Storable versions before 3.41 for Perl have a signed integer overflow  ... in perl-base has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-6653",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "epss_score": 0.00355,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libxml2: mingw-libxml2: libxml2: Denial of Service via crafted XML input due to use-after-free in libxml2 has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "libxml2@2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2023-31439",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00352,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "An issue was discovered in systemd 253. An attacker can modify the con ... in libsystemd0 has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.13-1~deb13u1",
+        "libudev1@257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-33164",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00349,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2017-14159",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.7,
+      "epss_score": 0.00349,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "openldap: Privilege escalation via PID file manipulation in libldap2 has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "libldap2@2.6.10+dfsg-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2017-18018",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.7,
+      "epss_score": 0.00348,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "coreutils: race condition vulnerability in chown and chgrp in coreutils has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2023-31437",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00344,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "An issue was discovered in systemd 253. An attacker can modify a seale ... in libsystemd0 has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.13-1~deb13u1",
+        "libudev1@257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32741",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00343,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Heap buffer overflow vulnerability in image decoding in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-12064",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00339,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: SSH host verification bypass when using schemeless URLs with SFTP/SCP in curl has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-41992",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00335,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "GNU gzip contains a global buffer overflow vulnerability in the LZH de ... in gzip has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "gzip@1.13-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-54411",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00333,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module in libpam-modules has very low exploit probability (EPSS 0.0033). Safe to defer.",
+      "affected_packages": [
+        "libpam-modules@1.7.0-5",
+        "libpam-modules-bin@1.7.0-5",
+        "libpam-runtime@1.7.0-5",
+        "libpam0g@1.7.0-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2023-31438",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00328,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "An issue was discovered in systemd 253. An attacker can truncate a sea ... in libsystemd0 has very low exploit probability (EPSS 0.0033). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.13-1~deb13u1",
+        "libudev1@257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-9547",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00325,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Man-in-the-middle attack via SSH host key bypass in curl has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32882",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00323,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Denial of Service and Information Disclosure vulnerability in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32739",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0032,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Denial of Service via crafted HEIF sequence file in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8458",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00315,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl might in some circumstances reuse the wrong connection when as ... in curl has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32814",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00311,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Information Disclosure via Crafted HEIF/AVIF Files in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0031). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-8286",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00309,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Insecure connection establishment due to TLS configuration mismatch in curl has very low exploit probability (EPSS 0.0031). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-41071",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.1,
+      "epss_score": 0.00302,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. In version ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0030). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32738",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.5,
+      "epss_score": 0.00301,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Unsigned integer underflow leads to Denial of Service in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0030). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-70873",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00301,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "sqlite: SQLite: Information Disclosure via Crafted ZIP File in libsqlite3-0 has very low exploit probability (EPSS 0.0030). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-9080",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00295,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl: libcurl: Use-after-free via curl_easy_pause() in CURLMOPT_SOCKETFUNCTION callback in curl has very low exploit probability (EPSS 0.0029). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-48962",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00292,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-IO-Compress: perl-IO-Compress: Arbitrary code execution via attacker-controlled output glob in perl-base has very low exploit probability (EPSS 0.0029). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-50219",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.9,
+      "epss_score": 0.00288,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "expat: libexpat: Use-after-free vulnerability due to improper handler call depth tracking in libexpat1 has very low exploit probability (EPSS 0.0029). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56208",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00275,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libaom: libaom: heap buffer overflow in AV1 encoder first-pass stats buffer via LAP mode in libaom3 has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "libaom3@3.12.1-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-8177",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.8,
+      "epss_score": 0.00271,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: LibTIFF Buffer Overflow in libtiff6 has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-9545",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00268,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libcurl: libcurl: Information disclosure via cached SSL session and early data in curl has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-68431",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.1,
+      "epss_score": 0.00267,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is an HEIF and AVIF file format decoder and encoder. Prior to  ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-48029",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00267,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. Versions 1 ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-11731",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00264,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libxslt: Type Confusion in exsltFuncResultCompfunction of libxslt in libxslt1.1 has very low exploit probability (EPSS 0.0026). Safe to defer.",
+      "affected_packages": [
+        "libxslt1.1@1.1.35-1.2+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-48961",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00262,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-IO-Compress: IO::Compress: Denial of Service in zipdetails CLI tool via malformed Info-ZIP Unix Extra Field in perl-base has very low exploit probability (EPSS 0.0026). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-11850",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00261,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "krb5: krb5: integer underflow in berval2tl_data() leads to heap out-of-bounds read in libgssapi-krb5-2 has very low exploit probability (EPSS 0.0026). Safe to defer.",
+      "affected_packages": [
+        "libgssapi-krb5-2@1.21.3-5+deb13u1",
+        "libk5crypto3@1.21.3-5+deb13u1",
+        "libkrb5-3@1.21.3-5+deb13u1",
+        "libkrb5support0@1.21.3-5+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-45383",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00257,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Ve ... in libde265-0 has very low exploit probability (EPSS 0.0026). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-53910",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00253,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "diff3tool from GNU diffutilsis vulnerable to a heap\\u2011based buffer  ... in diffutils has very low exploit probability (EPSS 0.0025). Safe to defer.",
+      "affected_packages": [
+        "diffutils@1:3.10-4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-45382",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00253,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0025). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-41069",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00253,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. In version ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0025). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-61144",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.3,
+      "epss_score": 0.00253,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: libtiff: Denial of Service via buffer overflow in libtiff6 has very low exploit probability (EPSS 0.0025). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56210",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00245,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libaom: libaom: heap-buffer-overflow read via missing bounds check in ctrl_set_layer_id in libaom3 has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libaom3@3.12.1-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-8176",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.8,
+      "epss_score": 0.00238,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: LibTIFF Use-After-Free Vulnerability in libtiff6 has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-5435",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00237,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "glibc: glibc: Out-of-bounds write via TSIG record processing in libc-bin has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12+deb13u3",
+        "libc6@2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-33165",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5,
+      "epss_score": 0.00232,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-12912",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00232,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: libtiff: Heap-based buffer overflow via crafted PixarLog-compressed TIFF image in libtiff6 has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2 -> 4.7.0-3+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-49295",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00227,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-49346",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00227,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-7010",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00227,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "HTTP::Tiny versions before 0.093 for Perl do not validate CRLF in HTTP ... in perl-base has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-5278",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00224,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "coreutils: Heap Buffer Under-Read in GNU Coreutils sort via Key Specification in coreutils has very low exploit probability (EPSS 0.0022). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-27171",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00218,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "zlib: zlib: Denial of Service via infinite loop in CRC32 combine functions in zlib1g has very low exploit probability (EPSS 0.0022). Safe to defer.",
+      "affected_packages": [
+        "zlib1g@1:1.3.dfsg+really1.3.1-1+b1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32777",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00216,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Denial of Service via infinite loop in DTD content parsing in libexpat1 has very low exploit probability (EPSS 0.0022). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-58055",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00202,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "nghttp2: nghttp2: HTTP Request/Response Smuggling and Response-Queue Poisoning via ambiguous HTTP/1.1 Upgrade requests in libnghttp2-14 has very low exploit probability (EPSS 0.0020). Safe to defer.",
+      "affected_packages": [
+        "libnghttp2-14@1.64.0-1.1+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-49271",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00199,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Denial of Service via crafted HEIF file due to integer wrap-around in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0020). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-49337",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00194,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libde265 is an open source implementation of the h.265 video codec. Pr ... in libde265-0 has very low exploit probability (EPSS 0.0019). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-25210",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.8,
+      "epss_score": 0.00193,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Information disclosure and data integrity issues due to integer overflow in buffer reallocation in libexpat1 has very low exploit probability (EPSS 0.0019). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-57432",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.4,
+      "epss_score": 0.00189,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "Perl versions through 5.43.10 have an integer overflow in S_measure_st ... in perl-base has very low exploit probability (EPSS 0.0019). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-66382",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00188,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Denial of service via crafted file processing in libexpat1 has very low exploit probability (EPSS 0.0019). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-14104",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00183,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames in bsdutils has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-8534",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00182,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: Libtiff Null Pointer Dereference Vulnerability in libtiff6 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-47709",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00175,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. Versions p ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-11822",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00175,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "SQLite before 3.53.2 contains memory corruption vulnerabilities in the ... in libsqlite3-0 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-11824",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00175,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "SQLite before 3.53.2 contains a heap-based buffer overflow vulnerabili ... in libsqlite3-0 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-40228",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.3,
+      "epss_score": 0.00173,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "systemd: systemd-journald: Unintended output to user terminals via logger command in libsystemd0 has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.13-1~deb13u1",
+        "libudev1@257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32778",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00171,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Denial of Service via NULL pointer dereference after out-of-memory condition in libexpat1 has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-24515",
+      "cvss_severity": "LOW",
+      "cvss_score": 2.5,
+      "epss_score": 0.0017,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat null pointer dereference in libexpat1 has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-6141",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00165,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "gnu-ncurses: ncurses Stack Buffer Overflow in libtinfo6 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libtinfo6@6.5+20250216-2",
+        "ncurses-base@6.5+20250216-2",
+        "ncurses-bin@6.5+20250216-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-32776",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00164,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Denial of Service due to NULL pointer dereference in libexpat1 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-10911",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00161,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libxslt: use-after-free with key data stored cross-RVT in libxslt1.1 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libxslt1.1@1.1.35-1.2+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-61147",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00159,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "strukturag libde265 commit d9fea9d wa discovered to contain a segmenta ... in libde265-0 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libde265-0@1.0.15-1+b3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-47178",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0015,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. In version ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-47254",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0015,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. Prior to v ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56392",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00149,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "coreutils: GNU coreutils unexpand: Denial of Service via crafted tab stop values in coreutils has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-11979",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.8,
+      "epss_score": 0.00148,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libxml2: libxml2: Arbitrary code execution in xmlcatalog utility via buffer overflow in libxml2 has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libxml2@2.12.7+dfsg+really2.9.14-2.1+deb13u3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-54369",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00147,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "acl: Symlink traversal privilege escalation via libacl functions in libacl1 has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libacl1@2.3.2-2+b1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56410",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00139,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Integer overflow in xmlwf can lead to information disclosure and arbitrary code execution. in libexpat1 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56411",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00139,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "expat: libexpat: Integer Overflow Vulnerability Leading to Information Disclosure or Code Execution in libexpat1 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56412",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.9,
+      "epss_score": 0.00138,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Use-after-free vulnerability due to improper handling of XML CDATA sections in libexpat1 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-13757",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00136,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "p11-kit: Stack exhaustion via unbounded recursion in RPC attribute parsing in libp11-kit0 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libp11-kit0@0.25.5-3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56131",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00135,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat before 2.8.2 lacks handler call depth tracking for calls to X ... in libexpat1 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56406",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00134,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Arbitrary code execution via integer overflow in XML_ParseBuffer in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56409",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00134,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "xmlwf in libexpat before 2.8.2 has an integer overflow for the output  ... in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-54371",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00131,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "attr: Symlink Traversal Privilege Escalation via getfattr and setfattr in libattr1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libattr1@1:2.5.2-3"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-61145",
+      "cvss_severity": "LOW",
+      "cvss_score": 5,
+      "epss_score": 0.00131,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: libtiff: Denial of service via double free in tiffcrop.c in libtiff6 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-22185",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00127,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "OpenLDAP: OpenLDAP LMDB: Denial of Service and Information Disclosure via Heap Buffer Underflow in libldap2 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libldap2@2.6.10+dfsg-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-15649",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00127,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "perl-IO-Compress: perl-IO-Compress: Denial of Service via malformed DOS date in zip header in perl-base has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-42250",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00126,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "bzip2: bzip2: Denial of Service in bzip2recover via a specially crafted file in libbz2-1.0 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libbz2-1.0@1.0.8-6"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-3713",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00126,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libpng: libpng: Heap-based buffer overflow in pnm2png allows information disclosure and denial of service in libpng16-16t64 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libpng16-16t64@1.6.48-1+deb13u5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56408",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00125,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat before 2.8.2 has an integer overflow in copyString. in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56403",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.9,
+      "epss_score": 0.00125,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Arbitrary code execution due to integer overflow in storeAtts in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56404",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.9,
+      "epss_score": 0.00125,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat before 2.8.2 has an integer overflow in addBinding. in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56405",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.9,
+      "epss_score": 0.00125,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat: libexpat: Information disclosure and arbitrary code execution via integer overflow in libexpat1 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56407",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00124,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libexpat before 2.8.2 has an integer overflow in doProlog that is rela ... in libexpat1 has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-27456",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00118,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "util-linux: TOCTOU in the mount program when setting up loop devices in bsdutils has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-41991",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 4.7,
+      "epss_score": 0.00117,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "gzip: gzip: Arbitrary file overwrite via insecure temporary file handling in gzexe utility in gzip has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "gzip@1.13-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-3949",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00117,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif: libheif: Out-of-bounds read via local argument manipulation in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-61143",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.5,
+      "epss_score": 0.00113,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libtiff: libtiff: Denial of Service via NULL pointer dereference in tif_open.c in libtiff6 has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libtiff6@4.7.0-3+deb13u2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-50812",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00112,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "A NULL pointer dereference in the SQLite Session Extension in SQLite 3 ... in libsqlite3-0 has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-13595",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.0011,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "util-linux: util-linux: heap use-after-free in libblkid nested partition probing in bsdutils has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-50813",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0011,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "An issue in SQLite before Fossil check-in 869a51ae84df allows a local  ... in libsqlite3-0 has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-56132",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.9,
+      "epss_score": 0.00107,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "expat: libexpat: Arbitrary Code Execution via Heap-based Buffer Overflow in libexpat1 has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libexpat1@2.7.1-2"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-47714",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00107,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "libheif is a HEIF and AVIF file format decoder and encoder. In version ... in libheif-plugin-dav1d has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libheif-plugin-dav1d@1.19.8-1",
+        "libheif-plugin-libde265@1.19.8-1",
+        "libheif1@1.19.8-1"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2025-14017",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00106,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "curl: curl: Security bypass due to global TLS option changes in multi-threaded LDAPS transfers in curl has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "curl@8.14.1-2+deb13u4",
+        "libcurl4t64@8.14.1-2+deb13u4"
+      ]
+    },
+    {
+      "container_image": "nginx:latest",
+      "cve_id": "CVE-2026-54370",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00088,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "acl: TOCTOU Symlink Traversal via getfacl/setfacl in libacl1 has very low exploit probability (EPSS 0.0009). Safe to defer.",
+      "affected_packages": [
+        "libacl1@2.3.2-2+b1"
+      ]
+    }
+  ]
+}
