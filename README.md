@@ -136,6 +136,61 @@ docs/               # weekly-progress.md, proposal.md, literature-review.md
 
 ---
 
+## Usage (CLI)
+
+All functionality is exposed through a single entry point, `run.py`:
+
+```bash
+python run.py scan nginx:latest                                        # Stage 1: Trivy scan -> JSON
+python run.py enrich experiments/results/trivy_nginx_latest.json       # Stage 2: add EPSS scores
+python run.py triage experiments/results/epss_enriched_trivy_nginx_latest.json  # Stage 3: SSVC + LLM triage
+python run.py pipeline nginx:latest                                    # Stages 1-3 in one command
+```
+
+`triage` and `pipeline` also write a compact machine-readable
+`experiments/results/triage_run.json` (image, CVE, CVSS, EPSS, KEV status, SSVC
+decision, rationale, timestamp, errors).
+
+Optional LLM explanations use **Groq** or **Google Gemini** — set
+`GROQ_API_KEY` or `GOOGLE_API_KEY` in `.env` (see `.env.example`). The pipeline
+works without a key (deterministic explanations).
+
+## Project Structure
+
+```
+run.py              # unified CLI entry point
+src/
+  config.py         # repo-relative paths
+  pipeline.py       # scan -> enrich -> triage orchestrator
+  scanners/         # trivy_scanner.py
+  enrichment/       # epss_client.py, kev_client.py
+  triage/           # ssvc.py (decisions), engine.py (analysis), explain.py (LLM),
+                    # report.py (grouped reports), compact.py (triage_run.json),
+                    # triage_agent.py (LangGraph)
+experiments/results/  # scan outputs + committed triage_run.json
+docs/               # weekly-progress.md, proposal.md, literature-review.md
+```
+
+---
+
+## Roadmap to September 8, 2026
+
+**Current state:** 18 commits of real, substantial work (CVE watcher agent, NVD/OSV pollers, SBOM ingestion, Exploit-DB lookup, K8s context, SQLite schema) sitting unsubmitted on `abdul-hadi-week-06` — not behind on work, behind on process (issue #7).
+
+**Novel contribution target:** fuse SBOM component matching with *live* exploit-availability signals and Kubernetes runtime reachability — most SSVC-style triage tools score CVEs in the abstract; scoring by whether the vulnerable component is actually reachable/running in a live cluster is a genuinely current, under-addressed angle in DevSecOps triage.
+
+| Date | Milestone |
+|---|---|
+| **Aug 2 (urgent)** | Open the PR for the 18 pending commits now; commit a fresh `experiments/results/triage_run.json` |
+| Aug 9 | Fuse SBOM + live CVE feed + Exploit-DB signals into a single SSVC score |
+| Aug 16 | Add Kubernetes-runtime-reachability weighting — is the vulnerable component actually live in the cluster? |
+| Aug 23 | Benchmark the fused, reachability-aware score against CVSS-only and EPSS-only baselines on labeled incidents |
+| Aug 30 | Full write-up |
+| Sep 6 | Paper draft |
+| **Sep 8** | **Final submission** |
+
+---
+
 ## Supervisor Note
 
 This repository is managed by **CNIT/PNTLab Pisa, TECIP, Scuola Superiore Sant'Anna**.
