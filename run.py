@@ -82,6 +82,11 @@ def cmd_chat(args):
     run_chat()
 
 
+def cmd_gatekeeper(args):
+    from src.enforce.gatekeeper import run as run_gatekeeper
+    run_gatekeeper(args.triage_json, args.image)
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -135,6 +140,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     c = sub.add_parser("chat", help="Interactive CLI chatbot over the MCP tools")
     c.set_defaults(func=cmd_chat)
+
+    gk = sub.add_parser("gatekeeper", help="Generate OPA Gatekeeper policy YAML from a triage report")
+    gk.add_argument("triage_json", help="path to triage_run*.json or triage_report*.json")
+    gk.add_argument("--image", default=None, help="override container image name")
+    gk.set_defaults(func=cmd_gatekeeper)
 
     return p
 
