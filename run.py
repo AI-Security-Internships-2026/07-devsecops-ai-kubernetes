@@ -87,6 +87,11 @@ def cmd_gatekeeper(args):
     run_gatekeeper(args.triage_json, args.image)
 
 
+def cmd_falco_capture(args):
+    from src.runtime.falco_client import run as run_falco
+    run_falco(args.falco_output)
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -145,6 +150,10 @@ def build_parser() -> argparse.ArgumentParser:
     gk.add_argument("triage_json", help="path to triage_run*.json or triage_report*.json")
     gk.add_argument("--image", default=None, help="override container image name")
     gk.set_defaults(func=cmd_gatekeeper)
+
+    fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream into normalized alerts")
+    fc.add_argument("falco_output", help="path to Falco JSON output (one JSON object per line)")
+    fc.set_defaults(func=cmd_falco_capture)
 
     return p
 
