@@ -9,3 +9,6 @@ langchain-core>=0.3.0
 langchain-groq>=0.2.0
 langchain-google-genai>=2.0.0
 kubernetes>=29.0.0
+# MCP servers + interactive chatbot
+mcp>=1.0.0
+langchain-mcp-adapters>=0.1.0
