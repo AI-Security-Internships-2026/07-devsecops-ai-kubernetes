@@ -47,7 +47,34 @@ def cmd_triage(args):
 
 def cmd_pipeline(args):
     from src.pipeline import run_pipeline
-    run_pipeline(args.image)
+    run_pipeline(args.image, use_k8s_context=not args.no_k8s, use_exploit_db=not args.no_exploit)
+
+
+def cmd_db_setup(args):
+    from src.database.db import init_db
+    path = init_db()
+    print(f"[+] CVE intelligence database ready at: {path}")
+
+
+def cmd_sbom(args):
+    from src.database.sbom import generate_and_store
+    generate_and_store(args.image)
+
+
+def cmd_db_poll(args):
+    from src.database import db
+    db.init_db()
+    if args.source in ("nvd", "all"):
+        from src.database.pollers.nvd_poller import poll_nvd
+        poll_nvd(hours=args.hours)
+    if args.source in ("osv", "all"):
+        from src.database.pollers.osv_poller import poll_osv
+        poll_osv()
+
+
+def cmd_watch(args):
+    from src.database.watcher_agent import run_watch
+    run_watch()
 
 
 def _print_triage_summary(report_json: dict) -> None:
@@ -82,7 +109,24 @@ def build_parser() -> argparse.ArgumentParser:
 
     pl = sub.add_parser("pipeline", help="Full pipeline: scan -> enrich -> triage")
     pl.add_argument("image", help="e.g. nginx:latest")
+    pl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
+    pl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
     pl.set_defaults(func=cmd_pipeline)
+
+    ds = sub.add_parser("db-setup", help="Initialise the CVE intelligence database")
+    ds.set_defaults(func=cmd_db_setup)
+
+    sb = sub.add_parser("sbom", help="Generate + store a CycloneDX SBOM for an image")
+    sb.add_argument("image", help="e.g. nginx:latest")
+    sb.set_defaults(func=cmd_sbom)
+
+    dp = sub.add_parser("db-poll", help="Pull latest CVEs into the database (NVD/OSV)")
+    dp.add_argument("--source", choices=["nvd", "osv", "all"], default="all")
+    dp.add_argument("--hours", type=int, default=24, help="NVD: look back this many hours")
+    dp.set_defaults(func=cmd_db_poll)
+
+    w = sub.add_parser("watch", help="Run the CVE-intelligence watcher (fresh-CVE alerts)")
+    w.set_defaults(func=cmd_watch)
 
     return p
 

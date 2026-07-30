@@ -4,8 +4,13 @@ Pipeline orchestrator.
 Runs the full flow in one process:
     scan (Trivy) -> enrich (EPSS) -> triage (SSVC + LLM) -> report + triage_run.json
 
+Optional enrichers refine the triage decision when available:
+    - Kubernetes deployment context, cluster-optional
+    - Exploit-DB "public exploit exists" signal
+
 Usage:
     python run.py pipeline nginx:latest
+    python run.py pipeline nginx:latest --no-k8s --no-exploit
 """
 
 import sys
@@ -16,7 +21,31 @@ from src.triage.triage_agent import run_triage, save_reports
 from src.triage.compact import write_triage_run
 
 
-def run_pipeline(image: str):
+def _build_context_provider(use_k8s: bool, image: str):
+    """Return a callable(cve)->K8s context dict, or None. Cluster-optional."""
+    if not use_k8s:
+        return None
+    try:
+        from src.context.k8s_context import make_context_provider
+        return make_context_provider(image)
+    except Exception as e:
+        print(f"[*] K8s context unavailable ({e}); continuing without it")
+        return None
+
+
+def _build_exploit_lookup(use_exploit: bool):
+    """Return a callable(cve_id)->bool for public-exploit existence, or None."""
+    if not use_exploit:
+        return None
+    try:
+        from src.enrichment.exploit_db import make_exploit_lookup
+        return make_exploit_lookup()
+    except Exception as e:
+        print(f"[*] Exploit-DB lookup unavailable ({e}); continuing without it")
+        return None
+
+
+def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool = True):
     """Scan -> enrich -> triage for a single image. Returns the JSON report dict."""
     print(f"\n{'#'*70}\n# PIPELINE: {image}\n{'#'*70}")
 
@@ -31,9 +60,15 @@ def run_pipeline(image: str):
         print("[!] No CVEs to triage. Stopping.")
         return None
 
-    # Stage 3 — triage
+    # Stage 3 — triage (with optional Kubernetes context + Exploit-DB signal)
     print("\n--- Stage 3/3: SSVC + LLM triage ---")
-    report_md, report_json = run_triage(str(epss_path))
+    context_provider = _build_context_provider(use_k8s_context, image)
+    exploit_lookup = _build_exploit_lookup(use_exploit_db)
+    report_md, report_json = run_triage(
+        str(epss_path),
+        context_provider=context_provider,
+        exploit_lookup=exploit_lookup,
+    )
     md_path, json_path = save_reports(report_md, report_json, str(epss_path))
     run_path = write_triage_run(report_json, image)
 

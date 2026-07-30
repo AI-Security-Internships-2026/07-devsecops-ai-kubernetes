@@ -73,3 +73,11 @@ experiments/results/*.md
 
 # Week-5 deliverable: committed real end-to-end triage output
 !experiments/results/triage_run.json
+!triage_run_multus-cni_v3.9.3.json
+!triage_run_nginx.json
+
+# CVE intelligence DB + SBOM store + cached feeds (runtime-generated)
+data/cve_intel.db
+data/sboms/
+data/cache/
+!data/.gitkeep

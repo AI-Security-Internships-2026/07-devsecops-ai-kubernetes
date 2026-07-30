@@ -174,4 +174,81 @@ scanner/enrichment errors.
 
 ---
 
+## Week 6
+
+**Branch:** `abdul-hadi-week-06`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week
+- [x] **Kubernetes deployment context** — `src/context/k8s_context.py` reads the
+  cluster (pods, services, ingress, RBAC) to see if a scanned image is deployed,
+  internet-facing, or privileged, and feeds that into the SSVC decision
+  (cluster-optional — degrades gracefully with no cluster).
+- [x] **Exploit-DB signal** — `src/enrichment/exploit_db.py` flags CVEs with a
+  public exploit (SSVC "Automatable"), which escalates borderline findings.
+- [x] **Own CVE-intelligence database** — SQLite schema + `db.py`, SBOM
+  generation/storage, **NVD** + **OSV.dev** feed pollers, an SBOM×feed **matcher**,
+  and a LangGraph **watcher agent** that raises fresh-CVE alerts. Linux
+  `scripts/setup_database.sh` for setup.
+- [x] **SSVC context bugfix** — fixed over-aggressive escalation that had inflated
+  the alert count; context now adjusts a finding by at most one level and never
+  inflates the actionable set.
+- [x] Ran real end-to-end triage on two images and committed the machine-readable
+  outputs to `experiments/results/`.
+
+### End-to-End Results (committed)
+
+| Image | Total CVEs | Act | Attend | Track* | Track | Alert reduction |
+|-------|-----------:|----:|-------:|-------:|------:|----------------:|
+| `ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.3` (old, internet-facing pod) | 417 | 22 | 83 | 55 | 257 | 74.8% |
+| `nginx:latest` (current) | 167 | 0 | 0 | 0 | 167 | 100% |
+
+- Files: `experiments/results/triage_run_multus-cni_v3.9.3.json`,
+  `experiments/results/triage_run_nginx.json`.
+- On the multus image, the **Kubernetes context escalated 5 exploitable HIGH
+  findings to CRITICAL** because the pod was internet-facing (rationale recorded
+  per finding, e.g. *"escalated HIGH->CRITICAL: internet-facing + EPSS 0.073"*).
+- The contrast is the point: a **3-year-old image (multus)** has 22 urgent items,
+  while a **current image (nginx:latest)** has **0** — all its CVEs are low
+  exploit-probability. The tool cleanly separates the two.
+
+### The context bug we fixed (short)
+
+The first version of the K8s-context rule escalated *every* finding with EPSS ≥ 0.01
+(exposed) **and** *every* finding unconditionally (privileged), and the two
+**stacked** — so an exposed+privileged pod pushed criticals from 17 to **155**,
+inflating the alert list. Fixed: context now moves a finding **at most one level**,
+escalates only already-actionable HIGH→CRITICAL (EPSS ≥ 0.05, exposed/privileged),
+never touches the MEDIUM/LOW noise, and de-escalates only borderline internal-only
+criticals. Net: context **re-ranks urgency by deployment**, it does not flood the
+queue (actionable set stays stable).
+
+### Validation
+
+- Live: NVD poller ingested hundreds of recent CVEs; OSV poller returned + parsed
+  package vulns; the DB chain (SBOM → poll → match → classify) ran end-to-end; both
+  pipeline runs above completed with `errors: []`.
+
+### Problems / Blockers
+
+The SBOM×feed matcher uses loose numeric version comparison, so fresh-CVE matches
+are flagged `needs_verification` (distro backports don't always bump versions) —
+positioned as early warning, with Trivy as the confirmatory scan. Automated test
+suite still pending (manual verification for now).
+
+### Next week plan (Week 7)
+- **MCP servers + chatbot (full):** integrate and validate the seven MCP servers
+  (scanner, epss, ssvc, kev, cvedb, k8s-context, report), wire the interactive CLI
+  chatbot, and expose the same servers to Claude Code / Copilot via `.mcp.json` —
+  so an analyst can ask "why is CVE-X urgent?" in natural language.
+- **OPA Gatekeeper (policy generation):** generate Gatekeeper `ConstraintTemplate`
+  + `Constraint` YAML from triage findings (e.g., block Act-level images, require
+  pinned digests). YAML generation only this week; live admission enforcement is a
+  follow-up.
+- **Falco (runtime signal, lightweight):** install Falco in the Minikube cluster and
+  capture/parse its runtime alert stream (JSON). Capture-only this week; wiring the
+  runtime-observed signal into the SSVC decision is a follow-up.
+
+---
+
 _(Add a new section each week)_
