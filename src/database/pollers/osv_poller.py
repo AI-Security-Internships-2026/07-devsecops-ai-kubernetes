@@ -26,11 +26,7 @@ def choose_cve_id(vuln: dict) -> str:
     for alias in vuln.get("aliases", []):
         if alias.startswith("CVE-"):
             return alias
-    vid = vuln.get("id", "")
-    for alias in vuln.get("aliases", []):
-        if alias.startswith("CVE-"):
-            return alias
-    return vid
+    return vuln.get("id", "")
 
 
 def parse_osv_vuln(vuln: dict) -> dict:
