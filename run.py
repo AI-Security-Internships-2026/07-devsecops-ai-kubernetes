@@ -74,7 +74,7 @@ def cmd_db_poll(args):
 
 def cmd_watch(args):
     from src.database.watcher_agent import run_watch
-    run_watch()
+    run_watch(interval=args.interval)
 
 
 def cmd_chat(args):
@@ -141,6 +141,8 @@ def build_parser() -> argparse.ArgumentParser:
     dp.set_defaults(func=cmd_db_poll)
 
     w = sub.add_parser("watch", help="Run the CVE-intelligence watcher (fresh-CVE alerts)")
+    w.add_argument("--interval", type=int, default=None,
+                   help="seconds between passes for continuous mode (default: one-shot)")
     w.set_defaults(func=cmd_watch)
 
     c = sub.add_parser("chat", help="Interactive CLI chatbot over the MCP tools")
