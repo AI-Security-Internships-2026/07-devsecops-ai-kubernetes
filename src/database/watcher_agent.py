@@ -7,8 +7,8 @@ Ties the intelligence layer together:
     classify -> fresh-CVE rule (handles the EPSS-lag problem)
     report   -> write alerts to the DB + a markdown alert report
 
-The fresh-CVE classification is pure (unit-tested). LangGraph is imported
-lazily inside build_watch_graph() so this module loads without it.
+The fresh-CVE classification is pure and deterministic. LangGraph is imported lazily inside
+build_watch_graph() so this module loads without it.
 
 Fresh-CVE rule: a brand-new CVE has an artificially low EPSS for days,
 so we lean on compensating signals — KEV, public exploit, high CVSS — to decide

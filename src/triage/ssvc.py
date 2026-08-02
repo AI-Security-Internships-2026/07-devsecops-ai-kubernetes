@@ -1,7 +1,7 @@
 """
 SSVC decision logic (pure, no external dependencies).
 
-Kept free of LangGraph / network so it can be unit-tested in isolation.
+Kept free of LangGraph / network so it can be tested in isolation.
 
 Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Two optional
 refinements plug in here without changing callers:
