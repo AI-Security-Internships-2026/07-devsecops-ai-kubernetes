@@ -251,4 +251,56 @@ suite still pending (manual verification for now).
 
 ---
 
+## Week 7
+
+**Branch:** `abdul-hadi-week-07`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week
+- [x] **Seven MCP servers** (`src/mcp_servers/`) — scanner, epss, ssvc, kev, cvedb,
+  k8s-context, report — built on FastMCP (stdio), plus `.mcp.json` so Claude Code /
+  Copilot can call the same tools an analyst would.
+- [x] **Interactive CLI chatbot** (`run.py chat`, `src/chatbot/cli.py`) — a natural-
+  language assistant that answers questions about scans by calling the MCP tools
+  (Groq or Google Gemini backend), e.g. *"why would CVE-2023-45288 be critical?"*.
+- [x] **OPA Gatekeeper policy generation** (`run.py gatekeeper`,
+  `src/enforce/gatekeeper.py`) — emits `ConstraintTemplate` + `Constraint` YAML from a
+  triage report (block Act-level images, require pinned digests, deny privileged).
+  YAML generation only.
+- [x] **Falco runtime-alert capture** (`run.py falco-capture`,
+  `src/runtime/falco_client.py`) — parses a Falco JSON alert stream into normalised
+  records and matches them to an image. Capture-only.
+- [x] **Some fixes (from the Week 6):** the watcher now has a real
+  continuous mode (`watch --interval N`) instead of one-shot only; removed dead code in `osv_poller.choose_cve_id`; corrected a
+  stale `apply_context` docstring.
+- [x] **Dependency fix (issue #9):** `run.py chat` failed because pip had
+  installed `mcp 2.0.0` in the test environment, which removed `mcp.server.fastmcp` (our servers) and
+  `mcp.shared.context.RequestContext` (needed by `langchain-mcp-adapters`). Capped
+  `mcp>=1.9,<2.0` + `langchain-mcp-adapters>=0.3.0,<0.4`. Pure-Python version issue,
+  not architecture-specific.
+
+### Problems / Blockers
+- **Falco and Gatekeeper are standalone commands, not yet wired into the main
+  pipeline**. Full integration is the Week 8
+  focus: Falco → SSVC reachability weighting, and Gatekeeper YAML as a pipeline output.
+- **Chat CLI dependency** — the mcp 2.0 mismatch (issue #9) blocked the chatbot; fixed
+  via the version cap.
+
+### Next week plan (Week 8)
+- **Integrate Falco into the pipeline** — fold the runtime signal into the SSVC
+  decision as a *reachability* weighting (is the vulnerable component actually live in
+  the cluster?).
+- **Integrate Gatekeeper into the pipeline** — `pipeline --gatekeeper` auto-emits the
+  policy YAML as a run artifact, so one command does scan → decide → enforce.
+- **Kubernetes pod discovery** (`run.py discover`) — list running/stopped pods with
+  image, namespace, status and exposure. (A `scan-cluster` command that triages every
+  running image, plus automatic Falco-alert capture straight from the cluster, is
+  designed now and scheduled for the following week.)
+- **Watcher background service + status** — run the watcher in the background with a
+  PID/status file; `watch --status` shows a live summary and re-running `watch` detects
+  an already-running instance. Written OS-agnostically (with an optional systemd unit)
+  so future multi-architecture / multi-OS support drops in cleanly.
+
+---
+
 _(Add a new section each week)_
