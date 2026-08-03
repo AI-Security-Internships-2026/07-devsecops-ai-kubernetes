@@ -163,7 +163,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except RuntimeError as e:
+        print(f"[!] {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
