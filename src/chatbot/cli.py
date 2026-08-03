@@ -47,6 +47,26 @@ def load_server_config() -> dict:
     return servers
 
 
+def _message_text(message) -> str:
+    """Extract plain text from an LLM message whose `content` may be a string or a
+    list of content blocks. Gemini returns blocks like
+    {'type': 'text', 'text': ..., 'extras': {'signature': ...}}; printing the raw
+    list dumps the block repr (and the opaque thought signature), so pull the text.
+    """
+    content = getattr(message, "content", message)
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, dict):
+                parts.append(block.get("text") or block.get("content") or "")
+            else:
+                parts.append(str(block))
+        return "".join(parts).strip()
+    return str(content)
+
+
 async def _amain() -> None:
     load_dotenv()
     llm = get_llm()
@@ -92,8 +112,7 @@ async def _amain() -> None:
             result = await agent.ainvoke({"messages": history})
             messages = result["messages"]
             answer = messages[-1]
-            content = getattr(answer, "content", str(answer))
-            print(f"\nbot> {content}")
+            print(f"\nbot> {_message_text(answer)}")
             history = messages  # keep full context (incl. tool calls)
         except Exception as e:
             print(f"[!] Error: {e}")
