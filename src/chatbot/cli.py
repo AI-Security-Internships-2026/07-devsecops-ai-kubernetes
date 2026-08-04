@@ -26,11 +26,21 @@ from src import config
 from src.triage.explain import get_llm
 
 SYSTEM_PROMPT = (
-    "You are a Kubernetes DevSecOps assistant. You have tools to scan images, "
-    "look up EPSS scores, check the CISA KEV catalog, classify CVEs with SSVC, "
-    "query the CVE intelligence database, inspect Kubernetes context, and run "
-    "triage reports. Use tools when they help; be concise and actionable. When "
-    "you state a CVE is urgent, say why (EPSS, KEV, exploit, exposure)."
+    "You are a Kubernetes DevSecOps assistant with tools to scan images, look up "
+    "EPSS scores, check the CISA KEV catalog, classify CVEs with SSVC, query the "
+    "CVE intelligence database, inspect Kubernetes context, and read/generate "
+    "triage reports.\n\n"
+    "How to work:\n"
+    "- Be decisive. Call each tool AT MOST ONCE per CVE, then STOP and write the "
+    "answer. Never repeat a tool call you already made.\n"
+    "- To explain a CVE, the epss, kev and ssvc tools are usually enough. As soon "
+    "as you have that data, give the final answer — do not keep calling tools.\n"
+    "- You cannot browse the filesystem. Only use read_report if you were given an "
+    "exact file path. If read_report returns '[not found]', do NOT guess other "
+    "paths — just answer from the CVE-lookup tools using the CVE ID.\n"
+    "- Ignore stray text such as a pasted filename; extract the CVE ID and answer.\n"
+    "- Be concise and actionable. When you call a CVE urgent, say why (EPSS, KEV, "
+    "exploit, exposure)."
 )
 
 
@@ -109,13 +119,23 @@ async def _amain() -> None:
 
         history.append(HumanMessage(content=user))
         try:
-            result = await agent.ainvoke({"messages": history})
+            # recursion_limit caps runaway tool loops (a flailing model would
+            # otherwise call tools until langgraph's default ~25-step limit).
+            result = await agent.ainvoke(
+                {"messages": history},
+                config={"recursion_limit": 15},
+            )
             messages = result["messages"]
             answer = messages[-1]
             print(f"\nbot> {_message_text(answer)}")
             history = messages  # keep full context (incl. tool calls)
         except Exception as e:
-            print(f"[!] Error: {e}")
+            if "recursion" in str(e).lower():
+                print("[!] The assistant kept calling tools without converging. "
+                      "Try rephrasing (just the CVE ID), or set a stronger model, "
+                      "e.g. LLM_MODEL=gemini-2.5-pro.")
+            else:
+                print(f"[!] Error: {e}")
 
 
 def run_chat() -> None:
