@@ -278,13 +278,25 @@ suite still pending (manual verification for now).
   `mcp.shared.context.RequestContext` (needed by `langchain-mcp-adapters`). Capped
   `mcp>=1.9,<2.0` + `langchain-mcp-adapters>=0.3.0,<0.4`. Pure-Python version issue,
   not architecture-specific.
+- [x] **Chat CLI hardening (found during test-environment runs):** (1) a failed Trivy
+  scan called `sys.exit(1)` inside the scanner MCP server and crashed it, now raises
+  `RuntimeError`, so the server survives and returns a tool error; (2) fixed the
+  default Gemini model (retired preview → `gemini-2.5-flash`); (3) the assistant
+  printed raw message content blocks (incl. Gemini's thought signature), now prints
+  clean text; (4) the agent could loop over tool calls without answering, fixed with
+  a decisive system prompt + a `recursion_limit` cap.
 
 ### Problems / Blockers
 - **Falco and Gatekeeper are standalone commands, not yet wired into the main
   pipeline**. Full integration is the Week 8
   focus: Falco → SSVC reachability weighting, and Gatekeeper YAML as a pipeline output.
-- **Chat CLI dependency** — the mcp 2.0 mismatch (issue #9) blocked the chatbot; fixed
-  via the version cap.
+- **Chat CLI — resolved this week.** Three issues surfaced during test-environment
+  runs and were fixed: the mcp 2.0 dependency mismatch (#9), the scanner MCP server
+  crashing on a failed Trivy scan, and the agent looping over tool calls without
+  answering.
+- **Chat can't yet read saved reports by name** — the assistant answers from live CVE
+  lookups but cannot discover/load a saved `triage_run*.json` by image or "latest", so
+  it can't ground answers in a specific report.
 
 ### Next week plan (Week 8)
 - **Integrate Falco into the pipeline** — fold the runtime signal into the SSVC
@@ -300,7 +312,8 @@ suite still pending (manual verification for now).
   PID/status file; `watch --status` shows a live summary and re-running `watch` detects
   an already-running instance. Written OS-agnostically (with an optional systemd unit)
   so future multi-architecture / multi-OS support drops in cleanly.
-
+- **Chat: read saved reports** — add MCP tools to discover/load a `triage_run*.json`
+  by image or "latest", so the assistant can ground answers in a specific report.
 ---
 
 _(Add a new section each week)_
