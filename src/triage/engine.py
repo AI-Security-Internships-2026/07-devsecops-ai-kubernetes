@@ -20,6 +20,7 @@ def analyze_cves(
     kev_ids: set,
     context_provider=None,
     exploit_lookup=None,
+    runtime_provider=None,
     llm="auto",
     verbose: bool = True,
 ) -> list[dict]:
@@ -31,6 +32,7 @@ def analyze_cves(
         kev_ids: set of CISA KEV CVE IDs
         context_provider: optional callable(cve)->K8s context dict (P3)
         exploit_lookup: optional callable(cve_id)->bool (P4)
+        runtime_provider: optional callable(cve)->Falco runtime signal dict
         llm: "auto" (auto-detect), an LLM instance, or None (static only)
 
     Returns:
@@ -58,7 +60,15 @@ def analyze_cves(
             except Exception:
                 context = None
 
-        result = ssvc.analyze(cve_with_kev, in_kev, context=context, exploit_exists=exploit_exists)
+        runtime = None
+        if runtime_provider:
+            try:
+                runtime = runtime_provider(cve)
+            except Exception:
+                runtime = None
+
+        result = ssvc.analyze(cve_with_kev, in_kev, context=context,
+                              exploit_exists=exploit_exists, runtime=runtime)
         priority, decision, notes = result["priority"], result["decision"], result["notes"]
 
         llm_result = None

@@ -7,10 +7,12 @@ Runs the full flow in one process:
 Optional enrichers refine the triage decision when available:
     - Kubernetes deployment context, cluster-optional
     - Exploit-DB "public exploit exists" signal
+    - Falco runtime-reachability signal (--falco <alert stream>)
 
 Usage:
     python run.py pipeline nginx:latest
     python run.py pipeline nginx:latest --no-k8s --no-exploit
+    python run.py pipeline nginx:latest --falco falco_alerts.json
 """
 
 import sys
@@ -45,7 +47,53 @@ def _build_exploit_lookup(use_exploit: bool):
         return None
 
 
-def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool = True):
+# Falco alert priorities, most-severe first (for picking the image's top signal).
+_FALCO_PRIORITY_ORDER = {
+    "EMERGENCY": 0, "ALERT": 1, "CRITICAL": 2, "ERROR": 3,
+    "WARNING": 4, "NOTICE": 5, "INFORMATIONAL": 6, "DEBUG": 7,
+}
+
+
+def _build_runtime_provider(falco_path: str | None, image: str):
+    """
+    Build a callable(cve)->runtime signal dict from a Falco JSON alert stream.
+
+    Image-level: the same signal applies to every finding in the image (Falco maps
+    alerts to a pod/image, not to a CVE). Returns None if no Falco input is given
+    or the file can't be read.
+    """
+    if not falco_path:
+        return None
+    try:
+        from src.runtime.falco_client import parse_falco_stream, alerts_for_image
+        alerts = alerts_for_image(parse_falco_stream(falco_path), image)
+    except Exception as e:
+        print(f"[*] Falco runtime signal unavailable ({e}); continuing without it")
+        return None
+
+    if not alerts:
+        print(f"[*] Falco: no runtime alerts matched {image}; runtime signal is empty")
+        runtime = {"available": True, "count": 0}
+    else:
+        top = sorted(alerts, key=lambda a: _FALCO_PRIORITY_ORDER.get(
+            (a.get("priority") or "").upper(), 9))
+        runtime = {
+            "available": True,
+            "count": len(alerts),
+            "max_priority": top[0].get("priority", ""),
+            "rules": [a.get("rule", "") for a in top[:5] if a.get("rule")],
+        }
+        print(f"[+] Falco runtime signal for {image}: {runtime['count']} alert(s), "
+              f"max priority {runtime['max_priority'] or '-'}")
+
+    def provider(_cve: dict) -> dict:
+        return runtime
+
+    return provider
+
+
+def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool = True,
+                 falco_path: str | None = None):
     """Scan -> enrich -> triage for a single image. Returns the JSON report dict."""
     print(f"\n{'#'*70}\n# PIPELINE: {image}\n{'#'*70}")
 
@@ -64,10 +112,12 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
     print("\n--- Stage 3/3: SSVC + LLM triage ---")
     context_provider = _build_context_provider(use_k8s_context, image)
     exploit_lookup = _build_exploit_lookup(use_exploit_db)
+    runtime_provider = _build_runtime_provider(falco_path, image)
     report_md, report_json = run_triage(
         str(epss_path),
         context_provider=context_provider,
         exploit_lookup=exploit_lookup,
+        runtime_provider=runtime_provider,
     )
     md_path, json_path = save_reports(report_md, report_json, str(epss_path))
     run_path = write_triage_run(report_json, image)

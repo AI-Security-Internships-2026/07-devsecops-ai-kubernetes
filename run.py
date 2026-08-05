@@ -47,7 +47,8 @@ def cmd_triage(args):
 
 def cmd_pipeline(args):
     from src.pipeline import run_pipeline
-    run_pipeline(args.image, use_k8s_context=not args.no_k8s, use_exploit_db=not args.no_exploit)
+    run_pipeline(args.image, use_k8s_context=not args.no_k8s,
+                 use_exploit_db=not args.no_exploit, falco_path=args.falco)
 
 
 def cmd_db_setup(args):
@@ -126,6 +127,8 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("image", help="e.g. nginx:latest")
     pl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
     pl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
+    pl.add_argument("--falco", default=None,
+                    help="Falco JSON alert stream to fold in as a runtime-reachability signal")
     pl.set_defaults(func=cmd_pipeline)
 
     ds = sub.add_parser("db-setup", help="Initialise the CVE intelligence database")

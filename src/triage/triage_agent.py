@@ -51,6 +51,7 @@ class TriageState(TypedDict):
     kev_catalog: set
     context_provider: object  # optional callable(image/pkg) -> context dict; P3
     exploit_lookup: object    # optional callable(cve_id) -> bool; P4
+    runtime_provider: object  # optional callable(cve) -> Falco runtime signal dict
     analyzed_cves: list[dict]
     report_markdown: str
     report_json: dict
@@ -103,6 +104,7 @@ def analysis_node(state: TriageState) -> dict:
         state["kev_catalog"],
         context_provider=state.get("context_provider"),
         exploit_lookup=state.get("exploit_lookup"),
+        runtime_provider=state.get("runtime_provider"),
         llm=llm,
     )
 
@@ -145,13 +147,15 @@ def build_triage_graph() -> StateGraph:
     return graph
 
 
-def run_triage(input_file: str, context_provider=None, exploit_lookup=None) -> tuple[str, dict]:
+def run_triage(input_file: str, context_provider=None, exploit_lookup=None,
+               runtime_provider=None) -> tuple[str, dict]:
     """
     Run the full triage pipeline on an EPSS-enriched JSON file.
 
     Optional:
-        context_provider(cve_dict) -> K8s context dict   (P3)
-        exploit_lookup(cve_id) -> bool                    (P4)
+        context_provider(cve_dict) -> K8s context dict
+        exploit_lookup(cve_id) -> bool
+        runtime_provider(cve_dict) -> Falco runtime signal  (runtime reachability)
     """
     app = build_triage_graph().compile()
 
@@ -165,6 +169,7 @@ def run_triage(input_file: str, context_provider=None, exploit_lookup=None) -> t
         "kev_catalog": set(),
         "context_provider": context_provider,
         "exploit_lookup": exploit_lookup,
+        "runtime_provider": runtime_provider,
         "analyzed_cves": [],
         "report_markdown": "",
         "report_json": {},
