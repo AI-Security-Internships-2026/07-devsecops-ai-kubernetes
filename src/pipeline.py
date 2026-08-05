@@ -13,6 +13,7 @@ Usage:
     python run.py pipeline nginx:latest
     python run.py pipeline nginx:latest --no-k8s --no-exploit
     python run.py pipeline nginx:latest --falco falco_alerts.json
+    python run.py pipeline nginx:latest --gatekeeper
 """
 
 import sys
@@ -93,7 +94,7 @@ def _build_runtime_provider(falco_path: str | None, image: str):
 
 
 def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool = True,
-                 falco_path: str | None = None):
+                 falco_path: str | None = None, gatekeeper: bool = False):
     """Scan -> enrich -> triage for a single image. Returns the JSON report dict."""
     print(f"\n{'#'*70}\n# PIPELINE: {image}\n{'#'*70}")
 
@@ -125,6 +126,16 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
     print(f"\n[+] Markdown report: {md_path}")
     print(f"[+] JSON report:     {json_path}")
     print(f"[+] Compact output:  {run_path}")
+
+    # Optional: emit OPA Gatekeeper policy YAML from the triage result, so one
+    # pipeline run does scan -> decide -> (generate) enforce.
+    if gatekeeper:
+        try:
+            from src.enforce.gatekeeper import run as run_gatekeeper
+            gk_path = run_gatekeeper(str(run_path), image)
+            print(f"[+] Gatekeeper policy: {gk_path}")
+        except Exception as e:
+            print(f"[*] Gatekeeper generation skipped ({e})")
 
     s = report_json.get("summary", {})
     print(f"\n{'='*70}\nPIPELINE COMPLETE — {image}\n{'='*70}")

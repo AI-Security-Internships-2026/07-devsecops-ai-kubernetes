@@ -48,7 +48,8 @@ def cmd_triage(args):
 def cmd_pipeline(args):
     from src.pipeline import run_pipeline
     run_pipeline(args.image, use_k8s_context=not args.no_k8s,
-                 use_exploit_db=not args.no_exploit, falco_path=args.falco)
+                 use_exploit_db=not args.no_exploit, falco_path=args.falco,
+                 gatekeeper=args.gatekeeper)
 
 
 def cmd_db_setup(args):
@@ -129,6 +130,8 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
     pl.add_argument("--falco", default=None,
                     help="Falco JSON alert stream to fold in as a runtime-reachability signal")
+    pl.add_argument("--gatekeeper", action="store_true",
+                    help="also emit OPA Gatekeeper policy YAML from the triage result")
     pl.set_defaults(func=cmd_pipeline)
 
     ds = sub.add_parser("db-setup", help="Initialise the CVE intelligence database")
