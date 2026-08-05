@@ -94,6 +94,40 @@ def cmd_falco_capture(args):
     run_falco(args.falco_output)
 
 
+def cmd_discover(args):
+    import json as _json
+    from src import config
+    from src.context.k8s_context import discover_pods
+
+    inv = discover_pods(namespace=args.namespace)
+    if not inv.get("available"):
+        print("[!] No reachable Kubernetes cluster (or the kubernetes package is missing).")
+        return
+    pods = inv["pods"]
+    if not pods:
+        print("[*] No pods found.")
+        return
+
+    print(f"\n{'NAMESPACE':<18} {'POD':<34} {'PHASE':<11} {'EXPOSURE':<12} {'PRIV':<5} IMAGE")
+    print("-" * 108)
+    for p in pods:
+        img = p["images"][0] if p["images"] else "-"
+        exposure = p["exposure_type"] or ("exposed" if p["exposed"] else "internal")
+        priv = "yes" if p["privileged"] else "no"
+        print(f"{p['namespace']:<18.18} {p['pod']:<34.34} {p['phase']:<11.11} "
+              f"{exposure:<12.12} {priv:<5} {img}")
+
+    running = sum(1 for p in pods if p["phase"] == "Running")
+    exposed = sum(1 for p in pods if p["exposed"])
+    privileged = sum(1 for p in pods if p["privileged"])
+    print(f"\n[+] {len(pods)} pods ({running} Running) | {exposed} exposed | {privileged} privileged")
+
+    config.ensure_dirs()
+    out = config.RESULTS_DIR / "cluster_inventory.json"
+    out.write_text(_json.dumps(inv, indent=2), encoding="utf-8")
+    print(f"[+] Inventory written: {out}")
+
+
 def _print_triage_summary(report_json: dict) -> None:
     summary = report_json.get("summary", {})
     print(f"\n{'='*70}\nTRIAGE COMPLETE\n{'='*70}")
@@ -162,6 +196,10 @@ def build_parser() -> argparse.ArgumentParser:
     fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream into normalized alerts")
     fc.add_argument("falco_output", help="path to Falco JSON output (one JSON object per line)")
     fc.set_defaults(func=cmd_falco_capture)
+
+    dc = sub.add_parser("discover", help="Discover pods in the cluster (image, status, exposure, privilege)")
+    dc.add_argument("--namespace", default=None, help="limit to a single namespace")
+    dc.set_defaults(func=cmd_discover)
 
     return p
 
