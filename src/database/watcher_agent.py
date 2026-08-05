@@ -17,11 +17,19 @@ urgency before EPSS matures.
 Usage:
     python run.py watch                  # one-shot: a single collect->classify->report pass
     python run.py watch --interval 3600  # continuous: repeat every 3600s until Ctrl-C
+    python run.py watch --status         # is a watcher running? show a summary
+    python run.py watch --stop           # stop a running background watcher
 
-By default this runs ONE pass (intended to be driven by an external scheduler
-such as cron or a systemd timer). Pass --interval to have it loop itself.
+By default this runs ONE pass (intended to be driven by an external scheduler such
+as cron or a systemd timer). Pass --interval to loop it; run it in the background
+(e.g. `nohup ... &` or the systemd unit in scripts/) and use --status to check on
+it. A PID + status file (data/watcher.pid, data/watcher_status.json) back the
+--status/--stop commands and keep a second watcher from double-starting.
 """
 
+import json
+import os
+import signal
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -183,27 +191,164 @@ def _watch_once() -> dict:
     return final
 
 
-def run_watch(interval: int | None = None) -> dict:
-    """
-    Run the watcher.
+# ---------------------------------------------------------------------------
+# Background-service plumbing (PID + status files)
+#
+# Stdlib-only and deliberately OS-neutral in the core logic so multi-arch /
+# multi-OS support can drop in later. The systemd unit in scripts/ is one optional
+# way to run this as a managed background service on Linux; it is not required.
+# ---------------------------------------------------------------------------
 
-    One-shot by default (a single pass), suitable for an external scheduler
-    (cron / systemd timer). Pass `interval` (seconds) to run continuously: the
-    pass repeats every `interval` seconds until interrupted (Ctrl-C).
+def _pid_path() -> Path:
+    return config.DATA_DIR / "watcher.pid"
+
+
+def _status_path() -> Path:
+    return config.DATA_DIR / "watcher_status.json"
+
+
+def _pid_alive(pid: int) -> bool:
+    """Best-effort, portable 'is this pid alive?' check."""
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)          # POSIX: signal 0 only checks existence
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True              # exists but owned by someone else
+    except OSError:
+        return False             # e.g. not supported on this OS -> not verifiable
+    return True
+
+
+def _running_pid() -> int | None:
+    """Pid of a live watcher from the pid file, clearing a stale file."""
+    pp = _pid_path()
+    if not pp.exists():
+        return None
+    try:
+        pid = int(pp.read_text(encoding="utf-8").strip())
+    except (ValueError, OSError):
+        return None
+    if _pid_alive(pid):
+        return pid
+    try:
+        pp.unlink()
+    except OSError:
+        pass
+    return None
+
+
+def _write_pid() -> None:
+    config.ensure_dirs()
+    _pid_path().write_text(str(os.getpid()), encoding="utf-8")
+
+
+def _clear_pid() -> None:
+    pp = _pid_path()
+    try:
+        if pp.exists() and pp.read_text(encoding="utf-8").strip() == str(os.getpid()):
+            pp.unlink()
+    except OSError:
+        pass
+
+
+def _write_status(final: dict, started_at: str, passes: int) -> None:
+    classified = (final or {}).get("classified", [])
+    fresh_crit = sum(1 for c in classified if c.get("priority") == "FRESH-CRITICAL")
+    status = {
+        "pid": os.getpid(),
+        "started_at": started_at,
+        "last_run": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "passes": passes,
+        "total_matches": len(classified),
+        "fresh_critical": fresh_crit,
+    }
+    config.ensure_dirs()
+    _status_path().write_text(json.dumps(status, indent=2), encoding="utf-8")
+
+
+def _print_status() -> None:
+    pid = _running_pid()
+    sp = _status_path()
+    if sp.exists():
+        s = json.loads(sp.read_text(encoding="utf-8"))
+        print(f"[*] Watcher status: {'RUNNING' if pid else 'stopped'}")
+        if pid:
+            print(f"    pid:         {pid}")
+        print(f"    started:     {s.get('started_at', '-')}")
+        print(f"    last pass:   {s.get('last_run', '-')}")
+        print(f"    passes:      {s.get('passes', 0)}")
+        print(f"    matches:     {s.get('total_matches', 0)} "
+              f"({s.get('fresh_critical', 0)} FRESH-CRITICAL)")
+    else:
+        print("[*] Watcher status: no run recorded yet.")
+    if not pid:
+        print("[*] No live watcher process.")
+
+
+def _stop_running() -> None:
+    pid = _running_pid()
+    if not pid:
+        print("[*] No running watcher to stop.")
+        return
+    try:
+        os.kill(pid, signal.SIGTERM)
+        print(f"[+] Sent stop signal to watcher (pid {pid}).")
+    except OSError as e:
+        print(f"[!] Could not stop pid {pid}: {e}")
+
+
+def run_watch(interval: int | None = None, status: bool = False, stop: bool = False) -> dict:
+    """
+    Run the watcher, or query/stop a background one.
+
+    - status=True : print whether a watcher is running + a summary, then return.
+    - stop=True   : signal a running background watcher to stop, then return.
+    - interval=None (default): one pass (suitable for cron / a systemd timer).
+    - interval=N  : run continuously every N seconds until Ctrl-C or `--stop`.
+
+    While running it writes data/watcher.pid + data/watcher_status.json. If a live
+    watcher is already running, a new invocation prints its status and refuses to
+    start a second one.
     """
     db.init_db()
-    if interval is None:
-        return _watch_once()
 
-    print(f"[*] Continuous watch: repeating every {interval}s (Ctrl-C to stop)")
+    if status:
+        _print_status()
+        return {}
+    if stop:
+        _stop_running()
+        return {}
+
+    existing = _running_pid()
+    if existing:
+        print(f"[*] A watcher is already running (pid {existing}); not starting another.")
+        _print_status()
+        return {}
+
+    started_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    _write_pid()
+    passes = 0
     final: dict = {}
     try:
-        while True:
+        if interval is None:
+            passes = 1
             final = _watch_once()
+            _write_status(final, started_at, passes)
+            return final
+        print(f"[*] Continuous watch: repeating every {interval}s (Ctrl-C to stop)")
+        while True:
+            passes += 1
+            final = _watch_once()
+            _write_status(final, started_at, passes)
             time.sleep(interval)
     except KeyboardInterrupt:
         print("\n[*] Watcher stopped.")
-    return final
+        return final
+    finally:
+        _clear_pid()
 
 
 if __name__ == "__main__":

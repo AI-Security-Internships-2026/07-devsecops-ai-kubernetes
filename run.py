@@ -76,7 +76,7 @@ def cmd_db_poll(args):
 
 def cmd_watch(args):
     from src.database.watcher_agent import run_watch
-    run_watch(interval=args.interval)
+    run_watch(interval=args.interval, status=args.status, stop=args.stop)
 
 
 def cmd_chat(args):
@@ -183,6 +183,10 @@ def build_parser() -> argparse.ArgumentParser:
     w = sub.add_parser("watch", help="Run the CVE-intelligence watcher (fresh-CVE alerts)")
     w.add_argument("--interval", type=int, default=None,
                    help="seconds between passes for continuous mode (default: one-shot)")
+    w.add_argument("--status", action="store_true",
+                   help="show whether a watcher is running + a summary")
+    w.add_argument("--stop", action="store_true",
+                   help="stop a running background watcher")
     w.set_defaults(func=cmd_watch)
 
     c = sub.add_parser("chat", help="Interactive CLI chatbot over the MCP tools")
