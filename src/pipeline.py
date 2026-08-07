@@ -16,8 +16,10 @@ Usage:
     python run.py pipeline nginx:latest --gatekeeper
 """
 
+import json
 import sys
 
+from src import config
 from src.scanners.trivy_scanner import run_trivy_scan
 from src.enrichment import epss_client
 from src.triage.triage_agent import run_triage, save_reports
@@ -151,6 +153,74 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
     print(f"  Alert reduction:   {s.get('alert_reduction_pct', 0)}%")
     print("=" * 70)
     return report_json
+
+
+def run_scan_cluster(use_k8s_context: bool = True, use_exploit_db: bool = True,
+                     falco_live: bool = False, namespace: str | None = None):
+    """
+    Discover the images running in the cluster, triage each with K8s context (and,
+    if falco_live, one cluster-wide Falco capture reused for every image), and write
+    an aggregate report. Composes discover + pipeline + runtime reachability.
+    """
+    from src.context.k8s_context import discover_pods
+
+    inv = discover_pods(namespace=namespace)
+    if not inv.get("available"):
+        print("[!] scan-cluster needs a reachable Kubernetes cluster.")
+        return None
+    running = [p for p in inv["pods"] if p.get("phase") == "Running"]
+    images = sorted({img for p in running for img in p.get("images", [])})
+    if not images:
+        print("[*] No running images to scan.")
+        return None
+    print(f"\n{'#'*70}\n# SCAN-CLUSTER: {len(images)} running image(s)\n{'#'*70}")
+
+    # Capture Falco ONCE for the whole cluster, reused for every image.
+    falco_file = None
+    if falco_live:
+        from src.runtime.falco_client import run_live
+        try:
+            falco_file = str(run_live())
+        except Exception as e:
+            print(f"[*] Falco live capture failed ({e}); continuing without runtime signal")
+
+    results = []
+    for img in images:
+        try:
+            report = run_pipeline(img, use_k8s_context=use_k8s_context,
+                                  use_exploit_db=use_exploit_db, falco_path=falco_file)
+            results.append({"image": img, "summary": (report or {}).get("summary", {})})
+        except Exception as e:
+            print(f"[!] {img}: pipeline failed ({e})")
+            results.append({"image": img, "error": str(e)})
+
+    _write_cluster_report(results)
+    return results
+
+
+def _write_cluster_report(results: list[dict]) -> None:
+    """Write the aggregate cluster-scan report (markdown + json)."""
+    config.ensure_dirs()
+    lines = ["# Cluster Scan Report", "",
+             f"Images triaged: {len(results)}", "",
+             "| Image | CVEs | Act | Attend | Track* | Track | Reduction |",
+             "|-------|-----:|----:|-------:|-------:|------:|----------:|"]
+    for r in results:
+        if r.get("error"):
+            lines.append(f"| `{r['image']}` | _error: {r['error']}_ |  |  |  |  |  |")
+            continue
+        s = r["summary"]
+        lines.append(
+            f"| `{r['image']}` | {s.get('total_cves', 0)} | {s.get('critical_act', 0)} | "
+            f"{s.get('high_attend', 0)} | {s.get('medium_track_star', 0)} | "
+            f"{s.get('low_track', 0)} | {s.get('alert_reduction_pct', 0)}% |")
+    md_path = config.RESULTS_DIR / "scan_cluster_report.md"
+    md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    json_path = config.RESULTS_DIR / "scan_cluster_report.json"
+    json_path.write_text(json.dumps({"images": results}, indent=2), encoding="utf-8")
+    print(f"\n{'='*70}\nSCAN-CLUSTER COMPLETE — {len(results)} image(s)\n{'='*70}")
+    print(f"[+] Aggregate report: {md_path}")
+    print(f"[+] JSON:             {json_path}")
 
 
 def main():

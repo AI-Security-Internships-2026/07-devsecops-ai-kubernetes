@@ -99,6 +99,12 @@ def cmd_falco_capture(args):
         print("[!] Provide a Falco JSON file, or use --live to pull from the cluster.")
 
 
+def cmd_scan_cluster(args):
+    from src.pipeline import run_scan_cluster
+    run_scan_cluster(use_k8s_context=not args.no_k8s, use_exploit_db=not args.no_exploit,
+                     falco_live=args.falco_live, namespace=args.namespace)
+
+
 def cmd_discover(args):
     import json as _json
     from src import config
@@ -216,6 +222,15 @@ def build_parser() -> argparse.ArgumentParser:
     dc = sub.add_parser("discover", help="Discover pods in the cluster (image, status, exposure, privilege)")
     dc.add_argument("--namespace", default=None, help="limit to a single namespace")
     dc.set_defaults(func=cmd_discover)
+
+    scl = sub.add_parser("scan-cluster",
+                         help="Discover running images and triage each one (cluster-wide report)")
+    scl.add_argument("--namespace", default=None, help="limit to a single namespace")
+    scl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
+    scl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
+    scl.add_argument("--falco-live", action="store_true",
+                     help="capture Falco alerts live and fold in runtime reachability per image")
+    scl.set_defaults(func=cmd_scan_cluster)
 
     return p
 
