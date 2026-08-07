@@ -55,19 +55,22 @@ _FALCO_PRIORITY_ORDER = {
 }
 
 
-def _build_runtime_provider(falco_path: str | None, image: str):
+def _build_runtime_provider(falco_path: str | None, falco_live: bool, image: str):
     """
-    Build a callable(cve)->runtime signal dict from a Falco JSON alert stream.
+    Build a callable(cve)->runtime signal dict from a Falco alert stream.
 
-    Image-level: the same signal applies to every finding in the image (Falco maps
-    alerts to a pod/image, not to a CVE). Returns None if no Falco input is given
-    or the file can't be read.
+    Source is either a captured file (`falco_path`) or a live pull from the running
+    cluster (`falco_live`). Image-level: the same signal applies to every finding in
+    the image (Falco maps alerts to a pod/image, not to a CVE). Returns None if no
+    Falco source is requested or it can't be read.
     """
-    if not falco_path:
+    if not falco_path and not falco_live:
         return None
     try:
-        from src.runtime.falco_client import parse_falco_stream, alerts_for_image
-        alerts = alerts_for_image(parse_falco_stream(falco_path), image)
+        from src.runtime.falco_client import (
+            parse_falco_stream, alerts_for_image, capture_from_cluster)
+        all_alerts = capture_from_cluster() if falco_live else parse_falco_stream(falco_path)
+        alerts = alerts_for_image(all_alerts, image)
     except Exception as e:
         print(f"[*] Falco runtime signal unavailable ({e}); continuing without it")
         return None
@@ -94,7 +97,8 @@ def _build_runtime_provider(falco_path: str | None, image: str):
 
 
 def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool = True,
-                 falco_path: str | None = None, gatekeeper: bool = False):
+                 falco_path: str | None = None, falco_live: bool = False,
+                 gatekeeper: bool = False):
     """Scan -> enrich -> triage for a single image. Returns the JSON report dict."""
     print(f"\n{'#'*70}\n# PIPELINE: {image}\n{'#'*70}")
 
@@ -113,7 +117,7 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
     print("\n--- Stage 3/3: SSVC + LLM triage ---")
     context_provider = _build_context_provider(use_k8s_context, image)
     exploit_lookup = _build_exploit_lookup(use_exploit_db)
-    runtime_provider = _build_runtime_provider(falco_path, image)
+    runtime_provider = _build_runtime_provider(falco_path, falco_live, image)
     report_md, report_json = run_triage(
         str(epss_path),
         context_provider=context_provider,

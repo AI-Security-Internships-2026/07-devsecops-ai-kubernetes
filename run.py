@@ -49,7 +49,7 @@ def cmd_pipeline(args):
     from src.pipeline import run_pipeline
     run_pipeline(args.image, use_k8s_context=not args.no_k8s,
                  use_exploit_db=not args.no_exploit, falco_path=args.falco,
-                 gatekeeper=args.gatekeeper)
+                 falco_live=args.falco_live, gatekeeper=args.gatekeeper)
 
 
 def cmd_db_setup(args):
@@ -90,8 +90,13 @@ def cmd_gatekeeper(args):
 
 
 def cmd_falco_capture(args):
-    from src.runtime.falco_client import run as run_falco
-    run_falco(args.falco_output)
+    from src.runtime.falco_client import run as run_falco, run_live
+    if args.live:
+        run_live(namespace=args.namespace)
+    elif args.falco_output:
+        run_falco(args.falco_output)
+    else:
+        print("[!] Provide a Falco JSON file, or use --live to pull from the cluster.")
 
 
 def cmd_discover(args):
@@ -163,7 +168,9 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
     pl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
     pl.add_argument("--falco", default=None,
-                    help="Falco JSON alert stream to fold in as a runtime-reachability signal")
+                    help="Falco JSON alert stream (file) to fold in as a runtime-reachability signal")
+    pl.add_argument("--falco-live", action="store_true",
+                    help="capture the Falco signal live from the running cluster (no file)")
     pl.add_argument("--gatekeeper", action="store_true",
                     help="also emit OPA Gatekeeper policy YAML from the triage result")
     pl.set_defaults(func=cmd_pipeline)
@@ -197,8 +204,13 @@ def build_parser() -> argparse.ArgumentParser:
     gk.add_argument("--image", default=None, help="override container image name")
     gk.set_defaults(func=cmd_gatekeeper)
 
-    fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream into normalized alerts")
-    fc.add_argument("falco_output", help="path to Falco JSON output (one JSON object per line)")
+    fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream (file, or --live from the cluster)")
+    fc.add_argument("falco_output", nargs="?", default=None,
+                    help="path to Falco JSON output (one JSON object per line)")
+    fc.add_argument("--live", action="store_true",
+                    help="capture straight from the running cluster's Falco pods (no file)")
+    fc.add_argument("--namespace", default="falco",
+                    help="Falco namespace for --live (default: falco)")
     fc.set_defaults(func=cmd_falco_capture)
 
     dc = sub.add_parser("discover", help="Discover pods in the cluster (image, status, exposure, privilege)")
