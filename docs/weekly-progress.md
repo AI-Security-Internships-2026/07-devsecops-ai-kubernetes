@@ -342,7 +342,11 @@ suite still pending (manual verification for now).
   the assistant answer about a saved triage report (by image or "latest") grounded
   in the stored SSVC decision/rationale, instead of guessing paths or re-scanning.
 - [x] Update README with the new commands.
-
+- [x] **`scan-cluster` + automatic Falco capture** —
+  `run.py scan-cluster [--falco-live]` discovers running images and triages each with
+  K8s context + runtime reachability into one aggregate report; Falco can now be
+  captured live from the cluster (`falco-capture --live`, `pipeline --falco-live`),
+  removing the manual `kubectl logs > file` step.
 ### Falco → SSVC design note
 Falco maps alerts to a pod/container/image, not to a CVE, so this is an
 *image-level* reachability signal,
@@ -352,16 +356,17 @@ critical-tier alert), so it re-ranks urgency without inflating the actionable se
 consistent with the K8s-context escalation-capping fix.
 
 ### Problems / Blockers
-- **Automatic Falco capture not in yet** — `--falco` still takes a captured file;
-  pulling alerts straight from the running cluster (`--falco-live`) is designed and
-  scheduled with `scan-cluster` feature.
+- **Gatekeeper is generate-only** — the pipeline emits policy YAML, but nothing
+  installs Gatekeeper or applies it, so a bad deploy isn't actually blocked yet. Live
+  admission enforcement is a follow-up.
 
 ### Next week plan (Week 9)
-- **`scan-cluster`** — discover running images → triage each with K8s context +
-  runtime reachability → one cluster-wide report; plus **automatic Falco capture**
-  (`--falco-live`) straight from the cluster (no manual file).
 - **Evaluation for the paper** — reachability-aware score vs CVSS-only / EPSS-only
-  baselines (issue #10, TNSM target).
+  baselines, KEV recall (issue #10, TNSM target). *Critical path.*
+- **Scan-to-scan diff** — "what changed since last scan" for an image (new / fixed
+  CVEs, decision changes), from the history already in the DB / triage_run files.
+- **Live Gatekeeper enforcement** — install Gatekeeper + apply the
+  generated policy so a bad deploy is actually blocked (demo scan → decide → enforce).
 ---
 
 _(Add a new section each week)_
