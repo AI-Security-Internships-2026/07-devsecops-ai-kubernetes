@@ -35,13 +35,30 @@ def _image_from_fields(fields: dict) -> str:
     return repo
 
 
+def _is_existing_file(value: str) -> bool:
+    """
+    True if `value` names an existing file.
+
+    Guarded because this is also called with raw alert text: a long or otherwise
+    invalid path makes Path.exists() raise OSError (notably on Windows, where the
+    path-length limit applies) or ValueError (embedded NUL) instead of returning
+    False. Either way it simply isn't a file.
+    """
+    try:
+        return Path(value).exists()
+    except (OSError, ValueError):
+        return False
+
+
 def parse_falco_stream(path_or_text: str) -> list[dict]:
     """
     Parse Falco JSON output (JSONL — one JSON alert per line) into normalized
     records. Accepts a file path or raw text. Blank/malformed lines are skipped.
     """
-    p = Path(path_or_text)
-    text = p.read_text(encoding="utf-8", errors="ignore") if p.exists() else path_or_text
+    if _is_existing_file(path_or_text):
+        text = Path(path_or_text).read_text(encoding="utf-8", errors="ignore")
+    else:
+        text = path_or_text
 
     alerts = []
     for line in text.splitlines():
