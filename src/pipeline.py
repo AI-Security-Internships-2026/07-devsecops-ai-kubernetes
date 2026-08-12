@@ -127,7 +127,15 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
         runtime_provider=runtime_provider,
     )
     md_path, json_path = save_reports(report_md, report_json, str(epss_path))
-    run_path = write_triage_run(report_json, image)
+
+    # Per-image compact output. A single shared triage_run.json would be overwritten
+    # by every image during scan-cluster, leaving only the last one; triage_run.json
+    # is still refreshed as a "latest run" convenience copy.
+    safe_image = image.replace("/", "_").replace(":", "_").replace("@", "_")
+    run_path = write_triage_run(report_json, image,
+                               path=config.RESULTS_DIR / f"triage_run_{safe_image}.json")
+    (config.RESULTS_DIR / "triage_run.json").write_text(
+        run_path.read_text(encoding="utf-8"), encoding="utf-8")
 
     print(f"\n[+] Markdown report: {md_path}")
     print(f"[+] JSON report:     {json_path}")
@@ -155,12 +163,24 @@ def run_pipeline(image: str, use_k8s_context: bool = True, use_exploit_db: bool 
     return report_json
 
 
+# Kubernetes' own infrastructure namespaces. Skipped by default: scanning the
+# control plane (etcd, apiserver, kube-proxy, ...) triples the runtime and buries
+# the workloads the user actually deployed. --include-system opts back in.
+SYSTEM_NAMESPACES = frozenset({
+    "kube-system", "kube-public", "kube-node-lease", "local-path-storage",
+})
+
+
 def run_scan_cluster(use_k8s_context: bool = True, use_exploit_db: bool = True,
-                     falco_live: bool = False, namespace: str | None = None):
+                     falco_live: bool = False, namespace: str | None = None,
+                     include_system: bool = False):
     """
     Discover the images running in the cluster, triage each with K8s context (and,
     if falco_live, one cluster-wide Falco capture reused for every image), and write
     an aggregate report. Composes discover + pipeline + runtime reachability.
+
+    System namespaces are skipped unless include_system is set (or `namespace`
+    explicitly targets one).
     """
     from src.context.k8s_context import discover_pods
 
@@ -169,11 +189,26 @@ def run_scan_cluster(use_k8s_context: bool = True, use_exploit_db: bool = True,
         print("[!] scan-cluster needs a reachable Kubernetes cluster.")
         return None
     running = [p for p in inv["pods"] if p.get("phase") == "Running"]
+
+    skipped_images: set[str] = set()
+    if not include_system and namespace is None:
+        kept = []
+        for p in running:
+            if p.get("namespace") in SYSTEM_NAMESPACES:
+                skipped_images.update(p.get("images", []))
+            else:
+                kept.append(p)
+        running = kept
+
     images = sorted({img for p in running for img in p.get("images", [])})
+    skipped_images -= set(images)
     if not images:
         print("[*] No running images to scan.")
         return None
     print(f"\n{'#'*70}\n# SCAN-CLUSTER: {len(images)} running image(s)\n{'#'*70}")
+    if skipped_images:
+        print(f"[*] Skipped {len(skipped_images)} image(s) in system namespaces "
+              f"({', '.join(sorted(SYSTEM_NAMESPACES))}); use --include-system to scan them.")
 
     # Capture Falco ONCE for the whole cluster, reused for every image.
     falco_file = None
