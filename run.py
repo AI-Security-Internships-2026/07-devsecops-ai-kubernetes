@@ -103,7 +103,7 @@ def cmd_scan_cluster(args):
     from src.pipeline import run_scan_cluster
     run_scan_cluster(use_k8s_context=not args.no_k8s, use_exploit_db=not args.no_exploit,
                      falco_live=args.falco_live, namespace=args.namespace,
-                     include_system=args.include_system)
+                     include_system=args.include_system, falco_path=args.falco)
 
 
 def cmd_discover(args):
@@ -229,6 +229,8 @@ def build_parser() -> argparse.ArgumentParser:
     scl.add_argument("--namespace", default=None, help="limit to a single namespace")
     scl.add_argument("--no-k8s", action="store_true", help="skip Kubernetes context enrichment")
     scl.add_argument("--no-exploit", action="store_true", help="skip Exploit-DB lookup")
+    scl.add_argument("--falco", default=None,
+                     help="Falco JSON alert stream (file) to fold in as runtime reachability per image")
     scl.add_argument("--falco-live", action="store_true",
                      help="capture Falco alerts live and fold in runtime reachability per image")
     scl.add_argument("--include-system", action="store_true",

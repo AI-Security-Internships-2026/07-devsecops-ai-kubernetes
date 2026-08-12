@@ -173,14 +173,15 @@ SYSTEM_NAMESPACES = frozenset({
 
 def run_scan_cluster(use_k8s_context: bool = True, use_exploit_db: bool = True,
                      falco_live: bool = False, namespace: str | None = None,
-                     include_system: bool = False):
+                     include_system: bool = False, falco_path: str | None = None):
     """
-    Discover the images running in the cluster, triage each with K8s context (and,
-    if falco_live, one cluster-wide Falco capture reused for every image), and write
-    an aggregate report. Composes discover + pipeline + runtime reachability.
+    Discover the images running in the cluster, triage each with K8s context and one
+    cluster-wide Falco signal reused for every image, and write an aggregate report.
+    Composes discover + pipeline + runtime reachability.
 
-    System namespaces are skipped unless include_system is set (or `namespace`
-    explicitly targets one).
+    Runtime signal source: `falco_path` (a captured alert file) takes precedence;
+    otherwise `falco_live` captures from the cluster. System namespaces are skipped
+    unless include_system is set (or `namespace` explicitly targets one).
     """
     from src.context.k8s_context import discover_pods
 
@@ -210,9 +211,14 @@ def run_scan_cluster(use_k8s_context: bool = True, use_exploit_db: bool = True,
         print(f"[*] Skipped {len(skipped_images)} image(s) in system namespaces "
               f"({', '.join(sorted(SYSTEM_NAMESPACES))}); use --include-system to scan them.")
 
-    # Capture Falco ONCE for the whole cluster, reused for every image.
+    # One Falco signal for the whole cluster, reused for every image. A captured
+    # file wins over a live pull (the file path is what works when Falco can't emit
+    # JSON on this host).
     falco_file = None
-    if falco_live:
+    if falco_path:
+        falco_file = falco_path
+        print(f"[*] Using Falco alerts from {falco_path} for runtime reachability")
+    elif falco_live:
         from src.runtime.falco_client import run_live
         try:
             falco_file = str(run_live())
