@@ -38,15 +38,19 @@ def _image_from_fields(fields: dict) -> str:
 
 def _is_existing_file(value: str) -> bool:
     """
-    True if `value` names an existing file.
+    True if `value` names an existing regular file.
 
-    Guarded because this is also called with raw alert text: a long or otherwise
-    invalid path makes Path.exists() raise OSError (notably on Windows, where the
-    path-length limit applies) or ValueError (embedded NUL) instead of returning
-    False. Either way it simply isn't a file.
+    Two guards, both hit in practice:
+      - `is_file()`, not `exists()`: Path("") normalises to Path(".") whose
+        exists() is True, so an empty stream would try to read the current
+        directory (IsADirectoryError on Linux, PermissionError on Windows).
+      - try/except: raw alert text longer than the path limit makes Path() raise
+        OSError (Windows) or ValueError (embedded NUL) rather than returning False.
     """
+    if not value or not value.strip():
+        return False
     try:
-        return Path(value).exists()
+        return Path(value).is_file()
     except (OSError, ValueError):
         return False
 
@@ -101,6 +105,24 @@ def summarize(alerts: list[dict]) -> dict:
     return {"total": len(alerts), "by_priority": by_priority, "by_image": by_image}
 
 
+def _falco_container_name(pod) -> str | None:
+    """
+    Pick the container whose stdout carries the alerts.
+
+    The Falco Helm chart runs a multi-container DaemonSet (falco plus
+    falco-driver-loader / falcoctl-artifact-install / falcoctl-artifact-follow), and
+    the logs API returns HTTP 400 unless a container is named. Prefer the container
+    literally called "falco", else the first one.
+    """
+    containers = list(getattr(pod.spec, "containers", None) or [])
+    if not containers:
+        return None
+    for c in containers:
+        if c.name == "falco":
+            return c.name
+    return containers[0].name
+
+
 def capture_from_cluster(namespace: str = "falco",
                          selector: str = "app.kubernetes.io/name=falco",
                          since_seconds: int | None = None) -> list[dict]:
@@ -132,12 +154,19 @@ def capture_from_cluster(namespace: str = "falco",
 
     chunks = []
     for p in pods:
+        container = _falco_container_name(p)
         try:
             chunks.append(core.read_namespaced_pod_log(
-                name=p.metadata.name, namespace=namespace, since_seconds=since_seconds))
+                name=p.metadata.name, namespace=namespace, container=container,
+                since_seconds=since_seconds))
         except Exception as e:
-            print(f"[*] Could not read logs of {p.metadata.name} ({e})")
-    return parse_falco_stream("\n".join(chunks))
+            print(f"[*] Could not read logs of {p.metadata.name}/{container} ({e})")
+    text = "\n".join(c for c in chunks if c)
+    if not text.strip():
+        print("[*] Falco pods returned no log output "
+              "(no alerts yet, or json_output is not enabled).")
+        return []
+    return parse_falco_stream(text)
 
 
 def _save_alerts(alerts: list[dict]) -> Path:
