@@ -1,7 +1,7 @@
 """
 SSVC decision logic (pure, no external dependencies).
 
-Kept free of LangGraph / network so it can be unit-tested in isolation.
+Kept free of LangGraph / network so it can be tested in isolation.
 
 Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Two optional
 refinements plug in here without changing callers:
@@ -99,11 +99,12 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
     """
     Kubernetes deployment-context refinement (P3).
 
-    Rules:
-      - not deployed anywhere          -> de-escalate to LOW (report as not-deployed)
-      - internet-facing + EPSS >= 0.01 -> escalate one level
-      - privileged / cluster-admin SA  -> escalate one level
-      - internal-only borderline CRITICAL (not KEV, EPSS < 0.3) -> de-escalate to HIGH
+    Adjusts a finding by AT MOST ONE level and never touches the MEDIUM/LOW tiers,
+    so context re-ranks urgency within the already-actionable set without inflating
+    it. Rules (must match the code below):
+      - not deployed anywhere                         -> de-escalate to LOW
+      - HIGH + EPSS >= 0.05 + exposed/privileged      -> escalate to CRITICAL
+      - CRITICAL, internal-only, not KEV, EPSS < 0.2  -> de-escalate to HIGH
         (kills EPSS-inflated false criticals like BEAST when unreachable)
 
     `context` shape: {available: bool, deployed: bool, exposed: bool,

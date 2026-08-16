@@ -53,16 +53,15 @@ def run_trivy_scan(image: str, output_file: str | None = None) -> tuple[dict, Pa
             timeout=300,
         )
     except FileNotFoundError:
-        print("[!] Error: Trivy is not installed or not in PATH.")
-        print("[!] Install Trivy: https://trivy.dev/docs/latest/getting-started/installation/")
-        sys.exit(1)
+        raise RuntimeError(
+            "Trivy is not installed or not in PATH. "
+            "Install: https://trivy.dev/docs/latest/getting-started/installation/"
+        )
     except subprocess.TimeoutExpired:
-        print("[!] Error: Trivy scan timed out after 300 seconds.")
-        sys.exit(1)
+        raise RuntimeError("Trivy scan timed out after 300 seconds.")
 
     if result.returncode != 0 and not result.stdout:
-        print(f"[!] Trivy error:\n{result.stderr}")
-        sys.exit(1)
+        raise RuntimeError(f"Trivy scan failed: {result.stderr.strip()}")
 
     scan_results = json.loads(result.stdout)
 

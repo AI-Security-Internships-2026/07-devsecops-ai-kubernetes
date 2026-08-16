@@ -7,16 +7,22 @@ Ties the intelligence layer together:
     classify -> fresh-CVE rule (handles the EPSS-lag problem)
     report   -> write alerts to the DB + a markdown alert report
 
-The fresh-CVE classification is pure (unit-tested). LangGraph is imported
-lazily inside build_watch_graph() so this module loads without it.
+The fresh-CVE classification is pure and deterministic. LangGraph is imported lazily inside
+build_watch_graph() so this module loads without it.
 
 Fresh-CVE rule: a brand-new CVE has an artificially low EPSS for days,
 so we lean on compensating signals — KEV, public exploit, high CVSS — to decide
 urgency before EPSS matures.
 
-Usage: python run.py watch
+Usage:
+    python run.py watch                  # one-shot: a single collect->classify->report pass
+    python run.py watch --interval 3600  # continuous: repeat every 3600s until Ctrl-C
+
+By default this runs ONE pass (intended to be driven by an external scheduler
+such as cron or a systemd timer). Pass --interval to have it loop itself.
 """
 
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TypedDict
@@ -165,9 +171,8 @@ def build_watch_graph():
     return g
 
 
-def run_watch() -> dict:
-    """Run one watcher pass. Returns the final state."""
-    db.init_db()
+def _watch_once() -> dict:
+    """Run a single collect -> enrich -> classify -> report pass."""
     print(f"\n{'='*70}\nCVE INTELLIGENCE WATCHER\n{'='*70}")
     app = build_watch_graph().compile()
     state: WatchState = {"matches": [], "exploit_lookup": None, "classified": [], "report_path": ""}
@@ -175,6 +180,29 @@ def run_watch() -> dict:
 
     crit = sum(1 for c in final["classified"] if c["priority"] == "FRESH-CRITICAL")
     print(f"\n{'='*70}\nWATCH COMPLETE — {len(final['classified'])} matches, {crit} FRESH-CRITICAL\n{'='*70}")
+    return final
+
+
+def run_watch(interval: int | None = None) -> dict:
+    """
+    Run the watcher.
+
+    One-shot by default (a single pass), suitable for an external scheduler
+    (cron / systemd timer). Pass `interval` (seconds) to run continuously: the
+    pass repeats every `interval` seconds until interrupted (Ctrl-C).
+    """
+    db.init_db()
+    if interval is None:
+        return _watch_once()
+
+    print(f"[*] Continuous watch: repeating every {interval}s (Ctrl-C to stop)")
+    final: dict = {}
+    try:
+        while True:
+            final = _watch_once()
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        print("\n[*] Watcher stopped.")
     return final
 
 

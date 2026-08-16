@@ -251,4 +251,69 @@ suite still pending (manual verification for now).
 
 ---
 
+## Week 7
+
+**Branch:** `abdul-hadi-week-07`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week
+- [x] **Seven MCP servers** (`src/mcp_servers/`) — scanner, epss, ssvc, kev, cvedb,
+  k8s-context, report — built on FastMCP (stdio), plus `.mcp.json` so Claude Code /
+  Copilot can call the same tools an analyst would.
+- [x] **Interactive CLI chatbot** (`run.py chat`, `src/chatbot/cli.py`) — a natural-
+  language assistant that answers questions about scans by calling the MCP tools
+  (Groq or Google Gemini backend), e.g. *"why would CVE-2023-45288 be critical?"*.
+- [x] **OPA Gatekeeper policy generation** (`run.py gatekeeper`,
+  `src/enforce/gatekeeper.py`) — emits `ConstraintTemplate` + `Constraint` YAML from a
+  triage report (block Act-level images, require pinned digests, deny privileged).
+  YAML generation only.
+- [x] **Falco runtime-alert capture** (`run.py falco-capture`,
+  `src/runtime/falco_client.py`) — parses a Falco JSON alert stream into normalised
+  records and matches them to an image. Capture-only.
+- [x] **Some fixes (from the Week 6):** the watcher now has a real
+  continuous mode (`watch --interval N`) instead of one-shot only; removed dead code in `osv_poller.choose_cve_id`; corrected a
+  stale `apply_context` docstring.
+- [x] **Dependency fix (issue #9):** `run.py chat` failed because pip had
+  installed `mcp 2.0.0` in the test environment, which removed `mcp.server.fastmcp` (our servers) and
+  `mcp.shared.context.RequestContext` (needed by `langchain-mcp-adapters`). Capped
+  `mcp>=1.9,<2.0` + `langchain-mcp-adapters>=0.3.0,<0.4`. Pure-Python version issue,
+  not architecture-specific.
+- [x] **Chat CLI hardening (found during test-environment runs):** (1) a failed Trivy
+  scan called `sys.exit(1)` inside the scanner MCP server and crashed it, now raises
+  `RuntimeError`, so the server survives and returns a tool error; (2) fixed the
+  default Gemini model (retired preview → `gemini-2.5-flash`); (3) the assistant
+  printed raw message content blocks (incl. Gemini's thought signature), now prints
+  clean text; (4) the agent could loop over tool calls without answering, fixed with
+  a decisive system prompt + a `recursion_limit` cap.
+
+### Problems / Blockers
+- **Falco and Gatekeeper are standalone commands, not yet wired into the main
+  pipeline**. Full integration is the Week 8
+  focus: Falco → SSVC reachability weighting, and Gatekeeper YAML as a pipeline output.
+- **Chat CLI — resolved this week.** Three issues surfaced during test-environment
+  runs and were fixed: the mcp 2.0 dependency mismatch (#9), the scanner MCP server
+  crashing on a failed Trivy scan, and the agent looping over tool calls without
+  answering.
+- **Chat can't yet read saved reports by name** — the assistant answers from live CVE
+  lookups but cannot discover/load a saved `triage_run*.json` by image or "latest", so
+  it can't ground answers in a specific report.
+
+### Next week plan (Week 8)
+- **Integrate Falco into the pipeline** — fold the runtime signal into the SSVC
+  decision as a *reachability* weighting (is the vulnerable component actually live in
+  the cluster?).
+- **Integrate Gatekeeper into the pipeline** — `pipeline --gatekeeper` auto-emits the
+  policy YAML as a run artifact, so one command does scan → decide → enforce.
+- **Kubernetes pod discovery** (`run.py discover`) — list running/stopped pods with
+  image, namespace, status and exposure. (A `scan-cluster` command that triages every
+  running image, plus automatic Falco-alert capture straight from the cluster, is
+  designed now and scheduled for the following week.)
+- **Watcher background service + status** — run the watcher in the background with a
+  PID/status file; `watch --status` shows a live summary and re-running `watch` detects
+  an already-running instance. Written OS-agnostically (with an optional systemd unit)
+  so future multi-architecture / multi-OS support drops in cleanly.
+- **Chat: read saved reports** — add MCP tools to discover/load a `triage_run*.json`
+  by image or "latest", so the assistant can ground answers in a specific report.
+---
+
 _(Add a new section each week)_

@@ -74,7 +74,22 @@ def cmd_db_poll(args):
 
 def cmd_watch(args):
     from src.database.watcher_agent import run_watch
-    run_watch()
+    run_watch(interval=args.interval)
+
+
+def cmd_chat(args):
+    from src.chatbot.cli import run_chat
+    run_chat()
+
+
+def cmd_gatekeeper(args):
+    from src.enforce.gatekeeper import run as run_gatekeeper
+    run_gatekeeper(args.triage_json, args.image)
+
+
+def cmd_falco_capture(args):
+    from src.runtime.falco_client import run as run_falco
+    run_falco(args.falco_output)
 
 
 def _print_triage_summary(report_json: dict) -> None:
@@ -126,7 +141,21 @@ def build_parser() -> argparse.ArgumentParser:
     dp.set_defaults(func=cmd_db_poll)
 
     w = sub.add_parser("watch", help="Run the CVE-intelligence watcher (fresh-CVE alerts)")
+    w.add_argument("--interval", type=int, default=None,
+                   help="seconds between passes for continuous mode (default: one-shot)")
     w.set_defaults(func=cmd_watch)
+
+    c = sub.add_parser("chat", help="Interactive CLI chatbot over the MCP tools")
+    c.set_defaults(func=cmd_chat)
+
+    gk = sub.add_parser("gatekeeper", help="Generate OPA Gatekeeper policy YAML from a triage report")
+    gk.add_argument("triage_json", help="path to triage_run*.json or triage_report*.json")
+    gk.add_argument("--image", default=None, help="override container image name")
+    gk.set_defaults(func=cmd_gatekeeper)
+
+    fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream into normalized alerts")
+    fc.add_argument("falco_output", help="path to Falco JSON output (one JSON object per line)")
+    fc.set_defaults(func=cmd_falco_capture)
 
     return p
 
@@ -134,7 +163,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    args.func(args)
+    try:
+        args.func(args)
+    except RuntimeError as e:
+        print(f"[!] {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "scanner": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.scanner_mcp"],
+      "cwd": "."
+    },
+    "epss": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.epss_mcp"],
+      "cwd": "."
+    },
+    "ssvc": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.ssvc_mcp"],
+      "cwd": "."
+    },
+    "kev": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.kev_mcp"],
+      "cwd": "."
+    },
+    "cvedb": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.cvedb_mcp"],
+      "cwd": "."
+    },
+    "k8s-context": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.k8s_context_mcp"],
+      "cwd": "."
+    },
+    "report": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.report_mcp"],
+      "cwd": "."
+    }
+  }
+}
