@@ -163,10 +163,31 @@ def capture_from_cluster(namespace: str = "falco",
             print(f"[*] Could not read logs of {p.metadata.name}/{container} ({e})")
     text = "\n".join(c for c in chunks if c)
     if not text.strip():
-        print("[*] Falco pods returned no log output "
-              "(no alerts yet, or json_output is not enabled).")
+        print("[*] Falco pods returned no log output at all.")
+        _explain_no_alerts()
         return []
-    return parse_falco_stream(text)
+
+    alerts = parse_falco_stream(text)
+    if not alerts:
+        # Distinguish "Falco said nothing" from "Falco is talking, but not in JSON".
+        # Both surface as zero alerts, but they need opposite fixes.
+        n_lines = sum(1 for line in text.splitlines() if line.strip())
+        print(f"[*] Read {n_lines} log line(s) from Falco but parsed 0 JSON alerts.")
+        _explain_no_alerts()
+    return alerts
+
+
+def _explain_no_alerts() -> None:
+    """
+    A zero-alert capture is ambiguous, so name the three preconditions rather than
+    letting the caller guess. Ordered by how often each one is actually the cause:
+    an idle cluster produces no alerts, and that is normal, healthy Falco behaviour.
+    """
+    print("    Three things must all hold for a live capture to return alerts:")
+    print("      1. a rule must have FIRED   — Falco is silent on an idle cluster")
+    print("      2. json_output must be true — we cannot parse Falco's text format")
+    print("      3. the driver must be loaded — no driver means no syscall events")
+    print("    Check all three, in that order:  bash scripts/falco_setup.sh verify")
 
 
 def _save_alerts(alerts: list[dict]) -> Path:
@@ -182,7 +203,7 @@ def _save_alerts(alerts: list[dict]) -> Path:
     if summary["by_image"]:
         print(f"    by image:    {summary['by_image']}")
     if not alerts:
-        print("[*] No alerts (empty stream, or Falco not producing JSON output yet).")
+        print("[*] No alerts parsed — see the checks above before treating this as a bug.")
     return out_path
 
 
