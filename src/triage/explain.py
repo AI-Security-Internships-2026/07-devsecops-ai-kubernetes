@@ -10,22 +10,82 @@ import json
 import os
 
 
+def _local_llm():
+    """
+    A self-hosted model behind an OpenAI-compatible endpoint (Ollama, vLLM, SGLang,
+    LiteLLM). Reached through the OpenAI protocol rather than a vendor SDK, so the
+    same code path serves any of them — and swapping the backend is an env change.
+
+    This is the provider that lets us say vulnerability data never leaves the
+    cluster's own infrastructure: no third-party API sees a CVE, an image name, or
+    a namespace.
+    """
+    base_url = os.getenv("LOCAL_LLM_BASE_URL")
+    if not base_url:
+        return None
+    model = os.getenv("LOCAL_LLM_MODEL", "qwen2.5-coder:32b")
+    print(f"[*] Using local LLM ({model} @ {base_url}) — no data leaves this host")
+    from langchain_openai import ChatOpenAI
+    return ChatOpenAI(
+        model=model,
+        temperature=0.2,
+        base_url=base_url,
+        # Local servers ignore the key but the OpenAI client requires a non-empty
+        # value, so this is a placeholder, not a credential.
+        api_key=os.getenv("LOCAL_LLM_API_KEY", "not-needed"),
+    )
+
+
+def _groq_llm():
+    key = os.getenv("GROQ_API_KEY")
+    if not key:
+        return None
+    model = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
+    print(f"[*] Using Groq ({model})")
+    from langchain_groq import ChatGroq
+    return ChatGroq(model=model, temperature=0.2, api_key=key)
+
+
+def _gemini_llm():
+    key = os.getenv("GOOGLE_API_KEY")
+    if not key:
+        return None
+    model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+    print(f"[*] Using Google Gemini ({model})")
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    return ChatGoogleGenerativeAI(model=model, temperature=0.2, google_api_key=key)
+
+
+# Local first: when a self-hosted endpoint is configured it should win over any
+# cloud key left in the environment, so the private path is the default path.
+_PROVIDERS = {"local": _local_llm, "groq": _groq_llm, "gemini": _gemini_llm}
+_PROVIDER_ORDER = ("local", "groq", "gemini")
+
+
 def get_llm():
-    """Return a configured chat model (Groq first, then Gemini) or None."""
-    groq_key = os.getenv("GROQ_API_KEY")
-    if groq_key:
-        model = os.getenv("LLM_MODEL", "llama-3.1-8b-instant")
-        print(f"[*] Using Groq ({model})")
-        from langchain_groq import ChatGroq
-        return ChatGroq(model=model, temperature=0.2, api_key=groq_key)
+    """
+    Return a configured chat model, or None if nothing is configured.
 
-    google_key = os.getenv("GOOGLE_API_KEY")
-    if google_key:
-        model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
-        print(f"[*] Using Google Gemini ({model})")
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        return ChatGoogleGenerativeAI(model=model, temperature=0.2, google_api_key=google_key)
+    Set LLM_PROVIDER to pin one backend (local|groq|gemini) instead of taking the
+    first that happens to be configured
+    """
+    pinned = (os.getenv("LLM_PROVIDER") or "").strip().lower()
+    if pinned:
+        factory = _PROVIDERS.get(pinned)
+        if factory is None:
+            print(f"[!] Unknown LLM_PROVIDER '{pinned}' "
+                  f"(expected one of: {', '.join(_PROVIDERS)})")
+            return None
+        llm = factory()
+        if llm is None:
+            print(f"[!] LLM_PROVIDER='{pinned}' but it is not configured "
+                  f"(missing base URL or API key)")
+        return llm
 
+    for name in _PROVIDER_ORDER:
+        llm = _PROVIDERS[name]()
+        if llm is not None:
+            return llm
     return None
 
 
