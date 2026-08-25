@@ -215,3 +215,61 @@ def make_context_provider(image: str):
         return context
 
     return provider
+
+
+def discover_pods(namespace: str | None = None) -> dict:
+    """
+    Inventory every pod in the cluster (running AND non-running) with its image(s),
+    namespace, status/phase, exposure and privilege.
+
+    Cluster-optional: returns {"available": False, "pods": []} if the kubernetes
+    package or a reachable cluster is missing. Optionally limited to `namespace`.
+    """
+    client = _load_cluster()
+    if client is None:
+        return {"available": False, "pods": []}
+    try:
+        core = client.CoreV1Api()
+        pod_items = core.list_pod_for_all_namespaces().items
+        services = [
+            {"namespace": s.metadata.namespace, "name": s.metadata.name,
+             "type": s.spec.type, "selector": s.spec.selector or {}}
+            for s in core.list_service_for_all_namespaces().items
+        ]
+    except Exception as e:
+        print(f"[*] Could not read cluster objects ({e})")
+        return {"available": False, "pods": []}
+
+    pods = []
+    for p in pod_items:
+        if namespace and p.metadata.namespace != namespace:
+            continue
+        spec = p.spec
+        containers = spec.containers or []
+        labels = p.metadata.labels or {}
+        privileged = any(
+            (c.security_context and c.security_context.privileged) for c in containers
+        ) or bool(spec.host_network)
+
+        exposed = False
+        exposure_type = None
+        for svc in services:
+            if svc["namespace"] == p.metadata.namespace and _selector_matches(
+                svc.get("selector", {}), labels
+            ):
+                if svc["type"] in ("LoadBalancer", "NodePort"):
+                    exposed = True
+                    exposure_type = svc["type"]
+
+        pods.append({
+            "namespace": p.metadata.namespace,
+            "pod": p.metadata.name,
+            "phase": (p.status.phase if p.status and p.status.phase else "Unknown"),
+            "images": [c.image for c in containers if c.image],
+            "privileged": privileged,
+            "exposed": exposed,
+            "exposure_type": exposure_type,
+        })
+
+    pods.sort(key=lambda x: (x["namespace"], x["pod"]))
+    return {"available": True, "pods": pods}

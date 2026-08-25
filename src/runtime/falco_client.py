@@ -15,7 +15,8 @@ a finding is via the pod's image (image-level runtime context), not per-CVE
 reachability.
 
 Usage:
-    python run.py falco-capture <falco_output.json>     # Falco JSON output (one JSON object per line)
+    python run.py falco-capture <falco_output.json>     # parse a captured file
+    python run.py falco-capture --live                  # pull straight from the cluster (no need to provide runtime report file)
 """
 
 import json
@@ -37,15 +38,19 @@ def _image_from_fields(fields: dict) -> str:
 
 def _is_existing_file(value: str) -> bool:
     """
-    True if `value` names an existing file.
+    True if `value` names an existing regular file.
 
-    Guarded because this is also called with raw alert text: a long or otherwise
-    invalid path makes Path.exists() raise OSError (notably on Windows, where the
-    path-length limit applies) or ValueError (embedded NUL) instead of returning
-    False. Either way it simply isn't a file.
+    Two guards, both hit in practice:
+      - `is_file()`, not `exists()`: Path("") normalises to Path(".") whose
+        exists() is True, so an empty stream would try to read the current
+        directory (IsADirectoryError on Linux, PermissionError on Windows).
+      - try/except: raw alert text longer than the path limit makes Path() raise
+        OSError (Windows) or ValueError (embedded NUL) rather than returning False.
     """
+    if not value or not value.strip():
+        return False
     try:
-        return Path(value).exists()
+        return Path(value).is_file()
     except (OSError, ValueError):
         return False
 
@@ -100,11 +105,73 @@ def summarize(alerts: list[dict]) -> dict:
     return {"total": len(alerts), "by_priority": by_priority, "by_image": by_image}
 
 
-def run(falco_output_path: str) -> Path:
-    """Parse a Falco output file and save normalized alerts to the results dir."""
-    alerts = parse_falco_stream(falco_output_path)
-    summary = summarize(alerts)
+def _falco_container_name(pod) -> str | None:
+    """
+    Pick the container whose stdout carries the alerts.
 
+    The Falco Helm chart runs a multi-container DaemonSet (falco plus
+    falco-driver-loader / falcoctl-artifact-install / falcoctl-artifact-follow), and
+    the logs API returns HTTP 400 unless a container is named. Prefer the container
+    literally called "falco", else the first one.
+    """
+    containers = list(getattr(pod.spec, "containers", None) or [])
+    if not containers:
+        return None
+    for c in containers:
+        if c.name == "falco":
+            return c.name
+    return containers[0].name
+
+
+def capture_from_cluster(namespace: str = "falco",
+                         selector: str = "app.kubernetes.io/name=falco",
+                         since_seconds: int | None = None) -> list[dict]:
+    """
+    Pull Falco alerts straight from the running cluster — the Falco DaemonSet pods'
+    JSON stdout — via the kubernetes client, and normalize them.
+
+    Returns [] if the kubernetes package, the cluster, or the Falco pods aren't
+    reachable (callers degrade gracefully).
+    """
+    try:
+        from kubernetes import client, config as kube_config
+    except Exception:
+        print("[*] kubernetes package not installed — cannot capture Falco from the cluster")
+        return []
+    try:
+        try:
+            kube_config.load_incluster_config()
+        except Exception:
+            kube_config.load_kube_config()
+        core = client.CoreV1Api()
+        pods = core.list_namespaced_pod(namespace, label_selector=selector).items
+    except Exception as e:
+        print(f"[*] Could not reach Falco pods in namespace '{namespace}' ({e})")
+        return []
+    if not pods:
+        print(f"[*] No Falco pods found in namespace '{namespace}' (selector '{selector}')")
+        return []
+
+    chunks = []
+    for p in pods:
+        container = _falco_container_name(p)
+        try:
+            chunks.append(core.read_namespaced_pod_log(
+                name=p.metadata.name, namespace=namespace, container=container,
+                since_seconds=since_seconds))
+        except Exception as e:
+            print(f"[*] Could not read logs of {p.metadata.name}/{container} ({e})")
+    text = "\n".join(c for c in chunks if c)
+    if not text.strip():
+        print("[*] Falco pods returned no log output "
+              "(no alerts yet, or json_output is not enabled).")
+        return []
+    return parse_falco_stream(text)
+
+
+def _save_alerts(alerts: list[dict]) -> Path:
+    """Summarize + persist normalized alerts to the results dir; print a breakdown."""
+    summary = summarize(alerts)
     config.ensure_dirs()
     out_path = config.RESULTS_DIR / "falco_alerts.json"
     out_path.write_text(json.dumps({"summary": summary, "alerts": alerts}, indent=2),
@@ -115,8 +182,19 @@ def run(falco_output_path: str) -> Path:
     if summary["by_image"]:
         print(f"    by image:    {summary['by_image']}")
     if not alerts:
-        print("[*] No alerts parsed (empty stream, or Falco not producing JSON output yet).")
+        print("[*] No alerts (empty stream, or Falco not producing JSON output yet).")
     return out_path
+
+
+def run(falco_output_path: str) -> Path:
+    """Parse a Falco output FILE and save normalized alerts to the results dir."""
+    return _save_alerts(parse_falco_stream(falco_output_path))
+
+
+def run_live(namespace: str = "falco", since_seconds: int | None = None) -> Path:
+    """Capture Falco alerts LIVE from the cluster and save them (no manual file)."""
+    print(f"[*] Capturing Falco alerts live from namespace '{namespace}'...")
+    return _save_alerts(capture_from_cluster(namespace=namespace, since_seconds=since_seconds))
 
 
 def main():

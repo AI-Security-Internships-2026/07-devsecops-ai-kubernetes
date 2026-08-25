@@ -3,10 +3,11 @@ SSVC decision logic (pure, no external dependencies).
 
 Kept free of LangGraph / network so it can be tested in isolation.
 
-Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Two optional
+Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Optional
 refinements plug in here without changing callers:
   - apply_context()  — Kubernetes deployment context
   - apply_exploit()  — public-exploit-exists signal for SSVC "Automatable"
+  - apply_runtime()  — Falco runtime-reachability signal (image is live/active)
 """
 
 # Priority <-> SSVC decision label
@@ -74,10 +75,10 @@ def apply_exploit(priority: str, cve: dict, exploit_exists: bool) -> tuple[str, 
 
 
 def analyze(cve: dict, in_kev: bool, context: dict | None = None,
-            exploit_exists: bool = False) -> dict:
+            exploit_exists: bool = False, runtime: dict | None = None) -> dict:
     """
-    Full deterministic analysis for one finding: base SSVC, then exploit and
-    context refinements. Single source of truth shared by the agent and tests.
+    Full deterministic analysis for one finding: base SSVC, then exploit, context
+    and runtime refinements. Single source of truth shared by the agent and tests.
 
     Returns {"priority", "decision", "notes"}.
     """
@@ -89,6 +90,10 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
         notes.append(note)
 
     priority, note = apply_context(priority, cve, context)
+    if note:
+        notes.append(note)
+
+    priority, note = apply_runtime(priority, cve, runtime)
     if note:
         notes.append(note)
 
@@ -150,3 +155,53 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
         return "HIGH", f"de-escalated CRITICAL->HIGH: internal-only, not in CISA KEV (EPSS {epss:.3f})"
 
     return priority, None
+
+
+# Falco alert priorities, most-severe tier that ESCALATES. Lower tiers (Warning,
+# Notice, ...) only annotate the rationale.
+_FALCO_CRITICAL_TIER = {"EMERGENCY", "ALERT", "CRITICAL", "ERROR"}
+
+
+def apply_runtime(priority: str, cve: dict, runtime: dict | None) -> tuple[str, str | None]:
+    """
+    Kubernetes runtime-reachability refinement (Falco), two-tier.
+
+    Falco maps alerts to a pod/container/image, not to a CVE, so this is an
+    IMAGE-LEVEL signal applied to the findings in that image — "is the vulnerable
+    component actually live and active?" — not per-CVE exploitation proof.
+
+    Tiers:
+      - a CRITICAL-tier Falco alert (Emergency/Alert/Critical/Error) on the image
+        escalates an already-actionable HIGH -> CRITICAL (at most one level;
+        never touches MEDIUM/LOW),
+      - anything else (lower-severity alerts, or a critical-tier alert on a
+        non-HIGH finding) is only recorded in the rationale — no level change.
+
+    `runtime` shape: {available: bool, count: int, max_priority: str,
+                      rules: list[str]}. No signal / not available -> unchanged.
+    Returns (new_priority, note_or_None).
+    """
+    if not runtime or not runtime.get("available"):
+        return priority, None
+    count = int(runtime.get("count", 0) or 0)
+    if count == 0:
+        return priority, None
+
+    max_pri = (runtime.get("max_priority") or "").upper()
+    rules = runtime.get("rules") or ["runtime activity"]
+    rule = rules[0] if rules else "runtime activity"
+    critical_tier = max_pri in _FALCO_CRITICAL_TIER
+
+    # ESCALATE (+1): critical-tier runtime alert on an already-actionable HIGH.
+    if critical_tier and priority == "HIGH":
+        return "CRITICAL", (
+            f"escalated HIGH->CRITICAL: Falco {max_pri.title()} runtime alert on this "
+            f"image (\"{rule}\") — vulnerable component is live and active"
+        )
+
+    # ANNOTATE only (no level change) for everything else.
+    tier = "critical-tier" if critical_tier else "low-severity"
+    return priority, (
+        f"runtime activity observed on this image "
+        f"(Falco {max_pri.title() or 'alert'}, {count} alert(s), {tier}); decision unchanged"
+    )

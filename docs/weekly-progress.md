@@ -43,7 +43,7 @@ No major blockers this week. Initial environment setup went smoothly. Spent time
 ## Week 2
 
 **Branch:** `abdul-hadi-week-02`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/2
 
 ### Completed this week
 - [x] Added 2 academic papers to literature review (EPSS paper by Jacobs et al. 2023, AgenticVM by Arifin et al. 2026)
@@ -68,7 +68,7 @@ Trivy requires Docker to be running for container image scanning. Local developm
 ## Week 3–4
 
 **Branch:** `abdul-hadi-week-04`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/4
 
 ### Completed this week
 - [x] Implemented `src/triage_agent.py` — LangGraph triage agent (3-node StateGraph as per AgenticVM pattern)
@@ -122,7 +122,7 @@ EPSS-only triage can over-prioritize old, well-known CVEs (e.g., CVE-2011-3389 B
 ## Week 5
 
 **Branch:** `abdul-hadi-week-05`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/6
 
 ### Completed this week (this PR)
 - [x] Restructured the codebase into a proper Python package with a single CLI entry point (`run.py`)
@@ -177,7 +177,7 @@ scanner/enrichment errors.
 ## Week 6
 
 **Branch:** `abdul-hadi-week-06`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/8
 
 ### Completed this week
 - [x] **Kubernetes deployment context** — `src/context/k8s_context.py` reads the
@@ -254,7 +254,7 @@ suite still pending (manual verification for now).
 ## Week 7
 
 **Branch:** `abdul-hadi-week-07`
-**PR link:** _[Add link after opening PR]_
+**PR link:** https://github.com/AI-Security-Internships-2026/07-devsecops-ai-kubernetes/pull/11
 
 ### Completed this week
 - [x] **Seven MCP servers** (`src/mcp_servers/`) — scanner, epss, ssvc, kev, cvedb,
@@ -314,6 +314,59 @@ suite still pending (manual verification for now).
   so future multi-architecture / multi-OS support drops in cleanly.
 - **Chat: read saved reports** — add MCP tools to discover/load a `triage_run*.json`
   by image or "latest", so the assistant can ground answers in a specific report.
+---
+
+## Week 8
+
+**Branch:** `abdul-hadi-week-08`
+**PR link:** _[Add link after opening PR]_
+
+### Completed this week
+- [x] **Falco → SSVC (runtime reachability)** — `ssvc.apply_runtime()` folds Falco
+  runtime alerts into the decision, two-tier and image-level: a CRITICAL-tier Falco
+  alert on an image escalates an already-actionable HIGH → CRITICAL (one level,
+  never MEDIUM/LOW); lower-severity alerts only annotate the rationale. Threaded
+  through the engine/agent and applied with
+  `run.py pipeline <image> --falco <alerts.json>`.
+- [x] **Gatekeeper → pipeline** — `run.py pipeline <image> --gatekeeper` runs
+  scan→enrich→triage then emits the OPA Gatekeeper policy YAML from the result
+  (scan → decide → generate-enforce in one command).
+- [x] **`discover` command** — `k8s_context.discover_pods()` + `run.py discover`
+  inventories every pod (running/non-running) with image, namespace, status,
+  exposure and privilege; writes `cluster_inventory.json`. Cluster-optional.
+- [x] **Background watcher + status** — the watcher writes a PID + status file, so
+  `run.py watch --status` shows whether it's running with a summary, `--stop` stops
+  it, and starting it twice is refused. Stdlib-only / OS-neutral; optional systemd
+  unit in `scripts/cve-watcher.service`.
+- [x] **Chat reads saved reports** — new `list_reports` / `get_report` MCP tools let
+  the assistant answer about a saved triage report (by image or "latest") grounded
+  in the stored SSVC decision/rationale, instead of guessing paths or re-scanning.
+- [x] Update README with the new commands.
+- [x] **`scan-cluster` + automatic Falco capture** —
+  `run.py scan-cluster [--falco-live]` discovers running images and triages each with
+  K8s context + runtime reachability into one aggregate report; Falco can now be
+  captured live from the cluster (`falco-capture --live`, `pipeline --falco-live`),
+  removing the manual `kubectl logs > file` step.
+### Falco → SSVC design note
+Falco maps alerts to a pod/container/image, not to a CVE, so this is an
+*image-level* reachability signal,
+applied to the findings in that image — not per-CVE exploitation proof. The two-tier
+rule stays conservative (escalates only a borderline HIGH, and only on a
+critical-tier alert), so it re-ranks urgency without inflating the actionable set —
+consistent with the K8s-context escalation-capping fix.
+
+### Problems / Blockers
+- **Gatekeeper is generate-only** — the pipeline emits policy YAML, but nothing
+  installs Gatekeeper or applies it, so a bad deploy isn't actually blocked yet. Live
+  admission enforcement is a follow-up.
+
+### Next week plan (Week 9)
+- **Evaluation for the paper** — reachability-aware score vs CVSS-only / EPSS-only
+  baselines, KEV recall (issue #10, TNSM target). *Critical path.*
+- **Scan-to-scan diff** — "what changed since last scan" for an image (new / fixed
+  CVEs, decision changes), from the history already in the DB / triage_run files.
+- **Live Gatekeeper enforcement** — install Gatekeeper + apply the
+  generated policy so a bad deploy is actually blocked (demo scan → decide → enforce).
 ---
 
 _(Add a new section each week)_
