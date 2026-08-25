@@ -81,8 +81,19 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     and runtime refinements. Single source of truth shared by the agent and tests.
 
     Returns {"priority", "decision", "notes"}.
+
+    Each refinement is individually capped at one level, but that is not the same
+    as the FINDING being capped: exploit could lift MEDIUM->HIGH and runtime then
+    lift HIGH->CRITICAL, moving a finding two levels off its evidence base. That
+    is the same failure mode as the original escalation-stacking bug, reached by a
+    different pair of signals, so the total is clamped here as well.
+
+    Only UPWARD movement is clamped. De-escalation is noise reduction and is
+    allowed to travel further — "image not deployed in this cluster" legitimately
+    drops a finding straight to LOW.
     """
-    priority, _ = classify_priority(cve, in_kev)
+    base, _ = classify_priority(cve, in_kev)
+    priority = base
     notes: list[str] = []
 
     priority, note = apply_exploit(priority, cve, exploit_exists)
@@ -97,7 +108,25 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     if note:
         notes.append(note)
 
+    priority, note = _cap_total_escalation(base, priority)
+    if note:
+        notes.append(note)
+
     return {"priority": priority, "decision": decision_for(priority), "notes": notes}
+
+
+def _cap_total_escalation(base: str, priority: str) -> tuple[str, str | None]:
+    """
+    Clamp a finding to at most ONE level above its base classification.
+    """
+    if base not in _LADDER or priority not in _LADDER:
+        return priority, None
+    ceiling = _LADDER.index(base) + 1
+    if _LADDER.index(priority) <= ceiling:
+        return priority, None
+    capped = _LADDER[ceiling]
+    return capped, (f"capped {priority}->{capped}: refinements may raise a finding "
+                    f"at most one level above its {base} base classification")
 
 
 def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, str | None]:

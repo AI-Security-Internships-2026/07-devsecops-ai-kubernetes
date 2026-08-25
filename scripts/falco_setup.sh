@@ -338,7 +338,10 @@ do_capture(){
   local out_dir="experiments/results"
   mkdir -p "$out_dir"
   local raw="$out_dir/falco_stream_raw.jsonl"
-  local out="$out_dir/falco_alerts.json"
+  # Deliberately NOT falco_alerts.json: `run.py falco-capture` WRITES that path
+  # (in its normalised {summary, alerts} form), so reusing it here would make the
+  # tool overwrite its own input and the second run would parse nothing.
+  local out="$out_dir/falco_captured.jsonl"
 
   hdr "capture: ${CAPTURE_SECS}s of real Falco alerts"
   inf "following $pod and generating activity in demo workloads..."
