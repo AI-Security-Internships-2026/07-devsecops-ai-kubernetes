@@ -1,0 +1,5 @@
+# Test-only dependencies. The unit suite must stay offline and deterministic,
+# so nothing here talks to the network.
+-r requirements.txt
+pytest>=8.0
+pytest-cov>=5.0
