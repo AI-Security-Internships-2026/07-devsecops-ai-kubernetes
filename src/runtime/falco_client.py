@@ -85,6 +85,17 @@ def parse_falco_stream(path_or_text: str) -> list[dict]:
             "container": fields.get("container.name", ""),
             "image": _image_from_fields(fields),
             "process": fields.get("proc.name", ""),
+            # Evidence used to attribute the alert to a package (issue #17).
+            # proc.exepath is the strongest signal: an absolute path to the binary
+            # that acted, which names the package that ships it.
+            "exepath": fields.get("proc.exepath", ""),
+            "cmdline": fields.get("proc.cmdline", ""),
+            "parent": fields.get("proc.pname", ""),
+            "file": fields.get("fd.name", ""),
+            "evt_type": fields.get("evt.type", ""),
+            # MITRE ATT&CK technique IDs, when the rule carries them - useful in the
+            # rationale, since "credential access" is more legible than a rule name.
+            "tags": [t for t in (obj.get("tags") or []) if str(t).startswith("T")],
         })
     return alerts
 

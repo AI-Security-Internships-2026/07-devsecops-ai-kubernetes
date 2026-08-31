@@ -62,9 +62,14 @@ def _build_runtime_provider(falco_path: str | None, falco_live: bool, image: str
     Build a callable(cve)->runtime signal dict from a Falco alert stream.
 
     Source is either a captured file (`falco_path`) or a live pull from the running
-    cluster (`falco_live`). Image-level: the same signal applies to every finding in
-    the image (Falco maps alerts to a pod/image, not to a CVE). Returns None if no
-    Falco source is requested or it can't be read.
+    cluster (`falco_live`). Returns None if no Falco source is requested or it can't
+    be read.
+
+    Per-finding, not per-image (issue #17): each alert's process/file evidence is
+    resolved to the package(s) it implicates, and the signal handed to a finding
+    carries only that attribution. An alert about `mount` therefore cannot escalate a
+    TLS-library CVE. Alert candidates are derived once and matched per finding, since
+    the same handful of alerts is scored against hundreds of findings.
     """
     if not falco_path and not falco_live:
         return None
@@ -92,8 +97,31 @@ def _build_runtime_provider(falco_path: str | None, falco_live: bool, image: str
         print(f"[+] Falco runtime signal for {image}: {runtime['count']} alert(s), "
               f"max priority {runtime['max_priority'] or '-'}")
 
-    def provider(_cve: dict) -> dict:
-        return runtime
+    if not alerts:
+        def provider(_cve: dict) -> dict:
+            return runtime
+        return provider
+
+    from src.runtime.attribution import candidate_packages, match_packages
+    from src.triage.ssvc import _packages_of
+
+    # Derive each alert's candidate package names once; matching them against a
+    # finding's packages is then a cheap set operation per finding.
+    ranked = sorted(alerts, key=lambda a: _FALCO_PRIORITY_ORDER.get(
+        (a.get("priority") or "").upper(), 9))
+    candidates = [(a, candidate_packages(a)) for a in ranked]
+    unresolved = sum(1 for _, c in candidates if not c)
+    if unresolved:
+        print(f"[*] Falco: {unresolved}/{len(candidates)} alert(s) carry no resolvable "
+              f"package evidence; those can annotate findings but never escalate them")
+
+    def provider(cve: dict) -> dict:
+        pkgs = _packages_of(cve)
+        attributed = [
+            {**alert, "packages": sorted(match_packages(cands, pkgs))}
+            for alert, cands in candidates
+        ]
+        return {**runtime, "alerts": attributed}
 
     return provider
 

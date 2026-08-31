@@ -191,23 +191,63 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
 _FALCO_CRITICAL_TIER = {"EMERGENCY", "ALERT", "CRITICAL", "ERROR"}
 
 
+def _packages_of(cve: dict) -> list[str]:
+    """Package names a finding affects, however the scanner spelled the field."""
+    pkgs = cve.get("affected_packages") or cve.get("packages") or []
+    if isinstance(pkgs, str):
+        pkgs = [pkgs]
+    out = []
+    for p in pkgs:
+        # Trivy findings carry either bare names or {name, version} records.
+        name = p.get("name") if isinstance(p, dict) else p
+        if name:
+            out.append(str(name))
+    return out
+
+
+def _attributed_alert(cve: dict, alerts: list[dict]) -> dict | None:
+    """
+    The first critical-tier alert that is evidence about THIS finding.
+
+    An alert is evidence about a finding only when the package it implicates is a
+    package the finding affects. That intersection is the whole point of issue #17:
+    without it, a shell spawned in a container escalates a TLS-library CVE that the
+    shell never touched.
+    """
+    pkgs = {p.lower() for p in _packages_of(cve)}
+    if not pkgs:
+        return None
+    for alert in alerts:
+        if (alert.get("priority") or "").upper() not in _FALCO_CRITICAL_TIER:
+            continue
+        hit = {str(p).lower() for p in (alert.get("packages") or [])}
+        if hit & pkgs:
+            return {**alert, "matched": sorted(hit & pkgs)}
+    return None
+
+
 def apply_runtime(priority: str, cve: dict, runtime: dict | None) -> tuple[str, str | None]:
     """
     Kubernetes runtime-reachability refinement (Falco), two-tier.
 
-    Falco maps alerts to a pod/container/image, not to a CVE, so this is an
-    IMAGE-LEVEL signal applied to the findings in that image — "is the vulnerable
-    component actually live and active?" — not per-CVE exploitation proof.
+    Escalation requires ATTRIBUTED evidence: a critical-tier alert whose implicated
+    package is one the finding actually affects. Falco reports behaviour and Trivy
+    reports packages, so without that link the signal is only about the image, and
+    one unrelated alert would escalate every borderline finding on it (issue #17).
 
     Tiers:
-      - a CRITICAL-tier Falco alert (Emergency/Alert/Critical/Error) on the image
-        escalates an already-actionable HIGH -> CRITICAL (at most one level;
-        never touches MEDIUM/LOW),
-      - anything else (lower-severity alerts, or a critical-tier alert on a
-        non-HIGH finding) is only recorded in the rationale — no level change.
+      - a CRITICAL-tier alert (Emergency/Alert/Critical/Error) attributed to a package
+        this finding affects escalates an already-actionable HIGH -> CRITICAL (one
+        level at most; never touches MEDIUM/LOW),
+      - everything else is recorded in the rationale only — lower-severity alerts, a
+        critical-tier alert on a non-HIGH finding, and critically also an alert that
+        could NOT be attributed to this finding's packages. Unattributable evidence
+        annotates; it never escalates.
 
     `runtime` shape: {available: bool, count: int, max_priority: str,
-                      rules: list[str]}. No signal / not available -> unchanged.
+                      rules: list[str], alerts: list[dict]} where each alert carries
+    at least {priority, rule, packages, process, exepath}. Without `alerts` there is
+    no evidence to attribute, so the signal can only annotate.
     Returns (new_priority, note_or_None).
     """
     if not runtime or not runtime.get("available"):
@@ -220,13 +260,28 @@ def apply_runtime(priority: str, cve: dict, runtime: dict | None) -> tuple[str, 
     rules = runtime.get("rules") or ["runtime activity"]
     rule = rules[0] if rules else "runtime activity"
     critical_tier = max_pri in _FALCO_CRITICAL_TIER
+    alerts = runtime.get("alerts") or []
 
-    # ESCALATE (+1): critical-tier runtime alert on an already-actionable HIGH.
-    if critical_tier and priority == "HIGH":
-        return "CRITICAL", (
-            f"escalated HIGH->CRITICAL: Falco {max_pri.title()} runtime alert on this "
-            f"image (\"{rule}\") — vulnerable component is live and active"
-        )
+    # ESCALATE (+1): a critical-tier alert tied to a package this finding affects.
+    if priority == "HIGH":
+        hit = _attributed_alert(cve, alerts)
+        if hit:
+            proc = hit.get("process") or hit.get("exepath") or "a process"
+            pkg = ", ".join(hit["matched"])
+            tags = hit.get("tags") or []
+            mitre = f" [MITRE {', '.join(tags)}]" if tags else ""
+            return "CRITICAL", (
+                f"escalated HIGH->CRITICAL: Falco {(hit.get('priority') or '').title()} "
+                f"alert \"{hit.get('rule') or rule}\" on process {proc} -> package "
+                f"{pkg}, which this CVE affects{mitre}"
+            )
+        if critical_tier:
+            # Real runtime activity on the image, but nothing ties it to this
+            # finding's packages. Record it; do not act on it.
+            return priority, (
+                f"runtime activity on this image (\"{rule}\") not attributable to this "
+                f"finding's package(s) — recorded, no change"
+            )
 
     # ANNOTATE only (no level change) for everything else.
     tier = "critical-tier" if critical_tier else "low-severity"

@@ -20,7 +20,7 @@ from src.triage.ssvc import (
     classify_priority,
     decision_for,
 )
-from tests.conftest import context, cve, runtime
+from tests.conftest import alert, context, cve, runtime
 
 LADDER = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
 
@@ -152,37 +152,99 @@ class TestApplyContext:
 # ------------------------------------------------------------ runtime refinement
 
 class TestApplyRuntime:
+    """
+    Escalation requires ATTRIBUTED evidence (issue #17): the alert must implicate a
+    package the finding actually affects. Unattributed evidence annotates only.
+    """
+
     def test_no_signal_changes_nothing(self):
         assert apply_runtime("HIGH", cve(), None) == ("HIGH", None)
         assert apply_runtime("HIGH", cve(), runtime(available=False)) == ("HIGH", None)
         assert apply_runtime("HIGH", cve(), runtime(count=0)) == ("HIGH", None)
 
     @pytest.mark.parametrize("falco_priority", ["Emergency", "Alert", "Critical", "Error"])
-    def test_critical_tier_escalates_high(self, falco_priority):
-        new, note = apply_runtime("HIGH", cve(), runtime(max_priority=falco_priority))
+    def test_critical_tier_escalates_when_attributed(self, falco_priority):
+        finding = cve(packages=["coreutils"])
+        sig = runtime(max_priority=falco_priority,
+                      alerts=[alert(priority=falco_priority, packages=["coreutils"])])
+        new, note = apply_runtime("HIGH", finding, sig)
         assert new == "CRITICAL"
         assert "escalated HIGH->CRITICAL" in note
+        assert "coreutils" in note
 
-    @pytest.mark.parametrize("falco_priority", ["Warning", "Notice", "Informational", "Debug"])
-    def test_lower_tier_annotates_only(self, falco_priority):
-        """A shell in a container is worth recording, not worth escalating."""
-        new, note = apply_runtime("HIGH", cve(), runtime(max_priority=falco_priority))
+    def test_unrelated_alert_does_not_escalate(self):
+        """
+        The core of issue #17: a Critical alert about `cat`/coreutils must not
+        escalate a TLS-library finding that coreutils has nothing to do with.
+        """
+        finding = cve(packages=["libssl3"])
+        sig = runtime(max_priority="Critical",
+                      alerts=[alert(priority="Critical", packages=["coreutils"])])
+        new, note = apply_runtime("HIGH", finding, sig)
+        assert new == "HIGH"
+        assert note and "not attributable" in note
+
+    def test_unattributable_alert_annotates_only(self):
+        """An alert whose evidence resolved to nothing must never escalate."""
+        sig = runtime(max_priority="Critical",
+                      alerts=[alert(priority="Critical", packages=[])])
+        new, note = apply_runtime("HIGH", cve(packages=["libssl3"]), sig)
         assert new == "HIGH"
         assert note is not None
+
+    def test_no_evidence_at_all_annotates_only(self):
+        """
+        Without an `alerts` list there is nothing to attribute, so the signal can
+        only annotate. This is the conservative default for any caller that supplies
+        no evidence — the pre-#17 behaviour would have escalated here.
+        """
+        new, note = apply_runtime("HIGH", cve(packages=["libssl3"]),
+                                  runtime(max_priority="Critical"))
+        assert new == "HIGH"
+        assert note is not None
+
+    def test_finding_with_no_packages_is_never_escalated(self):
+        """No packages means no possible link, so no escalation."""
+        sig = runtime(max_priority="Critical",
+                      alerts=[alert(priority="Critical", packages=["coreutils"])])
+        assert apply_runtime("HIGH", cve(packages=[]), sig)[0] == "HIGH"
+
+    @pytest.mark.parametrize("falco_priority", ["Warning", "Notice", "Informational", "Debug"])
+    def test_lower_tier_annotates_even_when_attributed(self, falco_priority):
+        """A shell in a container is worth recording, not worth escalating."""
+        finding = cve(packages=["busybox"])
+        sig = runtime(max_priority=falco_priority,
+                      alerts=[alert(priority=falco_priority, packages=["busybox"])])
+        new, note = apply_runtime("HIGH", finding, sig)
+        assert new == "HIGH"
+        assert note is not None
+
+    def test_mitre_tags_appear_in_the_rationale(self):
+        """
+        The rationale is the audit trail, so it carries the technique the rule maps
+        to — more legible to a reader than a bare rule name.
+        """
+        finding = cve(packages=["coreutils"])
+        sig = runtime(alerts=[alert(packages=["coreutils"], tags=["T1555"])])
+        _, note = apply_runtime("HIGH", finding, sig)
+        assert "T1555" in note
 
     def test_runtime_never_deescalates(self):
         """
         Runtime is one-directional by design: absence of alerts is not evidence of
         safety (Falco only sees what a rule matches), so it may never demote.
         """
+        finding = cve(packages=["coreutils"])
+        sig = runtime(alerts=[alert(packages=["coreutils"])])
         for priority in LADDER:
-            new, _ = apply_runtime(priority, cve(), runtime(max_priority="Critical"))
+            new, _ = apply_runtime(priority, finding, sig)
             assert rank(new) >= rank(priority)
 
     @pytest.mark.parametrize("priority", ["MEDIUM", "LOW"])
     def test_low_tiers_not_escalated(self, priority):
-        new, _ = apply_runtime(priority, cve(), runtime(max_priority="Critical"))
-        assert new == priority
+        finding = cve(packages=["coreutils"])
+        sig = runtime(alerts=[alert(packages=["coreutils"])])
+        assert apply_runtime(priority, finding, sig)[0] == priority
 
 
 # ------------------------------------------- the regression that matters most
@@ -197,7 +259,7 @@ class TestEscalationCap:
     """
 
     def test_all_three_signals_move_at_most_one_level(self):
-        finding = cve(epss=0.06, cvss=8.0, severity="HIGH")   # base -> HIGH
+        finding = cve(epss=0.06, cvss=8.0, severity="HIGH", packages=["coreutils"])   # base -> HIGH
         base, _ = classify_priority(finding, in_kev=False)
         assert base == "HIGH"
 
@@ -205,7 +267,8 @@ class TestEscalationCap:
             finding, in_kev=False,
             context=context(exposed=True, privileged=True),
             exploit_exists=True,
-            runtime=runtime(max_priority="Critical"),
+            runtime=runtime(max_priority="Critical",
+                                alerts=[alert(packages=["coreutils"])]),
         )
         assert rank(result["priority"]) - rank(base) <= 1, (
             f"stacked {base} -> {result['priority']}: {result['notes']}")
@@ -221,12 +284,13 @@ class TestEscalationCap:
         A MEDIUM base means EPSS 0.02 — five times below the Act threshold. No
         combination of corroborating context should make that Act.
         """
-        finding = cve(epss=0.02, cvss=5.0, severity="MEDIUM")   # base -> MEDIUM
+        finding = cve(epss=0.02, cvss=5.0, severity="MEDIUM", packages=["coreutils"])   # base -> MEDIUM
         assert classify_priority(finding, in_kev=False)[0] == "MEDIUM"
         result = analyze(
             finding, in_kev=False,
             exploit_exists=True,
-            runtime=runtime(max_priority="Critical"),
+            runtime=runtime(max_priority="Critical",
+                                alerts=[alert(packages=["coreutils"])]),
         )
         assert result["priority"] == "HIGH", (
             f"MEDIUM base stacked to {result['priority']}: {result['notes']}")
@@ -237,10 +301,10 @@ class TestEscalationCap:
         assert it across every base tier with all three refinements firing at once.
         """
         bases = {
-            "LOW":      cve(epss=0.001, cvss=2.0, severity="LOW"),
-            "MEDIUM":   cve(epss=0.02, cvss=5.0, severity="MEDIUM"),
-            "HIGH":     cve(epss=0.06, cvss=8.0, severity="HIGH"),
-            "CRITICAL": cve(epss=0.5, cvss=9.0, severity="CRITICAL"),
+            "LOW":      cve(epss=0.001, cvss=2.0, severity="LOW", packages=["coreutils"]),
+            "MEDIUM":   cve(epss=0.02, cvss=5.0, severity="MEDIUM", packages=["coreutils"]),
+            "HIGH":     cve(epss=0.06, cvss=8.0, severity="HIGH", packages=["coreutils"]),
+            "CRITICAL": cve(epss=0.5, cvss=9.0, severity="CRITICAL", packages=["coreutils"]),
         }
         for expected_base, finding in bases.items():
             base, _ = classify_priority(finding, in_kev=False)
@@ -249,7 +313,8 @@ class TestEscalationCap:
                 finding, in_kev=False,
                 context=context(exposed=True, privileged=True),
                 exploit_exists=True,
-                runtime=runtime(max_priority="Critical"),
+                runtime=runtime(max_priority="Critical",
+                                alerts=[alert(packages=["coreutils"])]),
             )
             assert rank(result["priority"]) - rank(base) <= 1, (
                 f"{base} stacked to {result['priority']}: {result['notes']}")
@@ -267,9 +332,9 @@ class TestEscalationCap:
 
     def test_analyze_is_idempotent_on_the_decision(self):
         """Re-running the same inputs must not compound the refinements."""
-        finding = cve(epss=0.06, cvss=8.0, severity="HIGH")
+        finding = cve(epss=0.06, cvss=8.0, severity="HIGH", packages=["coreutils"])
         kwargs = dict(in_kev=False, context=context(exposed=True),
-                      exploit_exists=True, runtime=runtime())
+                      exploit_exists=True, runtime=runtime(alerts=[alert(packages=["coreutils"])]))
         first = analyze(finding, **kwargs)
         second = analyze(finding, **kwargs)
         assert first["priority"] == second["priority"]
@@ -281,9 +346,10 @@ class TestEscalationCap:
         not defensible to an auditor, so absence of notes is a failure.
         """
         result = analyze(
-            cve(epss=0.06, cvss=8.0, severity="HIGH"), in_kev=False,
+            cve(epss=0.06, cvss=8.0, severity="HIGH", packages=["coreutils"]), in_kev=False,
             context=context(exposed=True), exploit_exists=True,
-            runtime=runtime(max_priority="Critical"),
+            runtime=runtime(max_priority="Critical",
+                                alerts=[alert(packages=["coreutils"])]),
         )
         assert result["notes"], "refinements fired but recorded no rationale"
 

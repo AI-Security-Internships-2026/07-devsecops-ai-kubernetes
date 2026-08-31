@@ -49,13 +49,31 @@ def context(available=True, deployed=True, exposed=False, privileged=False,
     }
 
 
-def runtime(available=True, count=1, max_priority="Critical", rules=None):
-    """Falco runtime signal, as `_build_runtime_provider` returns it."""
-    return {
+def runtime(available=True, count=1, max_priority="Critical", rules=None,
+            alerts=None):
+    """
+    Falco runtime signal, as `_build_runtime_provider` returns it.
+
+    `alerts` carries the attributed evidence. Escalation requires it: an alert with
+    no `packages` entry matching the finding cannot raise the decision (issue #17).
+    """
+    sig = {
         "available": available,
         "count": count,
         "max_priority": max_priority,
         "rules": rules or ["Terminal shell in container"],
+    }
+    if alerts is not None:
+        sig["alerts"] = alerts
+    return sig
+
+
+def alert(priority="Critical", rule="Read sensitive file untrusted", packages=(),
+          process="cat", exepath="/usr/bin/cat", file="/etc/shadow", tags=()):
+    """One attributed Falco alert, in the shape apply_runtime consumes."""
+    return {
+        "priority": priority, "rule": rule, "packages": list(packages),
+        "process": process, "exepath": exepath, "file": file, "tags": list(tags),
     }
 
 
