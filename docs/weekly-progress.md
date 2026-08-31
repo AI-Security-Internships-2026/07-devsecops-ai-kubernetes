@@ -369,4 +369,67 @@ consistent with the K8s-context escalation-capping fix.
   generated policy so a bad deploy is actually blocked (demo scan → decide → enforce).
 ---
 
+## Week 9-10
+
+### Completed this week
+
+- [x] **Falco actually verified working on ARM64** — `scripts/falco_setup.sh`
+  (detect / install / reinstall / uninstall / verify / capture / doctor). It selects
+  the driver from host capability (`modern_ebpf` where BTF is present, else legacy
+  `ebpf`, else `kmod`) and falls back automatically, so one command works on both
+  arm64 and x86_64. An install is only reported successful once a rule has been
+  triggered and a JSON alert observed.
+- [x] **Real, machine-generated runtime alerts** — `falco_setup.sh capture` produced
+  7 genuine alerts (2 Critical, 5 Warning) across `busybox`, `nginx`, `redis` and
+  `vuln-demo`. Every runtime number is now measured rather than fed from a
+  hand-written file.
+- [x] **Self-hosted LLM support** — a local provider (Ollama / vLLM / SGLang /
+  LiteLLM) reached over the OpenAI protocol, so one client covers any local backend
+  and switching is an env change. Provider order is local -> Groq -> Gemini, so a
+  configured local endpoint wins over a cloud key; `LLM_PROVIDER` pins one backend
+  explicitly. Vulnerability data no longer has to leave the host.
+- [x] **Automated test suite** (the standing gap) — 98 offline tests, ~0.2s, no
+  network / cluster / Trivy / LLM. Coverage of the decision core
+  (`src/triage/ssvc.py`) is 98%. Covers the base SSVC thresholds, the
+  KEV-always-actionable invariant behind the 100% KEV-recall figure, each
+  refinement's one-level cap, the total escalation bound, Falco parsing against the
+  field shape a live 0.44.1 capture emits, and Gatekeeper injection resistance.
+- [x] **Deterministic evaluation harness** — `evaluate_triage.py` produces the
+  paper's four tables (volume/reduction, CVSS-only vs EPSS-only vs ours, KEV recall,
+  context/runtime effect) purely from committed `triage_run_*.json`, plus
+  `run_benchmark.sh` to run a fixed image corpus into one frozen result set.
+
+### Bugs found and fixed
+
+- **Escalation stacking, second path.** Refinements were capped individually but not
+  in aggregate: a public exploit lifted MEDIUM -> HIGH and a critical-tier Falco alert
+  then lifted HIGH -> CRITICAL, moving a finding two levels above its base and making
+  an EPSS 0.02 finding Act. It also defeated `apply_runtime`'s own "never touches
+  MEDIUM/LOW" guard purely by ordering. Found by the new test suite; `analyze()` now
+  clamps upward movement to one level and records the clamp in the rationale.
+
+### Problems / Blockers
+
+- **Runtime reachability is image-level, not CVE-level** (issue #17). One Falco alert
+  escalates every borderline finding on that image, with no causal link to the
+  vulnerable package: a single alert on `vuln-demo:1.0` produced 20 of its 22 Act
+  items. The fix is package-level attribution using `proc.exepath` / `fd.name` from
+  the alert against the finding's affected packages, degrading to annotate-only when
+  no package can be attributed.
+- **Gatekeeper is still generate-only** — policy YAML is emitted but nothing applies
+  it. An opt-in apply switch with confirmation is planned.
+- Numbers produced before the escalation-cap fix may be marginally high, so the
+  canonical corpus is frozen *after* issue #17 lands rather than before.
+
+### Next week plan
+
+- **Issue #17** — package-level runtime attribution, with attribution rates reported
+  by the evaluator.
+- **Freeze the canonical corpus** — one dated result set that every paper number cites.
+- **Literature review** — academic, commercial and open-source, including Kubescape.
+- **Paper** §III Method and §IV Evaluation (issue #10, TNSM).
+- **Local web UI** — thin backend over the CLI plus a frontend, for the demo.
+
+---
+
 _(Add a new section each week)_
