@@ -1,0 +1,52 @@
+{
+  "images": [
+    {
+      "image": "busybox:1.35",
+      "summary": {}
+    },
+    {
+      "image": "nginx:1.21",
+      "summary": {
+        "total_cves": 493,
+        "critical_act": 34,
+        "high_attend": 71,
+        "medium_track_star": 95,
+        "low_track": 293,
+        "alert_reduction_pct": 78.7
+      }
+    },
+    {
+      "image": "nginx:latest",
+      "summary": {
+        "total_cves": 140,
+        "critical_act": 5,
+        "high_attend": 5,
+        "medium_track_star": 16,
+        "low_track": 114,
+        "alert_reduction_pct": 92.9
+      }
+    },
+    {
+      "image": "redis:6.2",
+      "summary": {
+        "total_cves": 85,
+        "critical_act": 2,
+        "high_attend": 6,
+        "medium_track_star": 8,
+        "low_track": 69,
+        "alert_reduction_pct": 90.6
+      }
+    },
+    {
+      "image": "vuln-demo:1.0",
+      "summary": {
+        "total_cves": 175,
+        "critical_act": 4,
+        "high_attend": 15,
+        "medium_track_star": 19,
+        "low_track": 137,
+        "alert_reduction_pct": 89.1
+      }
+    }
+  ]
+}

@@ -1,0 +1,398 @@
+{
+  "summary": {
+    "total": 20,
+    "by_priority": {
+      "Warning": 14,
+      "Critical": 2,
+      "Notice": 4
+    },
+    "by_image": {
+      "redis:6.2": 1,
+      "busybox:1.35": 2,
+      "vuln-demo:1.0": 1,
+      "nginx:1.21": 1
+    }
+  },
+  "alerts": [
+    {
+      "time": "2026-09-01T05:24:57.891657336Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:57.891657336: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=<NA> gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/usr/bin/cat parent=sh command=cat /etc/shadow terminal=0 container_id=769b31ade0b9 container_name=k8s_redis_internal-pod_default_baa7ead4-1c45-4893-8f69-ac0b402c072c_477 container_image_repository=redis container_image_tag=6.2 k8s_pod_name=internal-pod k8s_ns_name=default",
+      "namespace": "default",
+      "pod": "internal-pod",
+      "container": "k8s_redis_internal-pod_default_baa7ead4-1c45-4893-8f69-ac0b402c072c_477",
+      "image": "redis:6.2",
+      "process": "cat",
+      "exepath": "/usr/bin/cat",
+      "cmdline": "cat /etc/shadow",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:57.958356980Z",
+      "rule": "Drop and execute new binary in container",
+      "priority": "Critical",
+      "output": "05:24:57.958356980: Critical Executing binary not part of base image | proc_exe=mount proc_sname= gparent=<NA> proc_exe_ino_ctime=1785330201991973088 proc_exe_ino_mtime=5992711285472130048 proc_exe_ino_ctime_duration_proc_start=2910095966036751 proc_cwd=./ container_start_ts=1785330201204739087 evt_type=execve user=root user_uid=0 user_loginuid=-1 process=mount proc_exepath=/usr/bin/mount parent=<NA> command=mount -t tmpfs -o size=128524255232,noswap tmpfs /var/lib/kubelet/pods/348506fe-0203-4016-aa7a-816281d62eda/volumes/kubernetes.io~projected/kube-api-access-wvtgm terminal=0 exe_flags=EXE_WRITABLE|EXE_UPPER_LAYER container_id=82d331976fcb container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "mount",
+      "exepath": "/usr/bin/mount",
+      "cmdline": "mount -t tmpfs -o size=128524255232,noswap tmpfs /var/lib/kubelet/pods/348506fe-0203-4016-aa7a-816281d62eda/volumes/kubernetes.io~projected/kube-api-access-wvtgm",
+      "parent": null,
+      "file": "",
+      "evt_type": "execve",
+      "tags": [
+        "TA0003"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:58.057524664Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:58.057524664: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=<NA> gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/bin/cat parent=sh command=cat /etc/shadow terminal=0 container_id=065dc70b3a3f container_name=k8s_tools_priv-pod_default_d5386d4a-5473-44d0-b0bf-9133e5b3ade1_477 container_image_repository=busybox container_image_tag=1.35 k8s_pod_name=priv-pod k8s_ns_name=default",
+      "namespace": "default",
+      "pod": "priv-pod",
+      "container": "k8s_tools_priv-pod_default_d5386d4a-5473-44d0-b0bf-9133e5b3ade1_477",
+      "image": "busybox:1.35",
+      "process": "cat",
+      "exepath": "/bin/cat",
+      "cmdline": "cat /etc/shadow",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:58.161530995Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:58.161530995: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=<NA> ggparent=<NA> gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/usr/bin/cat parent=sh command=cat /etc/shadow terminal=0 container_id=e64ee65330e2 container_name=k8s_vuln-demo_vuln-demo-78585b66c7-59tt8_default_f10c3f39-1158-4ac5-a3f3-fad58f70c3c1_0 container_image_repository=vuln-demo container_image_tag=1.0 k8s_pod_name=vuln-demo-78585b66c7-59tt8 k8s_ns_name=default",
+      "namespace": "default",
+      "pod": "vuln-demo-78585b66c7-59tt8",
+      "container": "k8s_vuln-demo_vuln-demo-78585b66c7-59tt8_default_f10c3f39-1158-4ac5-a3f3-fad58f70c3c1_0",
+      "image": "vuln-demo:1.0",
+      "process": "cat",
+      "exepath": "/usr/bin/cat",
+      "cmdline": "cat /etc/shadow",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:58.266365801Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:58.266365801: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=<NA> ggparent=<NA> gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/bin/cat parent=sh command=cat /etc/shadow terminal=0 container_id=0481e0c00878 container_name=k8s_nginx_web-64448b899f-k5hp6_default_cb3e3061-283d-4a3b-b49b-22251dba267a_0 container_image_repository=nginx container_image_tag=1.21 k8s_pod_name=web-64448b899f-k5hp6 k8s_ns_name=default",
+      "namespace": "default",
+      "pod": "web-64448b899f-k5hp6",
+      "container": "k8s_nginx_web-64448b899f-k5hp6_default_cb3e3061-283d-4a3b-b49b-22251dba267a_0",
+      "image": "nginx:1.21",
+      "process": "cat",
+      "exepath": "/bin/cat",
+      "cmdline": "cat /etc/shadow",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:58.355285272Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:58.355285272: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=<NA> gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=cat proc_exepath=/bin/cat parent=sh command=cat /etc/shadow terminal=0 container_id=6ccac4748840 container_name=k8s_falco-trigger-1788240297_falco-trigger-1788240297_default_348506fe-0203-4016-aa7a-816281d62eda_0 container_image_repository=busybox container_image_tag=1.35 k8s_pod_name=falco-trigger-1788240297 k8s_ns_name=default",
+      "namespace": "default",
+      "pod": "falco-trigger-1788240297",
+      "container": "k8s_falco-trigger-1788240297_falco-trigger-1788240297_default_348506fe-0203-4016-aa7a-816281d62eda_0",
+      "image": "busybox:1.35",
+      "process": "cat",
+      "exepath": "/bin/cat",
+      "cmdline": "cat /etc/shadow",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:24:59.237647236Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:24:59.237647236: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:02.480837976Z",
+      "rule": "Drop and execute new binary in container",
+      "priority": "Critical",
+      "output": "05:25:02.480837976: Critical Executing binary not part of base image | proc_exe=umount proc_sname= gparent=<NA> proc_exe_ino_ctime=1785330201991973088 proc_exe_ino_mtime=5992711285472130048 proc_exe_ino_ctime_duration_proc_start=2910100488442562 proc_cwd=./ container_start_ts=1785330201204739087 evt_type=execve user=root user_uid=0 user_loginuid=-1 process=umount proc_exepath=/usr/bin/umount parent=<NA> command=umount /var/lib/kubelet/pods/348506fe-0203-4016-aa7a-816281d62eda/volumes/kubernetes.io~projected/kube-api-access-wvtgm terminal=0 exe_flags=EXE_WRITABLE|EXE_UPPER_LAYER container_id=82d331976fcb container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "umount",
+      "exepath": "/usr/bin/umount",
+      "cmdline": "umount /var/lib/kubelet/pods/348506fe-0203-4016-aa7a-816281d62eda/volumes/kubernetes.io~projected/kube-api-access-wvtgm",
+      "parent": null,
+      "file": "",
+      "evt_type": "execve",
+      "tags": [
+        "TA0003"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:03.255345834Z",
+      "rule": "Redirect STDOUT/STDIN to Network Connection in Container",
+      "priority": "Notice",
+      "output": "05:25:03.255345834: Notice Redirect stdout/stdin to network connection | gparent=containerd-shim ggparent=systemd gggparent=<NA> fd.sip=127.0.0.1 connection=127.0.0.1:35404->127.0.0.1:6333 lport=6333 rport=35404 fd_type=ipv4 fd_proto=tcp evt_type=dup3 user=root user_uid=0 user_loginuid=-1 process=bash proc_exepath=/usr/bin/bash parent=sh command=bash -c echo > /dev/tcp/127.0.0.1/6333 terminal=0 container_id=7006b68d540a container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "bash",
+      "exepath": "/usr/bin/bash",
+      "cmdline": "bash -c echo > /dev/tcp/127.0.0.1/6333",
+      "parent": "sh",
+      "file": "127.0.0.1:35404->127.0.0.1:6333",
+      "evt_type": "dup3",
+      "tags": [
+        "T1059"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:04.289120593Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:04.289120593: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:09.343872524Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:09.343872524: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:13.287586077Z",
+      "rule": "Redirect STDOUT/STDIN to Network Connection in Container",
+      "priority": "Notice",
+      "output": "05:25:13.287586077: Notice Redirect stdout/stdin to network connection | gparent=containerd-shim ggparent=systemd gggparent=<NA> fd.sip=127.0.0.1 connection=127.0.0.1:33164->127.0.0.1:6333 lport=6333 rport=33164 fd_type=ipv4 fd_proto=tcp evt_type=dup3 user=root user_uid=0 user_loginuid=-1 process=bash proc_exepath=/usr/bin/bash parent=sh command=bash -c echo > /dev/tcp/127.0.0.1/6333 terminal=0 container_id=7006b68d540a container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "bash",
+      "exepath": "/usr/bin/bash",
+      "cmdline": "bash -c echo > /dev/tcp/127.0.0.1/6333",
+      "parent": "sh",
+      "file": "127.0.0.1:33164->127.0.0.1:6333",
+      "evt_type": "dup3",
+      "tags": [
+        "T1059"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:14.412600080Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:14.412600080: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:19.479722496Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:19.479722496: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:23.317665665Z",
+      "rule": "Redirect STDOUT/STDIN to Network Connection in Container",
+      "priority": "Notice",
+      "output": "05:25:23.317665665: Notice Redirect stdout/stdin to network connection | gparent=containerd-shim ggparent=systemd gggparent=<NA> fd.sip=127.0.0.1 connection=127.0.0.1:37504->127.0.0.1:6333 lport=6333 rport=37504 fd_type=ipv4 fd_proto=tcp evt_type=dup3 user=root user_uid=0 user_loginuid=-1 process=bash proc_exepath=/usr/bin/bash parent=sh command=bash -c echo > /dev/tcp/127.0.0.1/6333 terminal=0 container_id=7006b68d540a container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "bash",
+      "exepath": "/usr/bin/bash",
+      "cmdline": "bash -c echo > /dev/tcp/127.0.0.1/6333",
+      "parent": "sh",
+      "file": "127.0.0.1:37504->127.0.0.1:6333",
+      "evt_type": "dup3",
+      "tags": [
+        "T1059"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:24.540289480Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:24.540289480: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:29.601891593Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:29.601891593: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:33.358581497Z",
+      "rule": "Redirect STDOUT/STDIN to Network Connection in Container",
+      "priority": "Notice",
+      "output": "05:25:33.358581497: Notice Redirect stdout/stdin to network connection | gparent=containerd-shim ggparent=systemd gggparent=<NA> fd.sip=127.0.0.1 connection=127.0.0.1:44228->127.0.0.1:6333 lport=6333 rport=44228 fd_type=ipv4 fd_proto=tcp evt_type=dup3 user=root user_uid=0 user_loginuid=-1 process=bash proc_exepath=/usr/bin/bash parent=sh command=bash -c echo > /dev/tcp/127.0.0.1/6333 terminal=0 container_id=7006b68d540a container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "bash",
+      "exepath": "/usr/bin/bash",
+      "cmdline": "bash -c echo > /dev/tcp/127.0.0.1/6333",
+      "parent": "sh",
+      "file": "127.0.0.1:44228->127.0.0.1:6333",
+      "evt_type": "dup3",
+      "tags": [
+        "T1059"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:34.662304517Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:34.662304517: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    },
+    {
+      "time": "2026-09-01T05:25:39.712643316Z",
+      "rule": "Read sensitive file untrusted",
+      "priority": "Warning",
+      "output": "05:25:39.712643316: Warning Sensitive file opened for reading by non-trusted program | file=/etc/shadow gparent=containerd-shim ggparent=systemd gggparent=<NA> evt_type=openat user=root user_uid=0 user_loginuid=-1 process=pg_isready proc_exepath=/usr/bin/perl parent=sh command=pg_isready /usr/bin/pg_isready -U spicedb terminal=0 container_id=929aca313e45 container_name=<NA> container_image_repository=<NA> container_image_tag=<NA> k8s_pod_name=<NA> k8s_ns_name=<NA>",
+      "namespace": null,
+      "pod": null,
+      "container": null,
+      "image": "",
+      "process": "pg_isready",
+      "exepath": "/usr/bin/perl",
+      "cmdline": "pg_isready /usr/bin/pg_isready -U spicedb",
+      "parent": "sh",
+      "file": "/etc/shadow",
+      "evt_type": "openat",
+      "tags": [
+        "T1555"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2645 @@
+{
+  "execution_timestamp": "2026-09-01T05:42:04Z",
+  "container_image": "vuln-demo:1.0",
+  "source_scan": "epss_enriched_trivy_vuln-demo_1.0.json",
+  "pipeline": {
+    "scan": "trivy",
+    "enrichment": [
+      "epss",
+      "cisa_kev"
+    ],
+    "decision": "ssvc",
+    "agent": "langgraph"
+  },
+  "summary": {
+    "total_cves": 175,
+    "critical_act": 4,
+    "high_attend": 15,
+    "medium_track_star": 19,
+    "low_track": 137,
+    "alert_reduction_pct": 89.1
+  },
+  "errors": [],
+  "findings": [
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-14322",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.55803,
+      "kev_status": false,
+      "ssvc_decision": "Act",
+      "priority": "CRITICAL",
+      "decision_rationale": "public exploit code exists; runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | This vulnerability (Pallets Werkzeug vulnerable to Path Traversal) in Werkzeug has a 55.8% probability of exploitation in the next 30 days.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 0.15.5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-15467",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.48211,
+      "kev_status": false,
+      "ssvc_decision": "Act",
+      "priority": "CRITICAL",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | This vulnerability (openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing) in libssl3t64 has a 48.2% probability of exploitation in the next 30 days.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2018-18074",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.07443,
+      "kev_status": false,
+      "ssvc_decision": "Act",
+      "priority": "CRITICAL",
+      "decision_rationale": "escalated HIGH->CRITICAL: internet-facing + EPSS 0.074; runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | This vulnerability (python-requests: Redirect from HTTPS to HTTP does not remove Authorization header) in requests has a 7.4% probability of exploitation in the next 30 days.",
+      "affected_packages": [
+        "requests@2.19.1 -> 2.20.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2018-20796",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.05757,
+      "kev_status": false,
+      "ssvc_decision": "Act",
+      "priority": "CRITICAL",
+      "decision_rationale": "escalated HIGH->CRITICAL: internet-facing + EPSS 0.058; runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | This vulnerability (glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c) in libc-bin has a 5.8% probability of exploitation in the next 30 days.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2018-1000656",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.03855,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-flask: Denial of Service via crafted JSON file in Flask has notable exploit risk (EPSS 0.039). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Flask@0.12.2 -> 0.12.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-10906",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.6,
+      "epss_score": 0.03633,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-jinja2: str.format_map allows sandbox escape in Jinja2 has notable exploit risk (EPSS 0.036). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 2.10.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-45447",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.03566,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Heap Use-After-Free in OpenSSL PKCS7_verify() in libssl3t64 has notable exploit risk (EPSS 0.036). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-34069",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.03397,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-werkzeug: user may execute code on a developer's machine in Werkzeug has notable exploit risk (EPSS 0.034). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 3.0.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-1010022",
+      "cvss_severity": "LOW",
+      "cvss_score": 9.8,
+      "epss_score": 0.03223,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: stack guard protection bypass in libc-bin has notable exploit risk (EPSS 0.032). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-1010023",
+      "cvss_severity": "LOW",
+      "cvss_score": 8.8,
+      "epss_score": 0.03044,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: running ldd on malicious ELF leads to code execution because of wrong size computation in libc-bin has notable exploit risk (EPSS 0.030). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-11324",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.02836,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-urllib3: Certification mishandle when error should be thrown in urllib3 has notable exploit risk (EPSS 0.028). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 1.24.2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-21441",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.02774,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3 vulnerable to decompression-bomb safeguard bypass when following HTTP redirects (streaming API) in urllib3 has notable exploit risk (EPSS 0.028). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.6.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-9192",
+      "cvss_severity": "LOW",
+      "cvss_score": 7.5,
+      "epss_score": 0.02427,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c in libc-bin has notable exploit risk (EPSS 0.024). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-14806",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.02288,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-werkzeug: insufficient debugger PIN randomness vulnerability in Werkzeug has notable exploit risk (EPSS 0.023). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 0.15.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-1010083",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.01884,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-flask: unexpected memory usage can lead to denial of service via crafted encoded JSON data in Flask has notable exploit risk (EPSS 0.019). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Flask@0.12.2 -> 1.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2017-11424",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.01804,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-jwt: Incorrect handling of PEM-encoded public keys in PyJWT has notable exploit risk (EPSS 0.018). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "PyJWT@1.4.0 -> 1.5.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-25577",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.0142,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-werkzeug: high resource usage when parsing multipart form data with many fields in Werkzeug has notable exploit risk (EPSS 0.014). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 2.2.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-30861",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.01261,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | flask: Possible disclosure of permanent session cookie due to missing Vary: Cookie header in Flask has notable exploit risk (EPSS 0.013). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "Flask@0.12.2 -> 2.3.2, 2.2.5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-43804",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.1,
+      "epss_score": 0.01207,
+      "kev_status": false,
+      "ssvc_decision": "Attend",
+      "priority": "HIGH",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-urllib3: Cookie request header isn't stripped during cross-origin redirects in urllib3 has notable exploit risk (EPSS 0.012). Combined with its severity, this warrants prompt attention.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.0.6, 1.26.17"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-11187",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.04691,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Arbitrary code execution or denial of service through crafted PKCS#12 file in libssl3t64 has moderate exploit probability (EPSS 0.047). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2005-2541",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.03992,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | tar: does not properly warn the user when extracting setuid or setgid files in tar has moderate exploit probability (EPSS 0.040). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2020-28493",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.03546,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-jinja2: ReDoS vulnerability in the urlize filter in Jinja2 has moderate exploit probability (EPSS 0.035). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 2.11.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-1010024",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.03193,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: ASLR bypass using cache of thread stack and heap in libc-bin has moderate exploit probability (EPSS 0.032). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-32681",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.1,
+      "epss_score": 0.02974,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-requests: Unintended leak of Proxy-Authorization header in requests has moderate exploit probability (EPSS 0.030). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "requests@2.19.1 -> 2.31.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2010-4756",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.02611,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glob implementation can cause excessive CPU and memory consumption due to crafted glob expressions in libc-bin has moderate exploit probability (EPSS 0.026). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2020-26137",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.5,
+      "epss_score": 0.02269,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-urllib3: CRLF injection via HTTP request method in urllib3 has moderate exploit probability (EPSS 0.023). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 1.25.9"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-1010025",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.02267,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: information disclosure of heap addresses of pthread_created thread in libc-bin has moderate exploit probability (EPSS 0.023). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2019-11236",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.1,
+      "epss_score": 0.02073,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-urllib3: CRLF injection due to not encoding the '\\r\\n' sequence leading to possible attack on internal service in urllib3 has moderate exploit probability (EPSS 0.021). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 1.24.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2021-45346",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.3,
+      "epss_score": 0.01614,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: crafted SQL query allows a malicious user to obtain sensitive information in libsqlite3-0 has moderate exploit probability (EPSS 0.016). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-18798",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.01481,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: QUIC server may trigger double free when processing INITIAL packet in libssl3t64 has moderate exploit probability (EPSS 0.015). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-63076",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0133,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: invalid pointer dereference in CMP server via crafted protectionAlg in libssl3t64 has moderate exploit probability (EPSS 0.013). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2011-3374",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.7,
+      "epss_score": 0.01191,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | It was found that apt-key in apt, all versions, do not correctly valid ... in apt has moderate exploit probability (EPSS 0.012). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "apt@3.0.3",
+        "libapt-pkg7.0@3.0.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42764",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.01165,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: NULL pointer dereference in QUIC server initial packet handling in libssl3t64 has moderate exploit probability (EPSS 0.012). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-37891",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.5,
+      "epss_score": 0.01141,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: proxy-authorization request header is not stripped during cross-origin redirects in urllib3 has moderate exploit probability (EPSS 0.011). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 1.26.19, 2.2.2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42766",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.0106,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Possible NULL Dereference in Password-Based CMS Decryption in libssl3t64 has moderate exploit probability (EPSS 0.011). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-34183",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.01049,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Unbounded Memory Growth in the QUIC PATH_CHALLENGE Handler in libssl3t64 has moderate exploit probability (EPSS 0.010). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-31790",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0103,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: openssl: Information Disclosure from Uninitialized Memory via Invalid RSA Public Key in libssl3t64 has moderate exploit probability (EPSS 0.010). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-34180",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.01025,
+      "kev_status": false,
+      "ssvc_decision": "Track*",
+      "priority": "MEDIUM",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Heap buffer over-read in ASN.1 decoding can lead to denial of service or information disclosure. in libssl3t64 has moderate exploit probability (EPSS 0.010). Lower impact reduces urgency but the vulnerability should be tracked.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-14457",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00984,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: RPK server signature algorithm selection can dereference a missing certificate in libssl3t64 has very low exploit probability (EPSS 0.0098). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-34064",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00979,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | jinja2: accepts keys containing non-attribute characters in Jinja2 has very low exploit probability (EPSS 0.0098). Safe to defer.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 3.1.4"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2007-5686",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00942,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | initscripts in rPath Linux 1 sets insecure permissions for the /var/lo ... in login.defs has very low exploit probability (EPSS 0.0094). Safe to defer.",
+      "affected_packages": [
+        "login.defs@1:4.17.4-2",
+        "passwd@1:4.17.4-2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-47081",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00912,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | requests: Requests vulnerable to .netrc credentials leak via malicious URLs in requests has very low exploit probability (EPSS 0.0091). Safe to defer.",
+      "affected_packages": [
+        "requests@2.19.1 -> 2.32.4"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-22195",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.1,
+      "epss_score": 0.00892,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | jinja2: HTML attribute injection when passing user input as keys to xmlattr filter in Jinja2 has very low exploit probability (EPSS 0.0089). Safe to defer.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 3.1.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-28388",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00885,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to NULL pointer dereference in delta CRL processing in libssl3t64 has very low exploit probability (EPSS 0.0089). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-69421",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00877,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service via malformed PKCS#12 file processing in libssl3t64 has very low exploit probability (EPSS 0.0088). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-28389",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00805,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service vulnerability in CMS processing in libssl3t64 has very low exploit probability (EPSS 0.0080). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-28390",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00805,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to NULL pointer dereference in CMS EnvelopedData processing in libssl3t64 has very low exploit probability (EPSS 0.0080). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-7383",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00804,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Heap buffer overflow due to signed integer overflow in Unicode output sizing in libssl3t64 has very low exploit probability (EPSS 0.0080). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-69420",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00798,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service via malformed TimeStamp Response in libssl3t64 has very low exploit probability (EPSS 0.0080). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-15468",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00777,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service via NULL pointer dereference in QUIC protocol handling in libssl3t64 has very low exploit probability (EPSS 0.0078). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-49766",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00776,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | werkzeug: python-werkzeug: Werkzeug safe_join not safe on Windows in Werkzeug has very low exploit probability (EPSS 0.0078). Safe to defer.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 3.0.6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-14456",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00729,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service via unbounded memory growth in QUIC server in libssl3t64 has very low exploit probability (EPSS 0.0073). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-9076",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00707,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to heap out-of-bounds read in CMS password-based decryption in libssl3t64 has very low exploit probability (EPSS 0.0071). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-66418",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00682,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3: Unbounded decompression chain leads to resource exhaustion in urllib3 has very low exploit probability (EPSS 0.0068). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.6.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-66471",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00682,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3 Streaming API improperly handles highly compressed data in urllib3 has very low exploit probability (EPSS 0.0068). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.6.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-28387",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.1,
+      "epss_score": 0.00671,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication in libssl3t64 has very low exploit probability (EPSS 0.0067). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-63072",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00612,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: heap buffer overflow in CMS key unwrapping in libssl3t64 has very low exploit probability (EPSS 0.0061). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-45445",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00603,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: AES-OCB IV Ignored on EVP_Cipher() Path in libssl3t64 has very low exploit probability (EPSS 0.0060). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42768",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.0058,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Multi-RecipientInfo Bleichenbacher Oracle in CMS_decrypt() and PKCS7_decrypt() in libssl3t64 has very low exploit probability (EPSS 0.0058). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-0915",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00574,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Information disclosure via zero-valued network query in libc-bin has very low exploit probability (EPSS 0.0057). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u2",
+        "libc6@2.41-12 -> 2.41-12+deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-69419",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00564,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Arbitrary code execution due to out-of-bounds write in PKCS#12 processing in libssl3t64 has very low exploit probability (EPSS 0.0056). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42767",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00557,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: NULL Pointer Dereference in CRMF EncryptedValue Decryption in libssl3t64 has very low exploit probability (EPSS 0.0056). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-27199",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00556,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged |  Werkzeug safe_join() allows Windows special device names in Werkzeug has very low exploit probability (EPSS 0.0056). Safe to defer.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 3.1.6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-23949",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00548,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | jaraco.context: jaraco.context: Path traversal via malicious tar archives in jaraco.context has very low exploit probability (EPSS 0.0055). Safe to defer.",
+      "affected_packages": [
+        "jaraco.context@5.3.0 -> 6.1.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-45803",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 4.2,
+      "epss_score": 0.00544,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: Request body not stripped after redirect from 303 status changes request method to GET in urllib3 has very low exploit probability (EPSS 0.0054). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.0.7, 1.26.18"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-56326",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00521,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | jinja2: Jinja has a sandbox breakout through indirect reference to format method in Jinja2 has very low exploit probability (EPSS 0.0052). Safe to defer.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 3.1.5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2011-4116",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.3,
+      "epss_score": 0.0052,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl: File:: Temp insecure temporary file handling in perl-base has very low exploit probability (EPSS 0.0052). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-54874",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00516,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: excessive memory use buffering DTLS records for a future epoch in libssl3t64 has very low exploit probability (EPSS 0.0052). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2018-25091",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.1,
+      "epss_score": 0.00516,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3 does not remove the authorization HTTP header when following a cross-origin redirect in urllib3 has very low exploit probability (EPSS 0.0052). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 1.24.2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-22796",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00511,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service via type confusion in PKCS#7 signature verification in libssl3t64 has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-66221",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00511,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | Werkzeug: Werkzeug: Denial of service via Windows device names in path segments in Werkzeug has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 3.1.4"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-23934",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.5,
+      "epss_score": 0.00507,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-werkzeug: cookie prefixed with = can shadow unprefixed cookie in Werkzeug has very low exploit probability (EPSS 0.0051). Safe to defer.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 2.2.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-5450",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00502,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Heap Buffer Overflow in `scanf` with `%mc` format specifier and large width in libc-bin has very low exploit probability (EPSS 0.0050). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-27516",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 8.8,
+      "epss_score": 0.00497,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | jinja2: Jinja sandbox breakout through attr filter selecting format method in Jinja2 has very low exploit probability (EPSS 0.0050). Safe to defer.",
+      "affected_packages": [
+        "Jinja2@2.10 -> 3.1.6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-63074",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00488,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: CMP indefinite cache growth of ExtraCerts in libssl3t64 has very low exploit probability (EPSS 0.0049). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-63075",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.0048,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: QUIC ACK-only packet retention can cause memory exhaustion in libssl3t64 has very low exploit probability (EPSS 0.0048). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-5752",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 3.3,
+      "epss_score": 0.00476,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pip: Mercurial configuration injectable in repo revision when installing via pip in pip has very low exploit probability (EPSS 0.0048). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 23.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-8869",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00469,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pip: pip missing checks on symbolic link extraction in pip has very low exploit probability (EPSS 0.0047). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 25.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42770",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00468,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: FFC-DH Peer Validation Uses Attacker-Supplied q in libssl3t64 has very low exploit probability (EPSS 0.0047). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2013-4392",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00468,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: TOCTOU race condition when updating file permissions and SELinux security contexts in libsystemd0 has very low exploit probability (EPSS 0.0047). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-15281",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00456,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: wordexp with WRDE_REUSE and WRDE_APPEND may return uninitialized memory in libc-bin has very low exploit probability (EPSS 0.0046). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u2",
+        "libc6@2.41-12 -> 2.41-12+deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-21860",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00451,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged |  Werkzeug safe_join() allows Windows special device names with compound extensions in Werkzeug has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "Werkzeug@0.15.2 -> 3.1.5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-34743",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.0045,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | xz: XZ Utils: Denial of Service via buffer overflow in index decoding in liblzma5 has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "liblzma5@5.8.1-1 -> 5.8.1-1+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-9538",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00448,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-Archive-Tar: perl-Archive-Tar: Denial of Service via crafted tar header with large entry size in perl-base has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-69720",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.8,
+      "epss_score": 0.00447,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution. in libncursesw6 has very low exploit probability (EPSS 0.0045). Safe to defer.",
+      "affected_packages": [
+        "libncursesw6@6.5+20250216-2",
+        "libtinfo6@6.5+20250216-2",
+        "ncurses-base@6.5+20250216-2",
+        "ncurses-bin@6.5+20250216-2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-8376",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "epss_score": 0.00443,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl: Perl: Heap buffer overflow when compiling regular expressions on 32-bit builds in perl-base has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-3184",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00436,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | util-linux: util-linux: Access control bypass due to improper hostname canonicalization in bsdutils has very low exploit probability (EPSS 0.0044). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-2673",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00435,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL TLS 1.3 server may choose unexpected key agreement group in libssl3t64 has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-34182",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00435,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: CMS AuthEnvelopedData Processing May Accept Forged Messages in libssl3t64 has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-13221",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.1,
+      "epss_score": 0.00432,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl: Perl: Incorrect regular expression processing via large regular expressions in perl-base has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42496",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.1,
+      "epss_score": 0.0043,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-archive-tar: perl-archive-tar: Path traversal via crafted symlinks allows arbitrary file access in perl-base has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2022-0563",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.5,
+      "epss_score": 0.00427,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline in bsdutils has very low exploit probability (EPSS 0.0043). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5",
+        "libblkid1@2.41-5",
+        "liblastlog2-2@2.41-5",
+        "libmount1@2.41-5",
+        "libsmartcols1@2.41-5",
+        "libuuid1@2.41-5",
+        "login@1:4.16.0-2+really2.41-5",
+        "mount@2.41-5",
+        "util-linux@2.41-5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-56433",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00423,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | shadow-utils: Default subordinate ID configuration in /etc/login.defs could lead to compromise in login.defs has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "login.defs@1:4.17.4-2",
+        "passwd@1:4.17.4-2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-2219",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00418,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | It was discovered that dpkg-deb (a component of dpkg, the Debian packa ... in dpkg has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "dpkg@1.22.21 -> 1.22.22"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-66199",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00418,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to excessive memory allocation in TLS 1.3 certificate compression in libssl3t64 has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42497",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00417,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-Archive-Tar: perl-Archive-Tar: Arbitrary file modification via crafted hardlinks during archive extraction in perl-base has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-41992",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7.5,
+      "epss_score": 0.00415,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | gzip: gzip: Information disclosure via global buffer overflow in LZH decompression in gzip has very low exploit probability (EPSS 0.0042). Safe to defer.",
+      "affected_packages": [
+        "gzip@1.13-1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-63073",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00409,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: untrusted sender DN used as format string in CMP response validation in libssl3t64 has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-50181",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 6.1,
+      "epss_score": 0.00408,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3 redirects are not disabled when retries are disabled on PoolManager instantiation in urllib3 has very low exploit probability (EPSS 0.0041). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.5.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-59890",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00405,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | setuptools: setuptools: MANIFEST.in exclusion bypass in sdist via Unicode normalization collision (NFC/NFD) in setuptools has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "setuptools@79.0.1 -> 83.0.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-7017",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00403,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | HTTP::Tiny versions before 0.095 for Perl forward credential headers t ... in perl-base has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42769",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00401,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Trust-Anchor Substitution via cert/issuer Typo in CMP rootCaKeyUpdate in libssl3t64 has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-48526",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00395,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-pyjwt: PyJWT: Authentication bypass due to forged JSON Web Tokens in PyJWT has very low exploit probability (EPSS 0.0040). Safe to defer.",
+      "affected_packages": [
+        "PyJWT@1.4.0 -> 2.13.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-1703",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.0039,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pip: pip: Information disclosure via path traversal when installing crafted wheel archives in pip has very low exploit probability (EPSS 0.0039). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 26.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-4046",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00382,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Denial of Service via iconv() function with specific character sets in libc-bin has very low exploit probability (EPSS 0.0038). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u3",
+        "libc6@2.41-12 -> 2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-45446",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00374,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: Incorrect Tag Processing for Empty Messages in AES-GCM-SIV and AES-SIV modes in libssl3t64 has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-12087",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00374,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-Socket: perl-Socket: Information Disclosure due to Out-of-Bounds Read in perl-base has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-48959",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00373,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-IO-Compress: perl-IO-Compress: CPU exhaustion via per-byte read loop in fastForward in perl-base has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-5704",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00372,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | tar: tar: Hidden file injection via crafted archives in tar has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-5928",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00369,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Information disclosure or denial of service via ungetwc function with specific wide character encodings in libc-bin has very low exploit probability (EPSS 0.0037). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-0861",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00359,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: Integer overflow in memalign leads to heap corruption in libc-bin has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u2",
+        "libc6@2.41-12 -> 2.41-12+deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-6238",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00358,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Application crash or uninitialized memory read via crafted DNS response in libc-bin has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-57433",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00357,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | Storable: Storable: Denial of Service via signed integer overflow in deserialization in perl-base has very low exploit probability (EPSS 0.0036). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-31439",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00349,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | An issue was discovered in systemd 253. An attacker can modify the con ... in libsystemd0 has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2017-18018",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.7,
+      "epss_score": 0.00348,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | coreutils: race condition vulnerability in chown and chgrp in coreutils has very low exploit probability (EPSS 0.0035). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-7709",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00345,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | An integer overflow exists in the  FTS5 https://sqlite.org/fts5.html e ... in libsqlite3-0 has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7 -> 3.46.1-7+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-27205",
+      "cvss_severity": "LOW",
+      "cvss_score": 4.3,
+      "epss_score": 0.00344,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | flask: Flask: Information disclosure via improper caching of session data in Flask has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "Flask@0.12.2 -> 3.1.3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-31437",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00341,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | An issue was discovered in systemd 253. An attacker can modify a seale ... in libsystemd0 has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2024-35195",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0034,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | requests: subsequent requests to the same host ignore cert verification in requests has very low exploit probability (EPSS 0.0034). Safe to defer.",
+      "affected_packages": [
+        "requests@2.19.1 -> 2.32.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-53910",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00332,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | diffutils: heap\u2011based buffer overflow due to multiple signed integer overflows in line\u2011mapping calculations in diffutils has very low exploit probability (EPSS 0.0033). Safe to defer.",
+      "affected_packages": [
+        "diffutils@1:3.10-4"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-44431",
+      "cvss_severity": "HIGH",
+      "cvss_score": 5.3,
+      "epss_score": 0.00331,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | urllib3: urllib3: Information disclosure via cross-origin redirects forwarding sensitive headers in urllib3 has very low exploit probability (EPSS 0.0033). Safe to defer.",
+      "affected_packages": [
+        "urllib3@1.24.1 -> 2.7.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-4437",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00325,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Incorrect DNS response parsing via crafted DNS server response in libc-bin has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u3",
+        "libc6@2.41-12 -> 2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2023-31438",
+      "cvss_severity": "LOW",
+      "cvss_score": 5.3,
+      "epss_score": 0.00325,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | An issue was discovered in systemd 253. An attacker can truncate a sea ... in libsystemd0 has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-54411",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0032,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module in libpam-modules has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libpam-modules@1.7.0-5",
+        "libpam-modules-bin@1.7.0-5",
+        "libpam-runtime@1.7.0-5",
+        "libpam0g@1.7.0-5"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-8643",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.0032,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite in pip has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 26.1.2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-24049",
+      "cvss_severity": "HIGH",
+      "cvss_score": 5.5,
+      "epss_score": 0.00317,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | wheel: wheel: Privilege Escalation or Arbitrary Code Execution via malicious wheel file unpacking in wheel has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "wheel@0.45.1 -> 0.46.2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-4438",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00316,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Invalid DNS hostname returned via gethostbyaddr functions in libc-bin has very low exploit probability (EPSS 0.0032). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12 -> 2.41-12+deb13u3",
+        "libc6@2.41-12 -> 2.41-12+deb13u3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-70873",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00301,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: SQLite: Information Disclosure via Crafted ZIP File in libsqlite3-0 has very low exploit probability (EPSS 0.0030). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-48962",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00292,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-IO-Compress: perl-IO-Compress: Arbitrary code execution via attacker-controlled output glob in perl-base has very low exploit probability (EPSS 0.0029). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-32597",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00269,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pyjwt: PyJWT accepts unknown `crit` header extensions (RFC 7515 \u00a74.1.11 MUST violation) in PyJWT has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "PyJWT@1.4.0 -> 2.12.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-5278",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00266,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | coreutils: Heap Buffer Under-Read in GNU Coreutils sort via Key Specification in coreutils has very low exploit probability (EPSS 0.0027). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-48961",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00262,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-IO-Compress: IO::Compress: Denial of Service in zipdetails CLI tool via malformed Info-ZIP Unix Extra Field in perl-base has very low exploit probability (EPSS 0.0026). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-31789",
+      "cvss_severity": "CRITICAL",
+      "cvss_score": 9.8,
+      "epss_score": 0.00243,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing in libssl3t64 has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.5-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-5435",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00237,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Out-of-bounds write via TSIG record processing in libc-bin has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-34181",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00235,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: PKCS#12 Files with PBMAC1 Are Accepted with Short HMAC Keys in libssl3t64 has very low exploit probability (EPSS 0.0024). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.6-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-7010",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00227,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | HTTP::Tiny versions before 0.093 for Perl do not validate CRLF in HTTP ... in perl-base has very low exploit probability (EPSS 0.0023). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-27171",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00218,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | zlib: zlib: Denial of Service via infinite loop in CRC32 combine functions in zlib1g has very low exploit probability (EPSS 0.0022). Safe to defer.",
+      "affected_packages": [
+        "zlib1g@1:1.3.dfsg+really1.3.1-1+b1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-57432",
+      "cvss_severity": "HIGH",
+      "cvss_score": 8.4,
+      "epss_score": 0.00211,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl: Perl: Information disclosure via integer overflow in pack/unpack operations in perl-base has very low exploit probability (EPSS 0.0021). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-6791",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00208,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: Glibc: Denial of Service via stack exhaustion during tilde expansion in libc-bin has very low exploit probability (EPSS 0.0021). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-4878",
+      "cvss_severity": "HIGH",
+      "cvss_score": 7,
+      "epss_score": 0.00206,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | libcap: libcap: Privilege escalation via TOCTOU race condition in cap_set_file() in libcap2 has very low exploit probability (EPSS 0.0021). Safe to defer.",
+      "affected_packages": [
+        "libcap2@1:2.75-10+b1 -> 1:2.75-10+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-14104",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00193,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | util-linux: util-linux: Heap buffer overread in setpwnam() when processing 256-byte usernames in bsdutils has very low exploit probability (EPSS 0.0019). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5 -> 2.41.3-1",
+        "libblkid1@2.41-5 -> 2.41.3-1",
+        "liblastlog2-2@2.41-5 -> 2.41.3-1",
+        "libmount1@2.41-5 -> 2.41.3-1",
+        "libsmartcols1@2.41-5 -> 2.41.3-1",
+        "libuuid1@2.41-5 -> 2.41.3-1",
+        "login@1:4.16.0-2+really2.41-5 -> 2.41.3-1",
+        "mount@2.41-5 -> 2.41.3-1",
+        "util-linux@2.41-5 -> 2.41.3-1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-15469",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00183,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Data integrity bypass in `openssl dgst` command due to silent truncation in libssl3t64 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-25645",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "epss_score": 0.00182,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | requests: Requests: Security bypass due to predictable temporary file creation in requests has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "requests@2.19.1 -> 2.33.0"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-11822",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00175,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: SQLite: Arbitrary code execution via crafted FTS5 full-text search data in libsqlite3-0 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-11824",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00175,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: SQLite: Arbitrary code execution and crash via heap-based buffer overflow in FTS5 in libsqlite3-0 has very low exploit probability (EPSS 0.0018). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-40228",
+      "cvss_severity": "LOW",
+      "cvss_score": 3.3,
+      "epss_score": 0.00173,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: systemd-journald: Unintended output to user terminals via logger command in libsystemd0 has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-6141",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00172,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | gnu-ncurses: ncurses Stack Buffer Overflow in libncursesw6 has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "libncursesw6@6.5+20250216-2",
+        "libtinfo6@6.5+20250216-2",
+        "ncurses-base@6.5+20250216-2",
+        "ncurses-bin@6.5+20250216-2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-13595",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "epss_score": 0.00168,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | util-linux: util-linux: heap use-after-free in libblkid nested partition probing in bsdutils has very low exploit probability (EPSS 0.0017). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5 -> 2.41.5-0+deb13u1",
+        "libblkid1@2.41-5 -> 2.41.5-0+deb13u1",
+        "liblastlog2-2@2.41-5 -> 2.41.5-0+deb13u1",
+        "libmount1@2.41-5 -> 2.41.5-0+deb13u1",
+        "libsmartcols1@2.41-5 -> 2.41.5-0+deb13u1",
+        "libuuid1@2.41-5 -> 2.41.5-0+deb13u1",
+        "login@1:4.16.0-2+really2.41-5 -> 2.41.5-0+deb13u1",
+        "mount@2.41-5 -> 2.41.5-0+deb13u1",
+        "util-linux@2.41-5 -> 2.41.5-0+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-50812",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0016,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: SQLite: Denial of Service via malformed changeset in Session Extension in libsqlite3-0 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-50813",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00159,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sqlite: SQLite: Information disclosure via Session Extension changeset merge path in libsqlite3-0 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libsqlite3-0@3.46.1-7"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-68160",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00158,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to out-of-bounds write in BIO filter in libssl3t64 has very low exploit probability (EPSS 0.0016). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-54369",
+      "cvss_severity": "HIGH",
+      "cvss_score": 0.0,
+      "epss_score": 0.00153,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | acl: Symlink traversal privilege escalation via libacl functions in libacl1 has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libacl1@2.3.2-2+b1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-56392",
+      "cvss_severity": "LOW",
+      "cvss_score": 6.1,
+      "epss_score": 0.00146,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | coreutils: GNU coreutils unexpand: Denial of Service via crafted tab stop values in coreutils has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-22795",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00146,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Denial of Service due to type confusion in PKCS#12 file processing in libssl3t64 has very low exploit probability (EPSS 0.0015). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-40225",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00144,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: udev in systemd: Privilege escalation via malicious hardware devices and unsanitized kernel output in libsystemd0 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2 -> 257.13-1~deb13u1",
+        "libudev1@257.8-1~deb13u2 -> 257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-3219",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00144,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pip: pip: Incorrect file installation due to improper archive handling in pip has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 26.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-4105",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00142,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: systemd: Privilege escalation via improper access control in RegisterMachine D-Bus method in libsystemd0 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2 -> 257.13-1~deb13u1",
+        "libudev1@257.8-1~deb13u2 -> 257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-5958",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00142,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | sed: GNU sed TOCTOU race condition in sed has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "sed@4.9-2+b1 -> 4.9-2+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-54371",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.0014,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | attr: attr: Symlink Traversal Privilege Escalation via getfattr and setfattr in libattr1 has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "libattr1@1:2.5.2-3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-6357",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00138,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation in pip has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "pip@23.0.1 -> 26.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-18508",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00136,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | tar: tar: --one-top-level hardlink targets not confined to top-level directory enabling arbitrary file overwrite in tar has very low exploit probability (EPSS 0.0014). Safe to defer.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-56391",
+      "cvss_severity": "LOW",
+      "cvss_score": 6.1,
+      "epss_score": 0.00131,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | coreutils: GNU coreutils uniq: Denial of Service and information disclosure via out-of-bounds read with multibyte input in coreutils has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "coreutils@9.7-3"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-15649",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00127,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | perl-IO-Compress: perl-IO-Compress: Denial of Service via malformed DOS date in zip header in perl-base has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "perl-base@5.40.1-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-42250",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00126,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | bzip2: bzip2: Denial of Service in bzip2recover via a specially crafted file in libbz2-1.0 has very low exploit probability (EPSS 0.0013). Safe to defer.",
+      "affected_packages": [
+        "libbz2-1.0@1.0.8-6"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-29111",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00121,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: systemd: Arbitrary code execution or Denial of Service via spurious IPC API call data in libsystemd0 has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2 -> 257.13-1~deb13u1",
+        "libudev1@257.8-1~deb13u2 -> 257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2025-69418",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00119,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | openssl: OpenSSL: Information disclosure and data tampering via specific low-level OCB encryption/decryption calls in libssl3t64 has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.4-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-15059",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00119,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | Local unprivileged users can terminate arbitrary local processes via a ... in libsystemd0 has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-27456",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00118,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | util-linux: TOCTOU in the mount program when setting up loop devices in bsdutils has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "bsdutils@1:2.41-5 -> 2.41.5-0+deb13u1",
+        "libblkid1@2.41-5 -> 2.41.5-0+deb13u1",
+        "liblastlog2-2@2.41-5 -> 2.41.5-0+deb13u1",
+        "libmount1@2.41-5 -> 2.41.5-0+deb13u1",
+        "libsmartcols1@2.41-5 -> 2.41.5-0+deb13u1",
+        "libuuid1@2.41-5 -> 2.41.5-0+deb13u1",
+        "login@1:4.16.0-2+really2.41-5 -> 2.41.5-0+deb13u1",
+        "mount@2.41-5 -> 2.41.5-0+deb13u1",
+        "util-linux@2.41-5 -> 2.41.5-0+deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-41991",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 4.7,
+      "epss_score": 0.00117,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | gzip: gzip: Arbitrary file overwrite via insecure temporary file handling in gzexe utility in gzip has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "gzip@1.13-1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-75803",
+      "cvss_severity": "LOW",
+      "cvss_score": 0.0,
+      "epss_score": 0.00116,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | Issue summary: ChaCha20-Poly1305 and AES-OCB decryption with an empty  ... in libssl3t64 has very low exploit probability (EPSS 0.0012). Safe to defer.",
+      "affected_packages": [
+        "libssl3t64@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2",
+        "openssl-provider-legacy@3.5.1-1+deb13u1 -> 3.5.7-1~deb13u2"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-6368",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00107,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | glibc: glibc: Process abort due to invalid memory in wordexp in libc-bin has very low exploit probability (EPSS 0.0011). Safe to defer.",
+      "affected_packages": [
+        "libc-bin@2.41-12",
+        "libc6@2.41-12"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-54370",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00088,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | acl: TOCTOU Symlink Traversal via getfacl/setfacl in libacl1 has very low exploit probability (EPSS 0.0009). Safe to defer.",
+      "affected_packages": [
+        "libacl1@2.3.2-2+b1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-18477",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00079,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | tar: tar: TOCTOU in incremental dumpdir 'X' rename handling allows restore path escape in tar has very low exploit probability (EPSS 0.0008). Safe to defer.",
+      "affected_packages": [
+        "tar@1.35+dfsg-3.1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-40226",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00072,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd: systemd nspawn: Escape-to-host action via crafted config file in libsystemd0 has very low exploit probability (EPSS 0.0007). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2 -> 257.13-1~deb13u1",
+        "libudev1@257.8-1~deb13u2 -> 257.13-1~deb13u1"
+      ]
+    },
+    {
+      "container_image": "vuln-demo:1.0",
+      "cve_id": "CVE-2026-16742",
+      "cvss_severity": "MEDIUM",
+      "cvss_score": 0.0,
+      "epss_score": 0.00057,
+      "kev_status": false,
+      "ssvc_decision": "Track",
+      "priority": "LOW",
+      "decision_rationale": "runtime activity observed on this image (Falco Warning, 1 alert(s), low-severity); decision unchanged | systemd-homed contains a local privilege escalation bug via arbitrary  ... in libsystemd0 has very low exploit probability (EPSS 0.0006). Safe to defer.",
+      "affected_packages": [
+        "libsystemd0@257.8-1~deb13u2",
+        "libudev1@257.8-1~deb13u2"
+      ]
+    }
+  ]
+}
