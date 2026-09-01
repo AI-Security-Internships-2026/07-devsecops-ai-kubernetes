@@ -118,7 +118,10 @@ def evaluate_one(path):
                           and "critical->" in f["rationale"])
     by_context = sum(1 for f in findings
                      if "internet-facing" in f["rationale"] or "privileged" in f["rationale"])
-    by_runtime = sum(1 for f in findings if "falco" in f["rationale"])
+    # Count only findings the runtime signal actually MOVED. Counting every finding
+    # that merely carries a runtime annotation reported 493 of 493 for an image where
+    # runtime changed nothing, which reads as "runtime drove everything".
+    by_runtime = sum(1 for f in findings if "which this cve affects" in f["rationale"])
     by_exploit = sum(1 for f in findings if "public exploit" in f["rationale"])
     capped = sum(1 for f in findings if "capped " in f["rationale"])
 
@@ -128,8 +131,13 @@ def evaluate_one(path):
     # paper from implying the link always exists.
     rt_attributed = sum(1 for f in findings if "which this cve affects" in f["rationale"])
     rt_unattributed = sum(1 for f in findings if "not attributable" in f["rationale"])
-    rt_seen = rt_attributed + rt_unattributed
-    rt_rate = (rt_attributed / rt_seen) if rt_seen else None
+    # Findings that saw ANY runtime signal, including the annotate-only case where the
+    # image had alerts but none of critical tier. Without this, "no critical-tier alert
+    # existed" and "attribution failed" both showed as n/a and were indistinguishable.
+    rt_seen = sum(1 for f in findings
+                  if "falco" in f["rationale"] or "runtime activity" in f["rationale"])
+    rt_candidates = rt_attributed + rt_unattributed
+    rt_rate = (rt_attributed / rt_candidates) if rt_candidates else None
 
     act_after = sum(1 for f in findings if f["priority"] == "CRITICAL")
     act_before = act_after - esc_to_crit + deesc_from_crit
@@ -150,6 +158,7 @@ def evaluate_one(path):
             "by_runtime": by_runtime,
             "by_exploit": by_exploit,
             "capped": capped,
+            "runtime_seen": rt_seen,
             "runtime_attributed": rt_attributed,
             "runtime_unattributed": rt_unattributed,
             "runtime_attribution_rate": rt_rate,
@@ -215,14 +224,21 @@ def render_markdown(results):
              "process/file evidence resolves to a package that finding affects. "
              "Alerts that cannot be attributed are recorded and ignored, so this "
              "table states how often the link was actually established.\n")
-    L.append("| Image | Attributed | Not attributable | Attribution rate |")
-    L.append("|-------|-----------:|-----------------:|-----------------:|")
+    L.append("| Image | Runtime signal seen | Critical-tier candidates | Attributed | Not attributable | Attribution rate |")
+    L.append("|-------|--------------------:|-------------------------:|-----------:|-----------------:|-----------------:|")
     for r in results:
         c = r["context_runtime"]
         rate = c["runtime_attribution_rate"]
-        L.append("| `%s` | %d | %d | %s |" % (
-            r["image"], c["runtime_attributed"], c["runtime_unattributed"],
-            "n/a" if rate is None else "%.0f%%" % (rate * 100)))
+        cands = c["runtime_attributed"] + c["runtime_unattributed"]
+        L.append("| `%s` | %d | %d | %d | %d | %s |" % (
+            r["image"], c["runtime_seen"], cands,
+            c["runtime_attributed"], c["runtime_unattributed"],
+            "no candidates" if rate is None else "%.0f%%" % (rate * 100)))
+    L.append("")
+    L.append("*Runtime signal seen* counts findings on an image that had Falco alerts at "
+             "all; only *critical-tier candidates* can escalate, since lower-severity "
+             "alerts annotate by design. `no candidates` therefore means no critical-tier "
+             "alert reached that image - not that attribution failed.")
 
     return "\n".join(L) + "\n"
 

@@ -118,6 +118,12 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
 def _cap_total_escalation(base: str, priority: str) -> tuple[str, str | None]:
     """
     Clamp a finding to at most ONE level above its base classification.
+
+    The refinements answer "is this more urgent than the raw scores suggest?" —
+    they are corroborating context, not independent evidence, so several of them
+    agreeing must not compound into a two-level jump. Keeping the ceiling at +1
+    is what makes the escalation bound a property of the tool rather than of the
+    particular signals that happened to fire.
     """
     if base not in _LADDER or priority not in _LADDER:
         return priority, None
@@ -154,8 +160,16 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
     exposed = bool(context.get("exposed"))
     privileged = bool(context.get("privileged") or context.get("sa_privileged"))
 
-    # Not deployed in this cluster -> not actionable here.
+    # Not deployed in this cluster -> not actionable here. KEV is exempt: a CVE under
+    # confirmed active exploitation stays actionable even when the image is not running
+    # yet, because the common reason to scan an un-deployed image is that someone is
+    # about to deploy it. Without this exemption a pre-deployment scan silently files a
+    # known-exploited CVE as Track, and the KEV-recall guarantee the evaluation reports
+    # does not hold. Matches the exemption on the de-escalation branch below.
     if context.get("deployed") is False:
+        if in_kev:
+            return priority, ("image not deployed in cluster, but CVE is in CISA KEV "
+                              "(actively exploited) — not de-escalated")
         if priority != "LOW":
             return "LOW", f"de-escalated {priority}->LOW: image not deployed in cluster"
         return priority, None

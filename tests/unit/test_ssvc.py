@@ -112,6 +112,28 @@ class TestApplyContext:
         assert new == "LOW"
         assert "not deployed" in note
 
+    def test_not_deployed_does_not_deescalate_a_kev_finding(self):
+        """
+        Regression: an actively-exploited CVE was filed as Track whenever the image
+        was not currently running. That is the normal state in a pre-deployment CI
+        scan, so the tool silently dropped known-exploited CVEs out of the actionable
+        set in its primary use case — and it broke the KEV-recall guarantee the
+        evaluation reports (observed: 0% recall on httpd:2.4.49 / CVE-2021-41773).
+        """
+        finding = cve("CVE-2021-41773", epss=0.94, cvss=7.5,
+                      severity="HIGH", in_kev=True)
+        new, note = apply_context("CRITICAL", finding, context(deployed=False))
+        assert new == "CRITICAL", "a KEV finding must survive not-deployed"
+        assert note and "KEV" in note
+
+    def test_kev_survives_every_context_deescalation_path(self):
+        """The KEV-recall invariant, asserted across every context shape."""
+        finding = cve("CVE-2021-41773", epss=0.94, in_kev=True)
+        for ctx in (context(deployed=False),
+                    context(exposed=False, privileged=False),
+                    context(deployed=False, exposed=False, privileged=False)):
+            assert apply_context("CRITICAL", finding, ctx)[0] == "CRITICAL"
+
     @pytest.mark.parametrize("ctx_kwargs,reason", [
         ({"exposed": True}, "internet-facing"),
         ({"privileged": True}, "privileged"),
