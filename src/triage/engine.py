@@ -11,8 +11,52 @@ Imports only langgraph-free modules (ssvc, explain), so it is usable and
 testable without langgraph installed.
 """
 
+import os
+from concurrent.futures import ThreadPoolExecutor
+
 from src.triage import ssvc
 from src.triage.explain import get_llm, llm_analyze_cve, static_explanation
+
+
+def _explain_concurrently(llm, wanted: list[dict], verbose: bool) -> dict:
+    """
+    Fetch explanations for the actionable CVEs in parallel.
+
+    The calls are independent - one explanation per CVE, no shared state - and each
+    is dominated by model latency, so running them sequentially left the pipeline
+    waiting on a few hundred round trips. A local model on a contended GPU made that
+    the slowest stage of a run by a wide margin.
+
+    Concurrency is capped and configurable (LLM_CONCURRENCY, default 6): a shared
+    GPU is not ours alone, and too many in-flight requests degrade everyone's
+    throughput rather than improving ours. Order does not matter because results are
+    keyed by CVE id, and a failed call simply falls back to the static explanation.
+    """
+    if not wanted:
+        return {}
+    try:
+        workers = max(1, int(os.getenv('LLM_CONCURRENCY', '6')))
+    except ValueError:
+        workers = 6
+    workers = min(workers, len(wanted))
+    if verbose:
+        print(f'    [*] Explaining {len(wanted)} actionable CVE(s) with {workers} '
+              f'parallel request(s)...')
+
+    def one(item):
+        try:
+            return item['cve_id'], llm_analyze_cve(llm, item['cve'], item['in_kev'])
+        except Exception:
+            return item['cve_id'], None
+
+    out = {}
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for cve_id, result in pool.map(one, wanted):
+            if result:
+                out[cve_id] = result
+    if verbose:
+        print(f'    [+] {len(out)}/{len(wanted)} explanation(s) generated')
+    return out
 
 
 def analyze_cves(
@@ -41,13 +85,12 @@ def analyze_cves(
     if llm == "auto":
         llm = get_llm()
 
-    analyzed = []
-    # Findings are per (CVE, package) pair, so the same CVE arrives several times
-    # when it affects several packages. The explanation describes the CVE, not the
-    # package instance, so it is generated once and reused - on a 759-finding image
-    # that is the difference between hundreds of model calls and one per CVE.
-    llm_cache: dict[str, dict] = {}
-    for i, cve in enumerate(cves):
+    # Two passes. The decisions are pure rule arithmetic and stay sequential and
+    # deterministic; the explanations are independent network calls, so they are
+    # batched and run in parallel afterwards. Separating them also means the SSVC
+    # result never depends on whether, or how fast, a model answered.
+    decided = []
+    for cve in cves:
         in_kev = cve["cve_id"] in kev_ids
         cve_with_kev = {**cve, "in_kev": in_kev}
 
@@ -74,21 +117,25 @@ def analyze_cves(
 
         result = ssvc.analyze(cve_with_kev, in_kev, context=context,
                               exploit_exists=exploit_exists, runtime=runtime)
-        priority, decision, notes = result["priority"], result["decision"], result["notes"]
+        decided.append((cve, in_kev, result))
 
-        llm_result = None
-        if llm and priority in ("CRITICAL", "HIGH"):
+    # One explanation per distinct actionable CVE. Findings are per (CVE, package)
+    # pair, so a CVE affecting several packages would otherwise be explained once per
+    # package; the explanation describes the CVE, not the package instance.
+    llm_cache: dict[str, dict] = {}
+    if llm:
+        wanted, seen = [], set()
+        for cve, in_kev, result in decided:
             cve_id = cve["cve_id"]
-            if cve_id in llm_cache:
-                llm_result = llm_cache[cve_id]
-                if verbose:
-                    print(f"    [{i+1}/{len(cves)}] {cve_id} -> {priority} (cached)")
-            else:
-                llm_result = llm_analyze_cve(llm, cve, in_kev)
-                if llm_result:
-                    llm_cache[cve_id] = llm_result
-                    if verbose:
-                        print(f"    [{i+1}/{len(cves)}] {cve_id} -> {priority} (LLM)")
+            if result["priority"] in ("CRITICAL", "HIGH") and cve_id not in seen:
+                seen.add(cve_id)
+                wanted.append({"cve_id": cve_id, "cve": cve, "in_kev": in_kev})
+        llm_cache = _explain_concurrently(llm, wanted, verbose)
+
+    analyzed = []
+    for cve, in_kev, result in decided:
+        priority, decision, notes = result["priority"], result["decision"], result["notes"]
+        llm_result = llm_cache.get(cve["cve_id"])
         if not llm_result:
             llm_result = static_explanation(cve, priority, in_kev)
 
