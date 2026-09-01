@@ -67,9 +67,17 @@ def get_llm():
     Return a configured chat model, or None if nothing is configured.
 
     Set LLM_PROVIDER to pin one backend (local|groq|gemini) instead of taking the
-    first that happens to be configured
+    first that happens to be configured — which is what makes an apples-to-apples
+    local-vs-cloud comparison reproducible.
     """
     pinned = (os.getenv("LLM_PROVIDER") or "").strip().lower()
+    if pinned in ("none", "off", "static"):
+        # Deterministic fast path: skip the model entirely and let callers fall back
+        # to static_explanation. Useful for benchmarks (no model variance in the
+        # numbers) and for a live demo on a contended GPU, where a few hundred
+        # sequential explanation calls are the slowest part of a run.
+        print("[*] LLM disabled (LLM_PROVIDER=none) - using static explanations")
+        return None
     if pinned:
         factory = _PROVIDERS.get(pinned)
         if factory is None:

@@ -42,6 +42,11 @@ def analyze_cves(
         llm = get_llm()
 
     analyzed = []
+    # Findings are per (CVE, package) pair, so the same CVE arrives several times
+    # when it affects several packages. The explanation describes the CVE, not the
+    # package instance, so it is generated once and reused - on a 759-finding image
+    # that is the difference between hundreds of model calls and one per CVE.
+    llm_cache: dict[str, dict] = {}
     for i, cve in enumerate(cves):
         in_kev = cve["cve_id"] in kev_ids
         cve_with_kev = {**cve, "in_kev": in_kev}
@@ -73,9 +78,17 @@ def analyze_cves(
 
         llm_result = None
         if llm and priority in ("CRITICAL", "HIGH"):
-            llm_result = llm_analyze_cve(llm, cve, in_kev)
-            if llm_result and verbose:
-                print(f"    [{i+1}/{len(cves)}] {cve['cve_id']} -> {priority} (LLM)")
+            cve_id = cve["cve_id"]
+            if cve_id in llm_cache:
+                llm_result = llm_cache[cve_id]
+                if verbose:
+                    print(f"    [{i+1}/{len(cves)}] {cve_id} -> {priority} (cached)")
+            else:
+                llm_result = llm_analyze_cve(llm, cve, in_kev)
+                if llm_result:
+                    llm_cache[cve_id] = llm_result
+                    if verbose:
+                        print(f"    [{i+1}/{len(cves)}] {cve_id} -> {priority} (LLM)")
         if not llm_result:
             llm_result = static_explanation(cve, priority, in_kev)
 
