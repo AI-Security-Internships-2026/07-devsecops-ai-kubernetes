@@ -141,6 +141,26 @@ def build_snapshot(snapshot: date, windows=DEFAULT_WINDOWS, *, cvss_index=None,
         rows.append(row)
 
     eligible = [r for r in rows if r["eligible"]]
+
+    # How many KEV entrants inside the window never made it into the population, and
+    # why. This is not bookkeeping: a CVE published after T did not exist when the
+    # prioritization decision was made, so no method operating on the population at T
+    # could have flagged it. Reporting it bounds what any method can achieve on this
+    # task, and stops the unreachable entrants being mistaken for missed detections.
+    in_population = {r["cve_id"] for r in rows}
+    unreachable = {f"{n}d": {"published_after_snapshot": 0, "absent_from_epss": 0}
+                   for n in windows}
+    for n in windows:
+        horizon = snapshot + timedelta(days=n)
+        for cve, added in kev_dates.items():
+            if not (snapshot < added <= horizon) or cve in in_population:
+                continue
+            record = cvss_index.get(cve)
+            if record and not nvd_cvss.published_before(record, snapshot):
+                unreachable[f"{n}d"]["published_after_snapshot"] += 1
+            else:
+                unreachable[f"{n}d"]["absent_from_epss"] += 1
+
     stats = {
         "snapshot_date": snapshot.isoformat(),
         "epss_model_version": _model_version(snapshot),
@@ -157,6 +177,7 @@ def build_snapshot(snapshot: date, windows=DEFAULT_WINDOWS, *, cvss_index=None,
         "cvss_high_or_above": sum(1 for r in rows if r["cvss_score"] >= 7.0),
         "epss_at_or_above_0.1": sum(1 for r in rows if r["epss_score"] >= 0.1),
         "median_epss": _median([r["epss_score"] for r in rows]),
+        "kev_entrants_not_in_population": unreachable,
     }
     stats["positive_rate"] = {
         f"{n}d": round(stats["positives"][f"{n}d"] / len(eligible), 6) if eligible else 0.0
@@ -276,8 +297,21 @@ def build(snapshots=DEFAULT_SNAPSHOTS, windows=DEFAULT_WINDOWS,
             "eligible": sum(s["eligible"] for s in per_snapshot),
             "positives": {f"{n}d": sum(s["positives"][f"{n}d"] for s in per_snapshot)
                           for n in windows},
-            "distinct_cves": None,   # filled by the caller if it retains the rows
+            "kev_entrants_not_in_population": {
+                f"{n}d": {
+                    reason: sum(s["kev_entrants_not_in_population"][f"{n}d"][reason]
+                                for s in per_snapshot)
+                    for reason in ("published_after_snapshot", "absent_from_epss")
+                } for n in windows
+            },
         },
+        "population_ceiling_note": (
+            "A majority of KEV additions within each window concern CVEs published AFTER "
+            "the snapshot. Those vulnerabilities did not exist when the prioritization "
+            "decision was made, so no method operating on the population at T could have "
+            "flagged them. They are excluded from the positive set rather than counted as "
+            "missed detections, and the counts are reported per window so the bound on "
+            "achievable recall is visible."),
     }
     manifest_path = out_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

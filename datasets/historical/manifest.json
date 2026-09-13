@@ -1,0 +1,202 @@
+{
+  "dataset": "historical",
+  "built": "2026-09-13T18:37:00+05:00",
+  "snapshots": [
+    "2025-09-01",
+    "2026-01-01",
+    "2026-06-01"
+  ],
+  "outcome_windows_days": [
+    30,
+    60,
+    90
+  ],
+  "sources": {
+    "epss": {
+      "url_template": "https://epss.empiricalsecurity.com/epss_scores-{date}.csv.gz",
+      "files": {
+        "2025-09-01": {
+          "sha256": "3f2cae4fdd8f7609dc4795fa0fdbc31ab915ffad7329cce4127b534068153b38",
+          "model_version": "v2025.03.14"
+        },
+        "2026-01-01": {
+          "sha256": "24c0b7ed6ce5a385b16899e5496c15820fcf8df1e307b194b8c64c7c0549e354",
+          "model_version": "v2025.03.14"
+        },
+        "2026-06-01": {
+          "sha256": "02faddfe00053bba47b50c6e7c4045dc66e6b998566716e21ede85e4b8cf01ba",
+          "model_version": "v2025.03.14"
+        }
+      }
+    },
+    "kev": {
+      "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "catalog_version": "2026.09.11",
+      "sha256": "c27673ad6c346c50f573c566f14c11c373e4ae452880d2cdb8f01a364e1e630b",
+      "note": "Single current download; dateAdded yields both snapshot state and future outcome. The download date bounds how far forward outcomes can be observed."
+    },
+    "cvss": {
+      "source": "NVD API 2.0",
+      "sha256": "ccdf713d246bb31420de6480cf1e49ce8d63055680f5db3f3884f862032ee79e",
+      "approximation": "Current base score used as a stand-in for the score at snapshot time; NVD publishes no per-date archive. Base scores are set at publication and revised rarely. CVEs published after a snapshot are excluded outright."
+    },
+    "exploit_db": {
+      "note": "date_published gives the earliest public exploit per CVE, so the feature is evaluated as of each snapshot rather than as of today."
+    }
+  },
+  "label_policy": {
+    "positive": "Entered CISA KEV strictly after the snapshot, within the window.",
+    "unknown": "Did not enter KEV in the window. NOT asserted as un-exploited \u2014 KEV is high-confidence positive evidence, not a census.",
+    "excluded": "Already in KEV at the snapshot (eligible=False): exploitation was an input to the decision, not a prediction target."
+  },
+  "resampling_note": "The same CVE appears at multiple snapshots and those rows are correlated. Bootstrap resampling must cluster by cve_id.",
+  "per_snapshot": [
+    {
+      "snapshot_date": "2025-09-01",
+      "epss_model_version": "v2025.03.14",
+      "cves_in_epss": 291870,
+      "rows": 291870,
+      "skipped_published_after_snapshot": 0,
+      "skipped_no_cvss_record": 0,
+      "kev_at_snapshot": 1406,
+      "eligible": 290464,
+      "positives": {
+        "30d": 8,
+        "60d": 30,
+        "90d": 31
+      },
+      "public_exploit_at_snapshot": 24729,
+      "cvss_high_or_above": 142549,
+      "epss_at_or_above_0.1": 20996,
+      "median_epss": 0.00266,
+      "kev_entrants_not_in_population": {
+        "30d": {
+          "published_after_snapshot": 8,
+          "absent_from_epss": 0
+        },
+        "60d": {
+          "published_after_snapshot": 17,
+          "absent_from_epss": 0
+        },
+        "90d": {
+          "published_after_snapshot": 27,
+          "absent_from_epss": 0
+        }
+      },
+      "positive_rate": {
+        "30d": 2.8e-05,
+        "60d": 0.000103,
+        "90d": 0.000107
+      },
+      "file": "historical_2025-09-01.csv.gz",
+      "sha256": "faf37f53ad9f1d675f2655c5e66183bba493b8761fb3c5c70d2aaf825fc74e26",
+      "bytes": 2981419
+    },
+    {
+      "snapshot_date": "2026-01-01",
+      "epss_model_version": "v2025.03.14",
+      "cves_in_epss": 308934,
+      "rows": 308934,
+      "skipped_published_after_snapshot": 0,
+      "skipped_no_cvss_record": 0,
+      "kev_at_snapshot": 1484,
+      "eligible": 307450,
+      "positives": {
+        "30d": 10,
+        "60d": 22,
+        "90d": 37
+      },
+      "public_exploit_at_snapshot": 24765,
+      "cvss_high_or_above": 149556,
+      "epss_at_or_above_0.1": 22064,
+      "median_epss": 0.00265,
+      "kev_entrants_not_in_population": {
+        "30d": {
+          "published_after_snapshot": 7,
+          "absent_from_epss": 0
+        },
+        "60d": {
+          "published_after_snapshot": 23,
+          "absent_from_epss": 0
+        },
+        "90d": {
+          "published_after_snapshot": 35,
+          "absent_from_epss": 0
+        }
+      },
+      "positive_rate": {
+        "30d": 3.3e-05,
+        "60d": 7.2e-05,
+        "90d": 0.00012
+      },
+      "file": "historical_2026-01-01.csv.gz",
+      "sha256": "ed5116d328e76ce5787963e556170c2cfcb640f0917211632362b8f8ecf2dd7c",
+      "bytes": 3143171
+    },
+    {
+      "snapshot_date": "2026-06-01",
+      "epss_model_version": "v2025.03.14",
+      "cves_in_epss": 336946,
+      "rows": 336946,
+      "skipped_published_after_snapshot": 0,
+      "skipped_no_cvss_record": 0,
+      "kev_at_snapshot": 1608,
+      "eligible": 335338,
+      "positives": {
+        "30d": 8,
+        "60d": 14,
+        "90d": 24
+      },
+      "public_exploit_at_snapshot": 24877,
+      "cvss_high_or_above": 163268,
+      "epss_at_or_above_0.1": 22973,
+      "median_epss": 0.00264,
+      "kev_entrants_not_in_population": {
+        "30d": {
+          "published_after_snapshot": 14,
+          "absent_from_epss": 1
+        },
+        "60d": {
+          "published_after_snapshot": 33,
+          "absent_from_epss": 1
+        },
+        "90d": {
+          "published_after_snapshot": 52,
+          "absent_from_epss": 1
+        }
+      },
+      "positive_rate": {
+        "30d": 2.4e-05,
+        "60d": 4.2e-05,
+        "90d": 7.2e-05
+      },
+      "file": "historical_2026-06-01.csv.gz",
+      "sha256": "9f4c85bcaaadb4d42f43be2560a6984285fed3bedb58ff7b06db60ad45674ffc",
+      "bytes": 3434758
+    }
+  ],
+  "totals": {
+    "rows": 937750,
+    "eligible": 933252,
+    "positives": {
+      "30d": 26,
+      "60d": 66,
+      "90d": 92
+    },
+    "kev_entrants_not_in_population": {
+      "30d": {
+        "published_after_snapshot": 29,
+        "absent_from_epss": 1
+      },
+      "60d": {
+        "published_after_snapshot": 73,
+        "absent_from_epss": 1
+      },
+      "90d": {
+        "published_after_snapshot": 114,
+        "absent_from_epss": 1
+      }
+    }
+  },
+  "population_ceiling_note": "A majority of KEV additions within each window concern CVEs published AFTER the snapshot. Those vulnerabilities did not exist when the prioritization decision was made, so no method operating on the population at T could have flagged them. They are excluded from the positive set rather than counted as missed detections, and the counts are reported per window so the bound on achievable recall is visible."
+}
