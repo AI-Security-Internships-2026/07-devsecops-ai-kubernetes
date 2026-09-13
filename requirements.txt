@@ -8,6 +8,8 @@ langgraph>=0.2.0
 langchain-core>=0.3.0
 langchain-groq>=0.2.0
 langchain-google-genai>=2.0.0
+# Self-hosted models (Ollama / vLLM / SGLang / LiteLLM) speak the OpenAI protocol,
+langchain-openai>=0.2.0
 kubernetes>=29.0.0
 # MCP servers + interactive chatbot
 # mcp 2.0 removed mcp.server.fastmcp and mcp.shared.context.RequestContext

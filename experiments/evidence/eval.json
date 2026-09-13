@@ -1,0 +1,178 @@
+[
+  {
+    "image": "nginx:1.21",
+    "file": "triage_run_nginx_1.21.json",
+    "total_cves": 493,
+    "summary": {
+      "total_cves": 493,
+      "critical_act": 34,
+      "high_attend": 71,
+      "medium_track_star": 95,
+      "low_track": 293,
+      "alert_reduction_pct": 78.7
+    },
+    "kev_total": 4,
+    "methods": {
+      "CVSS-only (sev>=HIGH)": {
+        "actionable": 142,
+        "reduction_pct": 71.2,
+        "kev_recall": 1.0
+      },
+      "EPSS-only (>=0.1)": {
+        "actionable": 26,
+        "reduction_pct": 94.7,
+        "kev_recall": 1.0
+      },
+      "Ours (Act+Attend)": {
+        "actionable": 105,
+        "reduction_pct": 78.7,
+        "kev_recall": 1.0
+      }
+    },
+    "context_runtime": {
+      "escalated_to_critical": 8,
+      "deescalated_from_critical": 0,
+      "act_before": 26,
+      "act_after": 34,
+      "by_context": 11,
+      "by_runtime": 493,
+      "by_exploit": 2,
+      "capped": 0,
+      "runtime_attributed": 0,
+      "runtime_unattributed": 0,
+      "runtime_attribution_rate": null
+    }
+  },
+  {
+    "image": "nginx:latest",
+    "file": "triage_run_nginx_latest.json",
+    "total_cves": 140,
+    "summary": {
+      "total_cves": 140,
+      "critical_act": 5,
+      "high_attend": 5,
+      "medium_track_star": 16,
+      "low_track": 114,
+      "alert_reduction_pct": 92.9
+    },
+    "kev_total": 0,
+    "methods": {
+      "CVSS-only (sev>=HIGH)": {
+        "actionable": 23,
+        "reduction_pct": 83.6,
+        "kev_recall": null
+      },
+      "EPSS-only (>=0.1)": {
+        "actionable": 1,
+        "reduction_pct": 99.3,
+        "kev_recall": null
+      },
+      "Ours (Act+Attend)": {
+        "actionable": 10,
+        "reduction_pct": 92.9,
+        "kev_recall": null
+      }
+    },
+    "context_runtime": {
+      "escalated_to_critical": 4,
+      "deescalated_from_critical": 0,
+      "act_before": 1,
+      "act_after": 5,
+      "by_context": 5,
+      "by_runtime": 140,
+      "by_exploit": 0,
+      "capped": 0,
+      "runtime_attributed": 0,
+      "runtime_unattributed": 0,
+      "runtime_attribution_rate": null
+    }
+  },
+  {
+    "image": "redis:6.2",
+    "file": "triage_run_redis_6.2.json",
+    "total_cves": 85,
+    "summary": {
+      "total_cves": 85,
+      "critical_act": 2,
+      "high_attend": 6,
+      "medium_track_star": 8,
+      "low_track": 69,
+      "alert_reduction_pct": 90.6
+    },
+    "kev_total": 0,
+    "methods": {
+      "CVSS-only (sev>=HIGH)": {
+        "actionable": 12,
+        "reduction_pct": 85.9,
+        "kev_recall": null
+      },
+      "EPSS-only (>=0.1)": {
+        "actionable": 1,
+        "reduction_pct": 98.8,
+        "kev_recall": null
+      },
+      "Ours (Act+Attend)": {
+        "actionable": 8,
+        "reduction_pct": 90.6,
+        "kev_recall": null
+      }
+    },
+    "context_runtime": {
+      "escalated_to_critical": 1,
+      "deescalated_from_critical": 0,
+      "act_before": 1,
+      "act_after": 2,
+      "by_context": 3,
+      "by_runtime": 85,
+      "by_exploit": 0,
+      "capped": 0,
+      "runtime_attributed": 0,
+      "runtime_unattributed": 0,
+      "runtime_attribution_rate": null
+    }
+  },
+  {
+    "image": "vuln-demo:1.0",
+    "file": "triage_run_vuln-demo_1.0.json",
+    "total_cves": 175,
+    "summary": {
+      "total_cves": 175,
+      "critical_act": 4,
+      "high_attend": 15,
+      "medium_track_star": 19,
+      "low_track": 137,
+      "alert_reduction_pct": 89.1
+    },
+    "kev_total": 0,
+    "methods": {
+      "CVSS-only (sev>=HIGH)": {
+        "actionable": 43,
+        "reduction_pct": 75.4,
+        "kev_recall": null
+      },
+      "EPSS-only (>=0.1)": {
+        "actionable": 2,
+        "reduction_pct": 98.9,
+        "kev_recall": null
+      },
+      "Ours (Act+Attend)": {
+        "actionable": 19,
+        "reduction_pct": 89.1,
+        "kev_recall": null
+      }
+    },
+    "context_runtime": {
+      "escalated_to_critical": 2,
+      "deescalated_from_critical": 0,
+      "act_before": 2,
+      "act_after": 4,
+      "by_context": 3,
+      "by_runtime": 175,
+      "by_exploit": 1,
+      "capped": 0,
+      "runtime_attributed": 0,
+      "runtime_unattributed": 0,
+      "runtime_attribution_rate": null
+    }
+  }
+]

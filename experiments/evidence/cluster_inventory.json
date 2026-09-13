@@ -1,0 +1,160 @@
+{
+  "available": true,
+  "pods": [
+    {
+      "namespace": "default",
+      "pod": "falco-test",
+      "phase": "Succeeded",
+      "images": [
+        "alpine"
+      ],
+      "privileged": false,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "default",
+      "pod": "internal-pod",
+      "phase": "Running",
+      "images": [
+        "redis:6.2"
+      ],
+      "privileged": false,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "default",
+      "pod": "nginx-demo-5dc66cb97d-npjnr",
+      "phase": "Running",
+      "images": [
+        "nginx:latest"
+      ],
+      "privileged": false,
+      "exposed": true,
+      "exposure_type": "NodePort"
+    },
+    {
+      "namespace": "default",
+      "pod": "priv-pod",
+      "phase": "Running",
+      "images": [
+        "busybox:1.35"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "default",
+      "pod": "vuln-demo-78585b66c7-59tt8",
+      "phase": "Running",
+      "images": [
+        "vuln-demo:1.0"
+      ],
+      "privileged": false,
+      "exposed": true,
+      "exposure_type": "NodePort"
+    },
+    {
+      "namespace": "default",
+      "pod": "web-64448b899f-k5hp6",
+      "phase": "Running",
+      "images": [
+        "nginx:1.21"
+      ],
+      "privileged": false,
+      "exposed": true,
+      "exposure_type": "NodePort"
+    },
+    {
+      "namespace": "falco",
+      "pod": "falco-crb4p",
+      "phase": "Running",
+      "images": [
+        "docker.io/falcosecurity/falco:0.44.1",
+        "docker.io/falcosecurity/falcoctl:0.13.0"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "coredns-7d764666f9-d7x46",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/coredns/coredns:v1.13.1"
+      ],
+      "privileged": false,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "etcd-minikube",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/etcd:3.6.6-0"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "kube-apiserver-minikube",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/kube-apiserver:v1.35.1"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "kube-controller-manager-minikube",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/kube-controller-manager:v1.35.1"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "kube-proxy-7mnrs",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/kube-proxy:v1.35.1"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "kube-scheduler-minikube",
+      "phase": "Running",
+      "images": [
+        "registry.k8s.io/kube-scheduler:v1.35.1"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    },
+    {
+      "namespace": "kube-system",
+      "pod": "storage-provisioner",
+      "phase": "Running",
+      "images": [
+        "gcr.io/k8s-minikube/storage-provisioner:v5"
+      ],
+      "privileged": true,
+      "exposed": false,
+      "exposure_type": null
+    }
+  ]
+}

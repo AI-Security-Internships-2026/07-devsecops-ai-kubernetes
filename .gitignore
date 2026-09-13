@@ -81,3 +81,8 @@ data/cve_intel.db
 data/sboms/
 data/cache/
 !data/.gitkeep
+
+# pytest-cov
+.coverage
+htmlcov/
+.pytest_cache/
