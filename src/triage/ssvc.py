@@ -1,14 +1,24 @@
 """
-SSVC decision logic (pure, no external dependencies).
+K-CAVP decision logic (pure, no external dependencies).
+
+Kubernetes Context-Aware Vulnerability Prioritization. The method borrows SSVC's
+decision vocabulary (Act / Attend / Track* / Track) but does NOT implement the
+official SSVC Deployer decision table, so it is deliberately not called SSVC.
 
 Kept free of LangGraph / network so it can be tested in isolation.
 
 Base classification (EPSS + CVSS + KEV) is the Phase-0 behaviour. Optional
 refinements plug in here without changing callers:
   - apply_context()  — Kubernetes deployment context
-  - apply_exploit()  — public-exploit-exists signal for SSVC "Automatable"
-  - apply_runtime()  — Falco runtime-reachability signal (image is live/active)
+  - apply_exploit()  — public-exploit-exists signal ("Automatable")
+  - apply_runtime()  — Falco runtime evidence, attributed to packages
+
+Every numeric cut-off lives in src/triage/thresholds.py, with its provenance
+recorded, so the threshold sensitivity sweep can vary them without editing this
+module and the paper can cite one location.
 """
+
+from src.triage.thresholds import DEFAULTS, FALCO_CRITICAL_TIER, Thresholds
 
 # Priority <-> SSVC decision label
 PRIORITY_TO_DECISION = {
@@ -33,25 +43,29 @@ def _step(priority: str, delta: int) -> str:
     return _LADDER[idx]
 
 
-def classify_priority(cve: dict, in_kev: bool) -> tuple[str, str]:
+def classify_priority(cve: dict, in_kev: bool,
+                      thresholds: Thresholds | None = None) -> tuple[str, str]:
     """
     Apply the base CISA SSVC decision tree. Returns (priority, ssvc_decision).
 
-    Base thresholds:
-        CRITICAL / Act    — EPSS >= 0.1 OR in CISA KEV
-        HIGH / Attend     — EPSS >= 0.01 AND (CVSS >= 7.0 OR CRITICAL/HIGH severity)
-        MEDIUM / Track*   — EPSS >= 0.01
+    Base thresholds (values and provenance in src/triage/thresholds.py):
+        CRITICAL / Act    — EPSS >= epss_act OR in CISA KEV
+        HIGH / Attend     — EPSS >= epss_attend AND (CVSS >= cvss_high
+                            OR CRITICAL/HIGH severity)
+        MEDIUM / Track*   — EPSS >= epss_attend
         LOW / Track       — everything else
     """
+    t = thresholds or DEFAULTS
     epss = cve.get("epss_score", 0.0)
     cvss = cve.get("cvss_score", 0.0)
     severity = cve.get("severity", "UNKNOWN").upper()
 
-    if epss >= 0.1 or in_kev:
+    if epss >= t.epss_act or in_kev:
         priority = "CRITICAL"
-    elif epss >= 0.01 and (cvss >= 7.0 or severity in ("CRITICAL", "HIGH")):
+    elif epss >= t.epss_attend and (cvss >= t.cvss_high
+                                    or severity in ("CRITICAL", "HIGH")):
         priority = "HIGH"
-    elif epss >= 0.01:
+    elif epss >= t.epss_attend:
         priority = "MEDIUM"
     else:
         priority = "LOW"
@@ -75,7 +89,8 @@ def apply_exploit(priority: str, cve: dict, exploit_exists: bool) -> tuple[str, 
 
 
 def analyze(cve: dict, in_kev: bool, context: dict | None = None,
-            exploit_exists: bool = False, runtime: dict | None = None) -> dict:
+            exploit_exists: bool = False, runtime: dict | None = None,
+            thresholds: Thresholds | None = None) -> dict:
     """
     Full deterministic analysis for one finding: base SSVC, then exploit, context
     and runtime refinements. Single source of truth shared by the agent and tests.
@@ -92,7 +107,8 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     allowed to travel further — "image not deployed in this cluster" legitimately
     drops a finding straight to LOW.
     """
-    base, _ = classify_priority(cve, in_kev)
+    t = thresholds or DEFAULTS
+    base, _ = classify_priority(cve, in_kev, t)
     priority = base
     notes: list[str] = []
 
@@ -100,7 +116,7 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     if note:
         notes.append(note)
 
-    priority, note = apply_context(priority, cve, context)
+    priority, note = apply_context(priority, cve, context, t)
     if note:
         notes.append(note)
 
@@ -108,14 +124,15 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     if note:
         notes.append(note)
 
-    priority, note = _cap_total_escalation(base, priority)
+    priority, note = _cap_total_escalation(base, priority, t)
     if note:
         notes.append(note)
 
     return {"priority": priority, "decision": decision_for(priority), "notes": notes}
 
 
-def _cap_total_escalation(base: str, priority: str) -> tuple[str, str | None]:
+def _cap_total_escalation(base: str, priority: str,
+                          thresholds: Thresholds | None = None) -> tuple[str, str | None]:
     """
     Clamp a finding to at most ONE level above its base classification.
 
@@ -125,26 +142,33 @@ def _cap_total_escalation(base: str, priority: str) -> tuple[str, str | None]:
     is what makes the escalation bound a property of the tool rather than of the
     particular signals that happened to fire.
     """
+    t = thresholds or DEFAULTS
+    if t.max_escalation_levels < 0:          # unbounded variant (experiment 6B)
+        return priority, None
     if base not in _LADDER or priority not in _LADDER:
         return priority, None
-    ceiling = _LADDER.index(base) + 1
+    ceiling = min(_LADDER.index(base) + t.max_escalation_levels, len(_LADDER) - 1)
     if _LADDER.index(priority) <= ceiling:
         return priority, None
     capped = _LADDER[ceiling]
-    return capped, (f"capped {priority}->{capped}: refinements may raise a finding "
-                    f"at most one level above its {base} base classification")
+    levels = t.max_escalation_levels
+    allowance = "may not be raised above" if levels == 0 else         f"may raise a finding at most {levels} level{'s' if levels != 1 else ''} above"
+    return capped, (f"capped {priority}->{capped}: refinements {allowance} "
+                    f"its {base} base classification")
 
 
-def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, str | None]:
+def apply_context(priority: str, cve: dict, context: dict | None,
+                  thresholds: Thresholds | None = None) -> tuple[str, str | None]:
     """
     Kubernetes deployment-context refinement (P3).
 
     Adjusts a finding by AT MOST ONE level and never touches the MEDIUM/LOW tiers,
     so context re-ranks urgency within the already-actionable set without inflating
     it. Rules (must match the code below):
-      - not deployed anywhere                         -> de-escalate to LOW
-      - HIGH + EPSS >= 0.05 + exposed/privileged      -> escalate to CRITICAL
-      - CRITICAL, internal-only, not KEV, EPSS < 0.2  -> de-escalate to HIGH
+      - not deployed anywhere (and not KEV)                        -> de-escalate to LOW
+      - HIGH + EPSS >= epss_context_escalate + exposed/privileged  -> escalate to CRITICAL
+      - CRITICAL, internal-only, not KEV,
+        EPSS < epss_context_deescalate                             -> de-escalate to HIGH
         (kills EPSS-inflated false criticals like BEAST when unreachable)
 
     `context` shape: {available: bool, deployed: bool, exposed: bool,
@@ -155,6 +179,7 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
     if not context or not context.get("available"):
         return priority, None
 
+    t = thresholds or DEFAULTS
     epss = cve.get("epss_score", 0.0)
     in_kev = cve.get("in_kev", False)
     exposed = bool(context.get("exposed"))
@@ -181,7 +206,8 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
 
     # ESCALATE (+1): an already-actionable, genuinely-exploitable HIGH finding
     # (EPSS >= 0.05) becomes urgent on an internet-facing or privileged pod.
-    if priority == "HIGH" and epss >= 0.05 and (exposed or privileged):
+    if (priority == "HIGH" and epss >= t.epss_context_escalate
+            and (exposed or privileged)):
         reason = "internet-facing" if exposed else "privileged pod"
         return "CRITICAL", f"escalated HIGH->CRITICAL: {reason} + EPSS {epss:.3f}"
 
@@ -193,16 +219,16 @@ def apply_context(priority: str, cve: dict, context: dict | None) -> tuple[str, 
         and not exposed
         and not privileged
         and not in_kev
-        and epss < 0.2
+        and epss < t.epss_context_deescalate
     ):
         return "HIGH", f"de-escalated CRITICAL->HIGH: internal-only, not in CISA KEV (EPSS {epss:.3f})"
 
     return priority, None
 
 
-# Falco alert priorities, most-severe tier that ESCALATES. Lower tiers (Warning,
-# Notice, ...) only annotate the rationale.
-_FALCO_CRITICAL_TIER = {"EMERGENCY", "ALERT", "CRITICAL", "ERROR"}
+# Falco alert priorities severe enough to be eligible to escalate. Defined once in
+# thresholds.py so the paper and the sweep reference a single source.
+_FALCO_CRITICAL_TIER = FALCO_CRITICAL_TIER
 
 
 def _packages_of(cve: dict) -> list[str]:
