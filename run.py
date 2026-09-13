@@ -89,6 +89,41 @@ def cmd_gatekeeper(args):
     run_gatekeeper(args.triage_json, args.image)
 
 
+def cmd_thresholds(args):
+    """
+    Print the decision thresholds with their provenance.
+
+    Exists because the thresholds were queried in review ("on what basis are these
+    values used?"). The table is generated from src/triage/thresholds.py, so the
+    paper's threshold table cannot drift from the values the code applies.
+    """
+    from src.triage.thresholds import Thresholds, provenance_rows
+
+    rows = provenance_rows()
+    active = Thresholds.from_env()
+
+    if args.markdown:
+        print("| Threshold | Value | Basis | Source | Rationale |")
+        print("|---|---:|---|---|---|")
+        for r in rows:
+            print(f"| `{r['threshold']}` | {r['value']} | {r['basis']} "
+                  f"| {r['source']} | {r['note']} |")
+    else:
+        print(f"{'THRESHOLD':<26}{'DEFAULT':>9}{'ACTIVE':>9}  BASIS      SOURCE")
+        print("-" * 100)
+        for r in rows:
+            cur = getattr(active, r["threshold"])
+            flag = " *" if cur != r["value"] else "  "
+            print(f"{r['threshold']:<26}{r['value']:>9}{cur:>9}{flag}"
+                  f"{r['basis']:<11}{r['source'][:44]}")
+        print()
+        published = sum(1 for r in rows if r["basis"] == "published")
+        print(f"[+] {published}/{len(rows)} thresholds have a published basis; "
+              f"the rest are ours and are justified by the sensitivity sweep.")
+        if any(getattr(active, r["threshold"]) != r["value"] for r in rows):
+            print("[*] Values marked * are overridden by K_CAVP_* environment variables.")
+
+
 def cmd_falco_capture(args):
     from src.runtime.falco_client import run as run_falco, run_live
     if args.live:
@@ -210,6 +245,12 @@ def build_parser() -> argparse.ArgumentParser:
     gk.add_argument("triage_json", help="path to triage_run*.json or triage_report*.json")
     gk.add_argument("--image", default=None, help="override container image name")
     gk.set_defaults(func=cmd_gatekeeper)
+
+    th = sub.add_parser("thresholds",
+                        help="Show decision thresholds and where each value comes from")
+    th.add_argument("--markdown", action="store_true",
+                    help="emit a markdown table for the paper")
+    th.set_defaults(func=cmd_thresholds)
 
     fc = sub.add_parser("falco-capture", help="Parse a Falco JSON alert stream (file, or --live from the cluster)")
     fc.add_argument("falco_output", nargs="?", default=None,
