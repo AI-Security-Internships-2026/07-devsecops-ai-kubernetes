@@ -40,6 +40,12 @@ datasets/**/*.zip
 datasets/**/*.tar.gz
 datasets/**/*.pcap
 
+# ...but a dataset's manifest records its provenance, source hashes and class balance,
+# and is the artifact a reviewer needs in order to check the numbers. The rules above
+# would silently swallow it, which is how the evidence artifacts went missing before.
+!datasets/**/manifest.json
+!datasets/**/schema.md
+
 # Model checkpoints
 *.pt
 *.pth
