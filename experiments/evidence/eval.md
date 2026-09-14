@@ -65,18 +65,20 @@ How the K8s-context + Falco-runtime refinements re-ranked findings (the escalati
 
 | Image | Act before | Act after | Escalated->CRIT | De-escalated | Capped | via context | via runtime | via exploit |
 |-------|-----------:|----------:|----------------:|-------------:|-------:|------------:|------------:|------------:|
-| `nginx:1.21` | 26 | 34 | 8 | 0 | 0 | 11 | 493 | 2 |
-| `nginx:latest` | 1 | 5 | 4 | 0 | 0 | 5 | 140 | 0 |
-| `redis:6.2` | 1 | 2 | 1 | 0 | 0 | 3 | 85 | 0 |
-| `vuln-demo:1.0` | 2 | 4 | 2 | 0 | 0 | 3 | 175 | 1 |
+| `nginx:1.21` | 26 | 34 | 8 | 0 | 0 | 11 | 0 | 2 |
+| `nginx:latest` | 1 | 5 | 4 | 0 | 0 | 5 | 0 | 0 |
+| `redis:6.2` | 1 | 2 | 1 | 0 | 0 | 3 | 0 | 0 |
+| `vuln-demo:1.0` | 2 | 4 | 2 | 0 | 0 | 3 | 0 | 1 |
 
 ## 5. Runtime attribution (issue #17)
 
 The runtime signal escalates a finding only when the Falco alert's process/file evidence resolves to a package that finding affects. Alerts that cannot be attributed are recorded and ignored, so this table states how often the link was actually established.
 
-| Image | Attributed | Not attributable | Attribution rate |
-|-------|-----------:|-----------------:|-----------------:|
-| `nginx:1.21` | 0 | 0 | n/a |
-| `nginx:latest` | 0 | 0 | n/a |
-| `redis:6.2` | 0 | 0 | n/a |
-| `vuln-demo:1.0` | 0 | 0 | n/a |
+| Image | Runtime signal seen | Critical-tier candidates | Attributed | Not attributable | Attribution rate |
+|-------|--------------------:|-------------------------:|-----------:|-----------------:|-----------------:|
+| `nginx:1.21` | 493 | 0 | 0 | 0 | no candidates |
+| `nginx:latest` | 140 | 0 | 0 | 0 | no candidates |
+| `redis:6.2` | 85 | 0 | 0 | 0 | no candidates |
+| `vuln-demo:1.0` | 175 | 0 | 0 | 0 | no candidates |
+
+*Runtime signal seen* counts findings on an image that had Falco alerts at all; only *critical-tier candidates* can escalate, since lower-severity alerts annotate by design. `no candidates` therefore means no critical-tier alert reached that image - not that attribution failed.

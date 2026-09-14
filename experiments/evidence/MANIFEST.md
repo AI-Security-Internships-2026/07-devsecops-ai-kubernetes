@@ -20,10 +20,12 @@ python scripts/collect_evidence.py --label <tag>
 | `falco_captured.jsonl` | `bash scripts/falco_setup.sh capture 45` | Raw Falco JSONL exactly as the kernel probe emitted it. | 37,374 bytes, verbatim |
 | `cve_watch_alerts.md` | `python run.py watch` | Fresh-CVE watcher output: SBOM x feed matches. | 70,462 bytes, verbatim |
 | `triage_run.json` | `python run.py pipeline <image>` | Most recent single-image triage run. — vuln-demo:1.0: 175 CVEs, Act 4, Attend 15, reduction 89.1% | 120,462 bytes, verbatim |
-| `eval.md` | `python scripts/evaluate_triage.py experiments/results --out eval` | Evaluation tables: baselines, KEV recall, context/runtime effect, attribution. | 3,251 bytes, verbatim |
-| `eval.json` | `python scripts/evaluate_triage.py experiments/results --out eval` | Machine-readable evaluation results. | 4,174 bytes, verbatim |
+| `eval.md` | `python scripts/evaluate_triage.py experiments/results --out eval` | Evaluation tables: baselines, KEV recall, context/runtime effect, attribution. | 3,785 bytes, verbatim |
+| `eval.json` | `python scripts/evaluate_triage.py experiments/results --out eval` | Machine-readable evaluation results. | 4,455 bytes, verbatim |
 | `triage_run_nginx_1.21.json` | `python run.py pipeline <image>` | Per-image triage output - the file every evaluation number is computed from. — nginx:1.21: 493 CVEs, Act 34, Attend 71, reduction 78.7% | 327,980 bytes, verbatim |
 | `triage_run_nginx_latest.json` | `python run.py pipeline <image>` | Per-image triage output - the file every evaluation number is computed from. — nginx:latest: 140 CVEs, Act 5, Attend 5, reduction 92.9% | 92,858 bytes, verbatim |
 | `triage_run_redis_6.2.json` | `python run.py pipeline <image>` | Per-image triage output - the file every evaluation number is computed from. — redis:6.2: 85 CVEs, Act 2, Attend 6, reduction 90.6% | 56,292 bytes, verbatim |
 | `triage_run_vuln-demo_1.0.json` | `python run.py pipeline <image>` | Per-image triage output - the file every evaluation number is computed from. — vuln-demo:1.0: 175 CVEs, Act 4, Attend 15, reduction 89.1% | 120,462 bytes, verbatim |
 | `gatekeeper_vuln-demo_1.0.yaml` | `python run.py pipeline <image> --gatekeeper` | Generated OPA Gatekeeper policy (generate-only; nothing applies it). | 3,381 bytes, verbatim |
+
+> `eval.md` / `eval.json` were regenerated from the committed `triage_run_*.json` in this directory after the evaluator's runtime reporting was corrected. The evaluator is deterministic and offline, so the tables derive from the same per-CVE records already committed here — no re-scan was needed.
