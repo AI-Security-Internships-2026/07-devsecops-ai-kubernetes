@@ -214,6 +214,57 @@ def bootstrap_proportion_ci(flags: list[bool], n_resamples: int = 2000,
             "resampling_unit": "cluster (cve_id)"}
 
 
+def clustered_proportion_ci(units: list[tuple], n_resamples: int = 2000,
+                            alpha: float = 0.05, seed: int = 20260916) -> dict:
+    """
+    CI for a proportion when several units belong to one cluster.
+
+    `units` is a list of (cluster_id, flag). The evaluation unit is (CVE, snapshot) but
+    the *independent* unit is the CVE, so resampling draws CVEs and brings all of that
+    CVE's snapshot rows with it. Resampling units directly would treat three snapshots of
+    one CVE as three independent observations.
+
+    Vectorised by pre-aggregating each cluster to (n_units, n_flagged), so a resample is
+    two array sums rather than a pass over ~900k rows.
+    """
+    if not units:
+        return {"point": None, "lower": None, "upper": None, "n_units": 0,
+                "n_clusters": 0, "n_resamples": 0,
+                "resampling_unit": "cluster (cve_id)"}
+
+    totals, flags = defaultdict(int), defaultdict(int)
+    for cluster, flag in units:
+        totals[cluster] += 1
+        flags[cluster] += 1 if flag else 0
+    keys = list(totals)
+    n_total = sum(totals.values())
+    point = sum(flags.values()) / n_total
+
+    try:
+        import numpy as np
+        t = np.fromiter((totals[k] for k in keys), dtype=np.int64, count=len(keys))
+        f = np.fromiter((flags[k] for k in keys), dtype=np.int64, count=len(keys))
+        rng = np.random.default_rng(seed)
+        idx = rng.integers(0, len(keys), size=(n_resamples, len(keys)))
+        draws = f[idx].sum(axis=1) / t[idx].sum(axis=1)
+        lo, hi = (float(x) for x in np.quantile(draws, [alpha / 2, 1 - alpha / 2]))
+    except ImportError:
+        rng = random.Random(seed)
+        draws = []
+        for _ in range(n_resamples):
+            picked = rng.choices(keys, k=len(keys))
+            num = sum(flags[k] for k in picked)
+            den = sum(totals[k] for k in picked)
+            draws.append(num / den if den else 0.0)
+        draws.sort()
+        lo = draws[max(0, int((alpha / 2) * len(draws)) - 1)]
+        hi = draws[min(len(draws) - 1, int((1 - alpha / 2) * len(draws)))]
+
+    return {"point": point, "lower": lo, "upper": hi, "confidence": 1 - alpha,
+            "n_units": n_total, "n_clusters": len(keys), "n_resamples": n_resamples,
+            "resampling_unit": "cluster (cve_id)"}
+
+
 # ------------------------------------------------------ paired significance
 
 def _binom_two_sided_p(b: int, c: int) -> float:

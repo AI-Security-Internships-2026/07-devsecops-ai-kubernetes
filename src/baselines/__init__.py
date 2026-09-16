@@ -10,7 +10,7 @@ difference in results is a difference in method rather than in plumbing.
 """
 
 from src.baselines.base import (ACTIONABLE, ALL_SIGNALS, NOT_ACTIONABLE, Baseline,
-                                Decision, rank_decisions)
+                                Decision, rank_decisions, unit_id_for)
 from src.baselines.chaining import DeterministicChaining
 from src.baselines.cvss import CvssOnly
 from src.baselines.epss import EpssOnly
@@ -53,6 +53,6 @@ def signal_matrix() -> list[dict]:
 
 __all__ = [
     "ACTIONABLE", "NOT_ACTIONABLE", "ALL_SIGNALS", "Baseline", "Decision",
-    "rank_decisions", "CvssOnly", "EpssOnly", "KevThenEpss", "OfficialSSVC",
+    "rank_decisions", "unit_id_for", "CvssOnly", "EpssOnly", "KevThenEpss", "OfficialSSVC",
     "DeterministicChaining", "BASELINE_CLASSES", "build_baselines", "signal_matrix",
 ]

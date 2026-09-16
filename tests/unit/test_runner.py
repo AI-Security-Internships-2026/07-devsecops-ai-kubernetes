@@ -232,3 +232,56 @@ class TestEnvironment:
         run = EvaluationRun("t", records(10, ("CVE-0",)), "later_kev_90d", run_id="r")
         base = write_run(run, run.run(), out_dir=tmp_path, write_raw=False)
         assert json.loads((base / "environment.json").read_text(encoding="utf-8"))
+
+
+class TestUnitOfAnalysis:
+    """
+    The unit is (cve_id, snapshot), not the CVE.
+
+    A CVE evaluated at three snapshots is three separate predictions with different
+    signals, and in the real dataset 34 CVEs have a 90-day outcome that differs between
+    snapshots. Keying metrics on cve_id alone merged ~598k rows and OR'd those labels
+    together, inflating recall.
+    """
+
+    def _multi_snapshot(self):
+        """Same CVE, two snapshots, opposite outcomes and opposite EPSS."""
+        return [
+            {"cve_id": "CVE-A", "snapshot_date": "2025-09-01", "epss_score": 0.9,
+             "cvss_score": 5.0, "cvss_severity": "MEDIUM", "kev_at_snapshot": False,
+             "public_exploit_at_snapshot": False, "later_kev_90d": False},
+            {"cve_id": "CVE-A", "snapshot_date": "2026-01-01", "epss_score": 0.001,
+             "cvss_score": 5.0, "cvss_severity": "MEDIUM", "kev_at_snapshot": False,
+             "public_exploit_at_snapshot": False, "later_kev_90d": True},
+        ]
+
+    def test_same_cve_at_two_snapshots_is_two_units(self):
+        run = EvaluationRun("t", self._multi_snapshot(), "later_kev_90d")
+        assert len(run.population) == 2
+        assert run.population == {"CVE-A@2025-09-01", "CVE-A@2026-01-01"}
+
+    def test_labels_are_not_ord_together(self):
+        """Only the second snapshot is positive; collapsing would make the CVE positive."""
+        run = EvaluationRun("t", self._multi_snapshot(), "later_kev_90d")
+        assert run.positives == {"CVE-A@2026-01-01"}
+
+    def test_recall_is_not_inflated_by_the_other_snapshot(self):
+        """
+        EPSS-only flags the high-EPSS snapshot, which is the NON-positive one. Correct
+        recall is 0. Keyed on cve_id it would read 1.0, because the CVE was both
+        'flagged somewhere' and 'positive somewhere'.
+        """
+        run = EvaluationRun("t", self._multi_snapshot(), "later_kev_90d")
+        assert run.run()["epss_only"]["recall"] == 0.0
+
+    def test_bootstrap_clusters_by_cve_not_by_unit(self):
+        run = EvaluationRun("t", self._multi_snapshot(), "later_kev_90d")
+        run.run()
+        ci = run.confidence_intervals(n_resamples=50)["epss_only"]["workload_reduction"]
+        assert ci["n_units"] == 2      # two predictions
+        assert ci["n_clusters"] == 1   # but one independent CVE
+
+    def test_records_without_a_snapshot_fall_back_to_cve_id(self):
+        run = EvaluationRun("t", records(5, ("CVE-0",)), "later_kev_90d")
+        assert "CVE-0" in run.population
+        assert "@" not in "".join(run.population)

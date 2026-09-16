@@ -42,11 +42,17 @@ class Decision:
     # K-CAVP emits Act/Attend/Track*/Track; baselines leave this empty. Kept so ordinal
     # methods are not flattened to binary in the stored results.
     priority: str = ""
+    # The evaluation unit. One CVE appears at several snapshot dates with different
+    # signals and sometimes a different outcome, so the unit is (cve_id, snapshot) and
+    # NOT the CVE alone — keying metrics on cve_id would merge those instances and
+    # silently OR their labels together. Defaults to cve_id when there is no snapshot.
+    unit_id: str = ""
     signals: dict = field(default_factory=dict)
 
     def as_dict(self) -> dict:
         return {
             "cve_id": self.cve_id,
+            "unit_id": self.unit_id or self.cve_id,
             "method": self.method,
             "score": round(self.score, 6),
             "decision": self.decision,
@@ -77,6 +83,18 @@ def as_float(value, default: float = 0.0) -> float:
         return default
 
 
+def unit_id_for(record: dict, cve_id: str) -> str:
+    """
+    The evaluation unit for one record.
+
+    A CVE evaluated at three snapshot dates is three separate predictions: the signals
+    differ, and for 34 CVEs in this dataset the 90-day outcome differs too. Collapsing
+    them to the CVE would merge distinct predictions and OR their labels.
+    """
+    snapshot = record.get("snapshot_date")
+    return f"{cve_id}@{snapshot}" if snapshot else cve_id
+
+
 def rank_decisions(decisions: list[Decision]) -> list[Decision]:
     """
     Assign ranks by descending score, breaking ties deterministically.
@@ -86,7 +104,7 @@ def rank_decisions(decisions: list[Decision]) -> list[Decision]:
     stability and input order, so a rerun on reordered input would move items across the
     K boundary and change the metric.
     """
-    ordered = sorted(decisions, key=lambda d: (-d.score, d.cve_id))
+    ordered = sorted(decisions, key=lambda d: (-d.score, d.unit_id or d.cve_id))
     for i, d in enumerate(ordered, start=1):
         d.rank = i
     return ordered
@@ -111,7 +129,12 @@ class Baseline:
         raise NotImplementedError
 
     def run(self, records: list[dict]) -> list[Decision]:
-        return rank_decisions([self.decide(r) for r in records])
+        decisions = []
+        for record in records:
+            d = self.decide(record)
+            d.unit_id = unit_id_for(record, d.cve_id)
+            decisions.append(d)
+        return rank_decisions(decisions)
 
     def actionable_count(self, decisions: list[Decision]) -> int:
         return sum(1 for d in decisions if d.decision == ACTIONABLE)

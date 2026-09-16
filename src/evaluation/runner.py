@@ -31,7 +31,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from src import config
-from src.baselines import ACTIONABLE, build_baselines, signal_matrix
+from src.baselines import (ACTIONABLE, build_baselines, signal_matrix,
+                           unit_id_for)
 from src.evaluation import metrics as M
 
 PUBLICATION_DIR = config.ROOT / "experiments" / "publication"
@@ -102,8 +103,15 @@ class EvaluationRun:
         self.ks = tuple(ks)
         self.run_id = run_id or datetime.now().strftime("%Y%m%d-%H%M%S")
 
-        self.population = {r["cve_id"] for r in records}
-        self.positives = {r["cve_id"] for r in records if _truthy(r.get(label_field))}
+        # The unit is (cve_id, snapshot): one CVE evaluated at three dates is three
+        # separate predictions with different signals, and sometimes different outcomes.
+        # `cluster_of` maps a unit back to its CVE, which is the independent unit for
+        # resampling.
+        self.units = [unit_id_for(r, r["cve_id"]) for r in records]
+        self.cluster_of = {unit_id_for(r, r["cve_id"]): r["cve_id"] for r in records}
+        self.population = set(self.units)
+        self.positives = {unit_id_for(r, r["cve_id"]) for r in records
+                          if _truthy(r.get(label_field))}
         self.results: dict[str, list] = {}
         self.timings: dict[str, float] = {}
 
@@ -118,8 +126,8 @@ class EvaluationRun:
             self.results[name] = decisions
             self.timings[name] = elapsed_ms
 
-            flagged = {d.cve_id for d in decisions if d.decision == ACTIONABLE}
-            ranked = [d.cve_id for d in decisions]
+            flagged = {d.unit_id for d in decisions if d.decision == ACTIONABLE}
+            ranked = [d.unit_id for d in decisions]
 
             summary[name] = {
                 "experiment": self.experiment,
@@ -137,26 +145,25 @@ class EvaluationRun:
         """
         Clustered bootstrap CIs on recall and workload reduction per method.
 
-        Each CVE is collapsed to one boolean before resampling, so a draw always takes a
-        whole CVE and correlated snapshot rows can never count as independent evidence —
-        the requirement the dataset manifest records. Collapsing first also makes the
-        statistic a plain proportion, which is vectorisable.
+        The evaluation unit is (CVE, snapshot) but the independent unit is the CVE, so
+        resampling draws CVEs and brings all their snapshot rows along. Treating the
+        snapshots as independent would understate every interval — the error the dataset
+        manifest warns about.
 
-        The two intervals behave very differently and that is informative rather than a
-        defect: recall rests on ~92 confirmed positives and comes out wide, while
-        reduction rests on ~900k records and comes out extremely tight. Reporting both
-        makes clear which claims the data can actually support.
+        The two intervals behave very differently, and that is informative: recall rests
+        on ~92 confirmed positives and comes out wide, reduction rests on ~900k units and
+        comes out tight. Reporting both shows which claims the data can support.
         """
         out = {}
-        population = sorted(self.population)
-        positives = sorted(self.positives)
         for name, decisions in self.results.items():
-            flagged = {d.cve_id for d in decisions if d.decision == ACTIONABLE}
+            flagged = {d.unit_id for d in decisions if d.decision == ACTIONABLE}
             out[name] = {
-                "recall": M.bootstrap_proportion_ci(
-                    [cve in flagged for cve in positives], n_resamples),
-                "workload_reduction": M.bootstrap_proportion_ci(
-                    [cve not in flagged for cve in population], n_resamples),
+                "recall": M.clustered_proportion_ci(
+                    [(self.cluster_of[u], u in flagged) for u in sorted(self.positives)],
+                    n_resamples),
+                "workload_reduction": M.clustered_proportion_ci(
+                    [(self.cluster_of[u], u not in flagged) for u in self.units],
+                    n_resamples),
             }
         return out
 
@@ -183,14 +190,15 @@ class EvaluationRun:
         return out
 
     def _caught(self, method: str) -> set:
-        flagged = {d.cve_id for d in self.results[method] if d.decision == ACTIONABLE}
+        flagged = {d.unit_id for d in self.results[method] if d.decision == ACTIONABLE}
         return flagged & self.positives
 
     # --------------------------------------------------------------- outputs
 
     def raw_rows(self) -> list[dict]:
         """Tidy long-form rows — one per (method, cve). The source for every table."""
-        labels = {r["cve_id"]: _truthy(r.get(self.label_field)) for r in self.records}
+        labels = {unit_id_for(r, r["cve_id"]): _truthy(r.get(self.label_field))
+                  for r in self.records}
         rows = []
         for name, decisions in self.results.items():
             for d in decisions:
@@ -199,11 +207,12 @@ class EvaluationRun:
                     "run_id": self.run_id,
                     "method": name,
                     "cve_id": d.cve_id,
+                    "unit_id": d.unit_id,
                     "score": round(d.score, 6),
                     "rank": d.rank,
                     "is_actionable": d.decision == ACTIONABLE,
                     "priority": d.priority,
-                    "outcome_label": labels.get(d.cve_id, False),
+                    "outcome_label": labels.get(d.unit_id, False),
                     "label_field": self.label_field,
                 })
         return rows
