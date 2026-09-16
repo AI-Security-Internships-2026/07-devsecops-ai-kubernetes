@@ -177,6 +177,43 @@ def clustered_bootstrap_ci(items: list, statistic, cluster_key, n_resamples: int
     }
 
 
+def bootstrap_proportion_ci(flags: list[bool], n_resamples: int = 2000,
+                            alpha: float = 0.05, seed: int = 20260916) -> dict:
+    """
+    Percentile CI for a proportion, where each element is already one cluster.
+
+    Collapsing to one boolean per CVE *before* resampling is what makes this a clustered
+    bootstrap: every draw takes a whole CVE, so correlated snapshot rows can never be
+    counted as independent observations. Once collapsed, the statistic is just a mean, so
+    resampling is a vectorised operation rather than a pass over ~900k rows per draw —
+    the difference between seconds and hours at this dataset's size.
+
+    Falls back to pure Python without numpy so the evaluator keeps working from a bare
+    stdlib install.
+    """
+    n = len(flags)
+    if n == 0:
+        return {"point": None, "lower": None, "upper": None, "n_clusters": 0,
+                "n_resamples": 0, "resampling_unit": "cluster (cve_id)"}
+
+    point = sum(flags) / n
+    try:
+        import numpy as np
+        rng = np.random.default_rng(seed)
+        arr = np.asarray(flags, dtype=np.int8)
+        draws = rng.choice(arr, size=(n_resamples, n), replace=True).mean(axis=1)
+        lo, hi = (float(x) for x in np.quantile(draws, [alpha / 2, 1 - alpha / 2]))
+    except ImportError:
+        rng = random.Random(seed)
+        draws = sorted(sum(rng.choices(flags, k=n)) / n for _ in range(n_resamples))
+        lo = draws[max(0, int((alpha / 2) * len(draws)) - 1)]
+        hi = draws[min(len(draws) - 1, int((1 - alpha / 2) * len(draws)))]
+
+    return {"point": point, "lower": lo, "upper": hi, "confidence": 1 - alpha,
+            "n_clusters": n, "n_resamples": n_resamples,
+            "resampling_unit": "cluster (cve_id)"}
+
+
 # ------------------------------------------------------ paired significance
 
 def _binom_two_sided_p(b: int, c: int) -> float:
