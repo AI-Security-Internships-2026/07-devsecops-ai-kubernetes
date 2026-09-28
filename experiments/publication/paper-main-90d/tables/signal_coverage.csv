@@ -1,0 +1,6 @@
+method,cvss_severity,epss,kev,public_exploit,k8s_deployed,k8s_exposure,k8s_privilege,runtime_evidence
+cvss_only,True,False,False,False,False,False,False,False
+epss_only,False,True,False,False,False,False,False,False
+kev_epss,False,True,True,False,False,False,False,False
+official_ssvc,False,False,True,True,True,True,False,False
+chaining,True,True,True,True,False,False,False,False

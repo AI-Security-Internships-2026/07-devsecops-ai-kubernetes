@@ -1,0 +1,112 @@
+{
+  "cvss_only": {
+    "recall": {
+      "point": 0.8586956521739131,
+      "lower": 0.782608695652174,
+      "upper": 0.9239130434782609,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 0.516277489895548,
+      "lower": 0.5146019273664472,
+      "upper": 0.5180173906891014,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
+  },
+  "epss_only": {
+    "recall": {
+      "point": 0.3804347826086957,
+      "lower": 0.2826086956521739,
+      "upper": 0.4891304347826087,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 0.9329237976452234,
+      "lower": 0.9320830893580241,
+      "upper": 0.9337892956922856,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
+  },
+  "kev_epss": {
+    "recall": {
+      "point": 0.3804347826086957,
+      "lower": 0.2826086956521739,
+      "upper": 0.4891304347826087,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 0.9329237976452234,
+      "lower": 0.9320830893580241,
+      "upper": 0.9337892956922856,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
+  },
+  "official_ssvc": {
+    "recall": {
+      "point": 0.0,
+      "lower": 0.0,
+      "upper": 0.0,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 1.0,
+      "lower": 1.0,
+      "upper": 1.0,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
+  },
+  "chaining": {
+    "recall": {
+      "point": 0.5108695652173914,
+      "lower": 0.4127717391304348,
+      "upper": 0.6086956521739131,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 0.8145313377308594,
+      "lower": 0.8132322359215242,
+      "upper": 0.8158397737846615,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
+  }
+}

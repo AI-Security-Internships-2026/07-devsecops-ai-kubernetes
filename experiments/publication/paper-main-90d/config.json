@@ -1,0 +1,15 @@
+{
+  "experiment": "historical-main",
+  "list": false,
+  "snapshots": [
+    "2025-09-01",
+    "2026-01-01",
+    "2026-06-01"
+  ],
+  "label": "later_kev_90d",
+  "reference": "epss_only",
+  "resamples": 2000,
+  "no_ci": false,
+  "no_raw": true,
+  "run_id": "paper-main-90d"
+}

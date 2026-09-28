@@ -1,0 +1,5 @@
+b,c,discordant,method,method_a,method_b,outcome,p_value,significant_at_0.05,statistic
+47,3,50,chi-square (continuity corrected),cvss_only,epss_only,caught a confirmed-exploited CVE,1.1934717937220432e-09,True,36.98
+0,0,0,none (no discordant pairs),kev_epss,epss_only,caught a confirmed-exploited CVE,1.0,False,
+0,35,35,chi-square (continuity corrected),official_ssvc,epss_only,caught a confirmed-exploited CVE,9.081445518184975e-09,True,33.02857142857143
+12,0,12,exact binomial,chaining,epss_only,caught a confirmed-exploited CVE,0.00048828125,True,
