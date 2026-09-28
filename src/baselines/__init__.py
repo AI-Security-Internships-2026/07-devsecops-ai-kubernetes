@@ -14,11 +14,15 @@ from src.baselines.base import (ACTIONABLE, ALL_SIGNALS, NOT_ACTIONABLE, Baselin
 from src.baselines.chaining import DeterministicChaining
 from src.baselines.cvss import CvssOnly
 from src.baselines.epss import EpssOnly
+from src.baselines.kcavp import ABLATION_VARIANTS, KCAVP, build_ablation
 from src.baselines.kev_epss import KevThenEpss
 from src.baselines.official_ssvc import OfficialSSVC
 
 # Ordered weakest to strongest, which is also the order Table B1 should read.
-BASELINE_CLASSES = (CvssOnly, EpssOnly, KevThenEpss, OfficialSSVC, DeterministicChaining)
+# Ordered weakest to strongest, with the proposed method last - the order Table B1
+# and the main results table should read.
+BASELINE_CLASSES = (CvssOnly, EpssOnly, KevThenEpss, OfficialSSVC,
+                    DeterministicChaining, KCAVP)
 
 
 def build_baselines(**overrides) -> dict[str, Baseline]:
@@ -54,5 +58,6 @@ def signal_matrix() -> list[dict]:
 __all__ = [
     "ACTIONABLE", "NOT_ACTIONABLE", "ALL_SIGNALS", "Baseline", "Decision",
     "rank_decisions", "unit_id_for", "CvssOnly", "EpssOnly", "KevThenEpss", "OfficialSSVC",
-    "DeterministicChaining", "BASELINE_CLASSES", "build_baselines", "signal_matrix",
+    "DeterministicChaining", "KCAVP", "ABLATION_VARIANTS", "build_ablation",
+    "BASELINE_CLASSES", "build_baselines", "signal_matrix",
 ]
