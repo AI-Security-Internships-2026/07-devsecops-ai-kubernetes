@@ -166,7 +166,7 @@ class TestDeterminism:
         result = verify_determinism(records(), "later_kev_90d")
         assert result["deterministic"] is True
         assert result["mismatches"] == []
-        assert result["methods_checked"] == 5
+        assert result["methods_checked"] == len(build_baselines())
 
 
 class TestOutputs:
@@ -174,7 +174,7 @@ class TestOutputs:
         run = EvaluationRun("t", records(20, ("CVE-0",)), "later_kev_90d")
         run.run()
         rows = run.raw_rows()
-        assert len(rows) == 20 * 5          # records x methods
+        assert len(rows) == 20 * len(build_baselines())   # records x methods
         for key in ("experiment_id", "method", "cve_id", "rank", "is_actionable",
                     "outcome_label"):
             assert key in rows[0]
@@ -200,7 +200,7 @@ class TestOutputs:
         summary = run.run()
         base = write_run(run, summary, out_dir=tmp_path, write_raw=False)
         with open(base / "summary_metrics.csv", encoding="utf-8") as fh:
-            assert len(list(csv.DictReader(fh))) == 5
+            assert len(list(csv.DictReader(fh))) == len(build_baselines())
 
     def test_raw_results_can_be_skipped(self, tmp_path):
         """It is methods x records; on the real dataset that is millions of rows."""

@@ -225,10 +225,10 @@ class TestChaining:
 
 
 class TestRegistry:
-    def test_builds_all_five(self):
+    def test_builds_every_registered_method(self):
         b = build_baselines()
         assert set(b) == {c.name for c in BASELINE_CLASSES}
-        assert len(b) == 5
+        assert "kcavp" in b, "the proposed method must be in the comparison"
 
     def test_overrides_reach_the_constructor(self):
         """How the sweep varies one method without disturbing the others."""
@@ -247,7 +247,7 @@ class TestRegistry:
         for row in rows.values():
             assert set(row) - {"method"} == set(ALL_SIGNALS)
 
-    def test_no_baseline_claims_runtime_evidence(self):
+    def test_only_the_proposed_method_claims_runtime_evidence(self):
         """Runtime is K-CAVP's addition; a baseline claiming it would void the ablation."""
-        for row in signal_matrix():
-            assert row["runtime_evidence"] is False
+        claiming = [r["method"] for r in signal_matrix() if r["runtime_evidence"]]
+        assert claiming == ["kcavp"]
