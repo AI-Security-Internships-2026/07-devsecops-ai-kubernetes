@@ -214,6 +214,11 @@ def bootstrap_proportion_ci(flags: list[bool], n_resamples: int = 2000,
             "resampling_unit": "cluster (cve_id)"}
 
 
+# Resamples per chunk. Bounds peak memory in the vectorised bootstrap; the draws are
+# identical to an unchunked run because each chunk draws from the same generator.
+_BOOTSTRAP_CHUNK = 50
+
+
 def clustered_proportion_ci(units: list[tuple], n_resamples: int = 2000,
                             alpha: float = 0.05, seed: int = 20260916) -> dict:
     """
@@ -245,8 +250,19 @@ def clustered_proportion_ci(units: list[tuple], n_resamples: int = 2000,
         t = np.fromiter((totals[k] for k in keys), dtype=np.int64, count=len(keys))
         f = np.fromiter((flags[k] for k in keys), dtype=np.int64, count=len(keys))
         rng = np.random.default_rng(seed)
-        idx = rng.integers(0, len(keys), size=(n_resamples, len(keys)))
-        draws = f[idx].sum(axis=1) / t[idx].sum(axis=1)
+        # Resample in chunks. A single (n_resamples x n_clusters) index array is
+        # n_resamples * n_clusters * 8 bytes — at 2000 x 335k that is 5 GiB and the
+        # allocation fails outright. Chunking caps peak memory at roughly
+        # CHUNK * n_clusters * 8 * 3 while producing identical draws.
+        chunk = max(1, min(n_resamples, _BOOTSTRAP_CHUNK))
+        parts = []
+        remaining = n_resamples
+        while remaining > 0:
+            size = min(chunk, remaining)
+            idx = rng.integers(0, len(keys), size=(size, len(keys)))
+            parts.append(f[idx].sum(axis=1) / t[idx].sum(axis=1))
+            remaining -= size
+        draws = np.concatenate(parts)
         lo, hi = (float(x) for x in np.quantile(draws, [alpha / 2, 1 - alpha / 2]))
     except ImportError:
         rng = random.Random(seed)

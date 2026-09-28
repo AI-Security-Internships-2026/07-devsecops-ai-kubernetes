@@ -249,3 +249,22 @@ class TestAttribution:
         m = M.attribution_metrics([])
         assert m["cases"] == 0
         assert m["attribution_precision"] is None
+
+
+class TestBootstrapMemory:
+    def test_large_cluster_count_does_not_exhaust_memory(self):
+        """
+        Regression: the vectorised path built one (n_resamples x n_clusters) index
+        array, which at 2000 x 335k is 5 GiB and fails to allocate. Resampling is
+        chunked so peak memory is bounded by the chunk size, not the resample count.
+        """
+        units = [(f"C{i // 3}", i % 4 == 0) for i in range(300_000)]
+        ci = M.clustered_proportion_ci(units, n_resamples=2000)
+        assert ci["n_units"] == 300_000
+        assert ci["n_clusters"] == 100_000
+        assert ci["lower"] <= ci["point"] <= ci["upper"]
+
+    def test_chunking_does_not_change_the_resample_count(self):
+        units = [(f"C{i}", i % 2 == 0) for i in range(500)]
+        ci = M.clustered_proportion_ci(units, n_resamples=137)   # not a chunk multiple
+        assert ci["n_resamples"] == 137
