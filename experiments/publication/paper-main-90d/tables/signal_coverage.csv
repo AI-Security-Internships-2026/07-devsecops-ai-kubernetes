@@ -4,3 +4,4 @@ epss_only,False,True,False,False,False,False,False,False
 kev_epss,False,True,True,False,False,False,False,False
 official_ssvc,False,False,True,True,True,True,False,False
 chaining,True,True,True,True,False,False,False,False
+kcavp,True,True,True,True,True,True,True,True

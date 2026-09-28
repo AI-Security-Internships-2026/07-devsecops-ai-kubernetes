@@ -108,5 +108,27 @@
       "n_resamples": 2000,
       "resampling_unit": "cluster (cve_id)"
     }
+  },
+  "kcavp": {
+    "recall": {
+      "point": 0.5,
+      "lower": 0.40217391304347827,
+      "upper": 0.6086956521739131,
+      "confidence": 0.95,
+      "n_units": 92,
+      "n_clusters": 92,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    },
+    "workload_reduction": {
+      "point": 0.8095573328532915,
+      "lower": 0.8082400964610499,
+      "upper": 0.8109128491618219,
+      "confidence": 0.95,
+      "n_units": 933252,
+      "n_clusters": 335473,
+      "n_resamples": 2000,
+      "resampling_unit": "cluster (cve_id)"
+    }
   }
 }
