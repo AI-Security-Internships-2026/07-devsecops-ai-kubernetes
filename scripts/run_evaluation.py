@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.baselines import build_baselines                      # noqa: E402
 from src.dataset import historical                             # noqa: E402
+from src.evaluation import ladder as L                         # noqa: E402
 from src.evaluation.runner import (EvaluationRun, verify_determinism,  # noqa: E402
                                    write_run)
 
@@ -34,6 +35,7 @@ SWEEP_THRESHOLDS = (0.01, 0.025, 0.05, 0.075, 0.10, 0.15, 0.20)
 EXPERIMENTS = {
     "historical-main": "All baselines on the historical dataset, with CIs and McNemar",
     "historical-threshold-sweep": "EPSS threshold sensitivity (issue #24, experiment 6D)",
+    "noise-ladder": "Progressive noise reduction, one signal layer at a time (issue #26)",
     "determinism-check": "Run the comparison twice and diff the decisions",
 }
 
@@ -136,6 +138,77 @@ def run_sweep(args, records, manifest):
     return out_dir
 
 
+def run_ladder(args, records, manifest):
+    """
+    Progressive noise reduction (issue #26) — one signal layer switched on at a time.
+
+    Reports the marginal effect of every layer rather than a single end-to-end figure,
+    so a reviewer can see which signal actually removes the noise and what recall each
+    removal costs.
+    """
+    methods = L.build_ladder()
+    run = EvaluationRun("noise-ladder", records, args.label, methods=methods,
+                        run_id=args.run_id or
+                        datetime.now().strftime("%Y%m%d-%H%M%S") + "-ladder")
+    summary = run.run()
+    rows = L.ladder_rows(summary)
+
+    print(f"\nProgressive noise reduction — {len(run.population):,} records, "
+          f"{len(run.positives)} positives, label {args.label}")
+    print(f"\n{'':>3} {'layer':<26}{'actionable':>12}{'reduction':>11}{'recall':>9}"
+          f"{'d(queue)':>12}{'d(recall)':>11}")
+    print("-" * 87)
+    for r in rows:
+        da = ("" if r["delta_actionable"] is None
+              else f"{r['delta_actionable']:+,}")
+        dr = ("" if r["delta_recall"] is None
+              else f"{r['delta_recall']:+.1%}")
+        marker = " " if r["cumulative"] else "."
+        print(f"{r['rung']:>3}{marker}{r['label']:<26}{r['actionable']:>12,}"
+              f"{fmt_pct(r['workload_reduction']):>11}{fmt_pct(r['recall']):>9}"
+              f"{da:>12}{dr:>11}")
+
+    print("\n  . = single-signal alternative, measured against L0 rather than the rung "
+          "above it.")
+
+    flat = [r for r in L.inert_rungs(rows) if r["status"] != "inert as documented"]
+    inert = [r for r in L.inert_rungs(rows) if r["status"] == "inert as documented"]
+    if inert:
+        print("\n[*] Rungs that cannot move on this dataset, as documented in "
+              "src/evaluation/ladder.py:")
+        for r in inert:
+            print(f"      {r['rung']} {r['label']:<24} {r['inert']}")
+    if flat:
+        print("\n[!] Rungs that did not behave as documented — investigate before "
+              "citing this table:")
+        for r in flat:
+            print(f"      {r['rung']} {r['label']:<24} {r['status']}")
+
+    collapsed = L.collapsed_rows(rows)
+    print(f"\n[*] Five-stage view for the waterfall figure:")
+    for r in collapsed:
+        da = "" if r["delta_actionable"] is None else f"{r['delta_actionable']:+,}"
+        print(f"      {r['stage']:<20}{r['actionable']:>12,}"
+              f"{fmt_pct(r['workload_reduction']):>11}{da:>12}")
+
+    out_dir = Path("experiments/publication") / run.run_id
+    (out_dir / "tables").mkdir(parents=True, exist_ok=True)
+    import csv
+    for fname, data in (("noise_ladder.csv", rows),
+                        ("noise_ladder_collapsed.csv", collapsed)):
+        with open(out_dir / "tables" / fname, "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(data[0]), extrasaction="ignore")
+            w.writeheader()
+            w.writerows(data)
+
+    write_run(run, summary, None, None, dataset_manifest=manifest,
+              config_used=vars(args) | {"snapshots": [str(s) for s in args.snapshots],
+                                        "rungs": [r.key for r in L.RUNGS]},
+              write_raw=False, out_dir=None)
+    print(f"\n[+] {out_dir}")
+    return out_dir
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -188,6 +261,10 @@ def main():
 
     if args.experiment == "historical-threshold-sweep":
         run_sweep(args, records, manifest)
+        return 0
+
+    if args.experiment == "noise-ladder":
+        run_ladder(args, records, manifest)
         return 0
 
     run_main(args, records, manifest)

@@ -1,0 +1,6 @@
+rung,label,adds,stage,cumulative,actionable,workload_reduction,recall,efficiency,compare_to,delta_actionable,delta_reduction,delta_recall,inert,notes
+L0,Scan only (no triage),--,Untriaged,False,933252,0.0,1.0,9.858001911595153e-05,,,,,,the denominator for every reduction figure in the paper
+L3,CVSS + EPSS,fusion of the two scores,Fused base,True,161608,0.826833481203362,0.4891304347826087,0.0002784515618038711,L0,-771644,0.826833481203362,-0.5108695652173914,,K-CAVP base classification with no threat or context refinement
+L5,+ public exploit code,exploit availability,Threat intelligence,True,177731,0.8095573328532915,0.5,0.0002588181015129606,L3,16123,-0.01727614835007052,0.010869565217391297,,
+L6,+ Kubernetes context,deployed / exposed / privileged,Deployment context,True,177731,0.8095573328532915,0.5,0.0002588181015129606,L5,0,0.0,0.0,signal absent from this dataset: CVE-level records carry no cluster or runtime state,
+L7,+ Falco runtime,attributed runtime evidence,Runtime,True,177731,0.8095573328532915,0.5,0.0002588181015129606,L6,0,0.0,0.0,signal absent from this dataset: CVE-level records carry no cluster or runtime state,

@@ -54,21 +54,27 @@ class KCAVP(Baseline):
                     "k8s_deployed", "k8s_exposure", "k8s_privilege", "runtime_evidence")
 
     def __init__(self, thresholds: Thresholds | None = None,
-                 enable_exploit: bool = True, enable_context: bool = True,
-                 enable_runtime: bool = True, enable_bound: bool = True,
-                 variant: str = "full"):
+                 enable_kev: bool = True, enable_exploit: bool = True,
+                 enable_context: bool = True, enable_runtime: bool = True,
+                 enable_bound: bool = True, variant: str = "full"):
         self.thresholds = thresholds or DEFAULTS
         if not enable_bound:
             # -1 disables the aggregate clamp, which is the "Full - Bound" ablation
             # variant issue #24 experiment 6B compares against.
             self.thresholds = self.thresholds.replace(max_escalation_levels=-1)
+        # Off only for rung L3 of the noise ladder, which isolates what CVSS and EPSS
+        # achieve before any confirmed-exploitation signal is added. Never off in the
+        # deployed method.
+        self.enable_kev = enable_kev
         self.enable_exploit = enable_exploit
         self.enable_context = enable_context
         self.enable_runtime = enable_runtime
         self.variant = variant
 
     def decide(self, record: dict) -> Decision:
-        in_kev = as_bool(record.get("kev_at_snapshot")) or as_bool(record.get("in_kev"))
+        in_kev = (self.enable_kev
+                  and (as_bool(record.get("kev_at_snapshot"))
+                       or as_bool(record.get("in_kev"))))
         # The engine reads severity/epss/cvss under its own field names; the historical
         # dataset uses cvss_severity, so map rather than duplicate the parsing.
         cve = {

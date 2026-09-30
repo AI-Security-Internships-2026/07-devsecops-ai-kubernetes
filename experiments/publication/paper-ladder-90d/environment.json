@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-09-30T21:18:01+00:00",
+  "git_commit": "16971618cdf4a67735679ad930c53e17e683cb3e",
+  "git_branch": "abdul-hadi-week-14",
+  "git_dirty": true,
+  "python": "3.13.7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "machine": "AMD64",
+  "trivy": "unavailable",
+  "kubectl": "unavailable",
+  "dataset": {
+    "snapshots": [
+      "2025-09-01",
+      "2026-01-01",
+      "2026-06-01"
+    ],
+    "outcome_windows_days": [
+      30,
+      60,
+      90
+    ],
+    "epss_model_versions": {
+      "2025-09-01": "v2025.03.14",
+      "2026-01-01": "v2025.03.14",
+      "2026-06-01": "v2025.03.14"
+    },
+    "kev_catalog_version": "2026.09.11",
+    "totals": {
+      "rows": 937750,
+      "eligible": 933252,
+      "positives": {
+        "30d": 26,
+        "60d": 66,
+        "90d": 92
+      },
+      "kev_entrants_not_in_population": {
+        "30d": {
+          "published_after_snapshot": 29,
+          "absent_from_epss": 1
+        },
+        "60d": {
+          "published_after_snapshot": 73,
+          "absent_from_epss": 1
+        },
+        "90d": {
+          "published_after_snapshot": 114,
+          "absent_from_epss": 1
+        }
+      }
+    }
+  }
+}
