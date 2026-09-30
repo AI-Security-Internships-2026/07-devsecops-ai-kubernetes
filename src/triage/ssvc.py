@@ -20,6 +20,59 @@ module and the paper can cite one location.
 
 from src.triage.thresholds import DEFAULTS, FALCO_CRITICAL_TIER, Thresholds
 
+# ---------------------------------------------------------------------------
+# Operating modes (issue #19 item 6).
+#
+# The same deployment-context rule is correct in one mode and dangerous in the other,
+# so the mode has to be explicit rather than implied by whatever context happened to be
+# passed.
+#
+# CLUSTER: we are triaging against a live cluster we can query. "This image is not
+#   running anywhere" is a *positive observation* and legitimately de-escalates.
+#
+# PRE_DEPLOYMENT: we are gating an image in CI, before it is deployed. The image is
+#   not running BY DEFINITION, and that fact carries no information about risk. Applying
+#   the cluster rule here de-escalates every finding in exactly the place the pipeline is
+#   supposed to block — the defect recorded in PR-Week10 and only partially patched by
+#   the KEV exemption, which left every non-KEV finding still wrongly deferred.
+#
+# Runtime evidence is likewise unavailable pre-deployment: there is no running container
+# to observe, so an alert supplied in this mode describes some other workload and must
+# not escalate.
+# ---------------------------------------------------------------------------
+MODE_CLUSTER = "cluster"
+MODE_PRE_DEPLOYMENT = "pre_deployment"
+MODES = (MODE_CLUSTER, MODE_PRE_DEPLOYMENT)
+
+
+def resolve_mode(context: dict | None, runtime: dict | None = None,
+                 mode: str | None = None) -> str:
+    """
+    The mode in force for one analysis.
+
+    An explicit mode always wins. Otherwise it is inferred from whether we have any
+    observation of a live workload: reachable cluster context, or runtime evidence.
+
+    Runtime evidence counts on its own. Falco alerts can only be produced by a container
+    that is actually running, so their presence is direct proof that this is not a
+    pre-deployment gate, even when the Kubernetes API was unreachable. Inferring
+    pre-deployment from a missing cluster connection alone would silence genuine runtime
+    escalations whenever context lookup failed — which is a failure mode the test suite
+    caught when this function first ignored `runtime`.
+
+    Inference is a convenience for callers written before the split; the pipeline passes
+    the mode explicitly and the resolved value is recorded in every result, so a stored
+    decision can always be read back with the rule set that produced it.
+    """
+    if mode is not None:
+        if mode not in MODES:
+            raise ValueError(f"unknown mode {mode!r}; expected one of {MODES}")
+        return mode
+    observed_live = bool((context or {}).get("available")
+                         or (runtime or {}).get("available"))
+    return MODE_CLUSTER if observed_live else MODE_PRE_DEPLOYMENT
+
+
 # Priority <-> SSVC decision label
 PRIORITY_TO_DECISION = {
     "CRITICAL": "Act",
@@ -90,12 +143,18 @@ def apply_exploit(priority: str, cve: dict, exploit_exists: bool) -> tuple[str, 
 
 def analyze(cve: dict, in_kev: bool, context: dict | None = None,
             exploit_exists: bool = False, runtime: dict | None = None,
-            thresholds: Thresholds | None = None) -> dict:
+            thresholds: Thresholds | None = None,
+            mode: str | None = None) -> dict:
     """
     Full deterministic analysis for one finding: base SSVC, then exploit, context
     and runtime refinements. Single source of truth shared by the agent and tests.
 
-    Returns {"priority", "decision", "notes"}.
+    `mode` selects the rule set (see MODES). Left as None it is inferred from whether
+    cluster context was available, which preserves the behaviour of callers written
+    before the split; the pipeline passes it explicitly.
+
+    Returns {"priority", "decision", "notes", "mode"} — the resolved mode is returned so
+    a stored decision records which rule set produced it.
 
     Each refinement is individually capped at one level, but that is not the same
     as the FINDING being capped: exploit could lift MEDIUM->HIGH and runtime then
@@ -108,6 +167,7 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     drops a finding straight to LOW.
     """
     t = thresholds or DEFAULTS
+    resolved_mode = resolve_mode(context, runtime, mode)
     base, _ = classify_priority(cve, in_kev, t)
     priority = base
     notes: list[str] = []
@@ -116,11 +176,11 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     if note:
         notes.append(note)
 
-    priority, note = apply_context(priority, cve, context, t)
+    priority, note = apply_context(priority, cve, context, t, resolved_mode)
     if note:
         notes.append(note)
 
-    priority, note = apply_runtime(priority, cve, runtime)
+    priority, note = apply_runtime(priority, cve, runtime, resolved_mode)
     if note:
         notes.append(note)
 
@@ -128,7 +188,8 @@ def analyze(cve: dict, in_kev: bool, context: dict | None = None,
     if note:
         notes.append(note)
 
-    return {"priority": priority, "decision": decision_for(priority), "notes": notes}
+    return {"priority": priority, "decision": decision_for(priority), "notes": notes,
+            "mode": resolved_mode}
 
 
 def _cap_total_escalation(base: str, priority: str,
@@ -158,7 +219,8 @@ def _cap_total_escalation(base: str, priority: str,
 
 
 def apply_context(priority: str, cve: dict, context: dict | None,
-                  thresholds: Thresholds | None = None) -> tuple[str, str | None]:
+                  thresholds: Thresholds | None = None,
+                  mode: str = MODE_CLUSTER) -> tuple[str, str | None]:
     """
     Kubernetes deployment-context refinement (P3).
 
@@ -185,13 +247,20 @@ def apply_context(priority: str, cve: dict, context: dict | None,
     exposed = bool(context.get("exposed"))
     privileged = bool(context.get("privileged") or context.get("sa_privileged"))
 
-    # Not deployed in this cluster -> not actionable here. KEV is exempt: a CVE under
-    # confirmed active exploitation stays actionable even when the image is not running
-    # yet, because the common reason to scan an un-deployed image is that someone is
-    # about to deploy it. Without this exemption a pre-deployment scan silently files a
-    # known-exploited CVE as Track, and the KEV-recall guarantee the evaluation reports
-    # does not hold. Matches the exemption on the de-escalation branch below.
+    # Not deployed -> not actionable *in this cluster*. The rule is only sound when we
+    # actually queried a cluster and observed the image absent from it.
+    #
+    # In PRE_DEPLOYMENT mode the image is not running by definition, so "not deployed"
+    # is not an observation and must not de-escalate anything. The earlier KEV exemption
+    # was a partial patch for the same defect: it rescued known-exploited findings but
+    # left every other finding in a CI gate silently filed as Track. Mode is the
+    # complete fix; the KEV exemption remains below because it is still needed in
+    # CLUSTER mode, where an image genuinely absent today may be deployed tomorrow.
     if context.get("deployed") is False:
+        if mode == MODE_PRE_DEPLOYMENT:
+            return priority, ("pre-deployment scan: image is not running by definition, "
+                              "so deployment state carries no evidence — not "
+                              "de-escalated")
         if in_kev:
             return priority, ("image not deployed in cluster, but CVE is in CISA KEV "
                               "(actively exploited) — not de-escalated")
@@ -266,7 +335,8 @@ def _attributed_alert(cve: dict, alerts: list[dict]) -> dict | None:
     return None
 
 
-def apply_runtime(priority: str, cve: dict, runtime: dict | None) -> tuple[str, str | None]:
+def apply_runtime(priority: str, cve: dict, runtime: dict | None,
+                  mode: str = MODE_CLUSTER) -> tuple[str, str | None]:
     """
     Kubernetes runtime-reachability refinement (Falco), two-tier.
 
@@ -295,6 +365,13 @@ def apply_runtime(priority: str, cve: dict, runtime: dict | None) -> tuple[str, 
     count = int(runtime.get("count", 0) or 0)
     if count == 0:
         return priority, None
+
+    # A pre-deployment gate has no running container of this image to observe. Any
+    # alerts handed to us describe some other workload, so they are recorded and
+    # explicitly not acted on rather than silently dropped.
+    if mode == MODE_PRE_DEPLOYMENT:
+        return priority, (f"pre-deployment scan: {count} runtime alert(s) supplied but "
+                          f"this image is not running — recorded, no change")
 
     max_pri = (runtime.get("max_priority") or "").upper()
     rules = runtime.get("rules") or ["runtime activity"]

@@ -67,6 +67,7 @@ def analyze_cves(
     runtime_provider=None,
     llm="auto",
     verbose: bool = True,
+    mode: str | None = None,
 ) -> list[dict]:
     """
     Analyze a list of EPSS-enriched CVE dicts into triage findings.
@@ -78,6 +79,10 @@ def analyze_cves(
         exploit_lookup: optional callable(cve_id)->bool (P4)
         runtime_provider: optional callable(cve)->Falco runtime signal dict
         llm: "auto" (auto-detect), an LLM instance, or None (static only)
+        mode: ssvc.MODE_CLUSTER or ssvc.MODE_PRE_DEPLOYMENT. A CI gate must pass
+            MODE_PRE_DEPLOYMENT explicitly: the deployment-context rules are only
+            sound against a cluster that was actually queried. Left as None the mode
+            is inferred per finding from whether live evidence was observed.
 
     Returns:
         list of finding dicts (keys consumed by triage.report).
@@ -116,7 +121,8 @@ def analyze_cves(
                 runtime = None
 
         result = ssvc.analyze(cve_with_kev, in_kev, context=context,
-                              exploit_exists=exploit_exists, runtime=runtime)
+                              exploit_exists=exploit_exists, runtime=runtime,
+                              mode=mode)
         decided.append((cve, in_kev, result))
 
     # One explanation per distinct actionable CVE. Findings are per (CVE, package)

@@ -56,7 +56,8 @@ class KCAVP(Baseline):
     def __init__(self, thresholds: Thresholds | None = None,
                  enable_kev: bool = True, enable_exploit: bool = True,
                  enable_context: bool = True, enable_runtime: bool = True,
-                 enable_bound: bool = True, variant: str = "full"):
+                 enable_bound: bool = True, variant: str = "full",
+                 mode: str | None = None):
         self.thresholds = thresholds or DEFAULTS
         if not enable_bound:
             # -1 disables the aggregate clamp, which is the "Full - Bound" ablation
@@ -70,6 +71,10 @@ class KCAVP(Baseline):
         self.enable_context = enable_context
         self.enable_runtime = enable_runtime
         self.variant = variant
+        # None leaves the engine to infer per record, which is what Dataset A needs
+        # (it has no context and no runtime, so every record is pre-deployment).
+        # Issue #24 sets it explicitly to compare the two rule sets.
+        self.mode = mode
 
     def decide(self, record: dict) -> Decision:
         in_kev = (self.enable_kev
@@ -93,6 +98,7 @@ class KCAVP(Baseline):
                             and as_bool(record.get("public_exploit_at_snapshot"))),
             runtime=record.get("runtime") if self.enable_runtime else None,
             thresholds=self.thresholds,
+            mode=self.mode,
         )
 
         priority = result["priority"]
@@ -111,7 +117,7 @@ class KCAVP(Baseline):
             explanation="; ".join(notes) if notes else
                         f"base classification -> {result['decision']}",
             signals={"priority": priority, "variant": self.variant,
-                     "notes": len(notes)},
+                     "mode": result["mode"], "notes": len(notes)},
         )
 
 
