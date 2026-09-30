@@ -36,6 +36,7 @@ EXPERIMENTS = {
     "historical-main": "All baselines on the historical dataset, with CIs and McNemar",
     "historical-threshold-sweep": "EPSS threshold sensitivity (issue #24, experiment 6D)",
     "noise-ladder": "Progressive noise reduction, one signal layer at a time (issue #26)",
+    "component-ablation": "Leave-one-out over K-CAVP components (issue #23, exp. 5B)",
     "determinism-check": "Run the comparison twice and diff the decisions",
 }
 
@@ -209,6 +210,67 @@ def run_ladder(args, records, manifest):
     return out_dir
 
 
+def run_ablation(args, records, manifest):
+    """
+    Component ablation, issue #23 experiment 5B — leave-one-out from the full method.
+
+    Registered as a first-class experiment rather than computed ad hoc, because the
+    figure previously quoted in the manuscript was produced on a single snapshot and
+    then printed beside three-snapshot numbers. Running it through the same loader as
+    every other experiment makes that class of mismatch impossible to reintroduce.
+    """
+    from src.baselines.kcavp import build_ablation
+
+    methods = build_ablation()
+    run = EvaluationRun("component-ablation", records, args.label, methods=methods,
+                        run_id=args.run_id or
+                        datetime.now().strftime("%Y%m%d-%H%M%S") + "-ablation")
+    summary = run.run()
+
+    print(f"\nComponent ablation — {len(run.population):,} records, "
+          f"{len(run.positives)} positives, label {args.label}")
+    print(f"\n{'variant':<22}{'actionable':>12}{'reduction':>11}{'recall':>9}"
+          f"{'caught':>8}{'vs full':>10}")
+    print("-" * 72)
+
+    full = summary.get("full")
+    rows = []
+    for name, s in summary.items():
+        caught = len(run._caught(name))
+        delta = "" if full is None else f"{s['actionable'] - full['actionable']:+,}"
+        print(f"{name:<22}{s['actionable']:>12,}{fmt_pct(s['workload_reduction']):>11}"
+              f"{fmt_pct(s['recall']):>9}{caught:>8}{delta:>10}")
+        rows.append({"variant": name, "actionable": s["actionable"],
+                     "workload_reduction": s["workload_reduction"],
+                     "recall": s["recall"], "positives_caught": caught,
+                     "delta_actionable_vs_full": (None if full is None else
+                                                  s["actionable"] - full["actionable"])})
+
+    base, exploit = summary.get("base"), summary.get("base+exploit")
+    if base and exploit:
+        added = exploit["actionable"] - base["actionable"]
+        gained = len(run._caught("base+exploit")) - len(run._caught("base"))
+        print(f"\n[*] The exploit refinement adds {added:,} findings to the queue and "
+              f"catches {gained:+d} additional\n    confirmed-exploited CVE(s). Quote "
+              f"this figure, not a single-snapshot one.")
+
+    out_dir = Path("experiments/publication") / run.run_id
+    (out_dir / "tables").mkdir(parents=True, exist_ok=True)
+    import csv
+    with open(out_dir / "tables" / "component_ablation.csv", "w", newline="",
+              encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+
+    write_run(run, summary, None, None, dataset_manifest=manifest,
+              config_used=vars(args) | {"snapshots": [str(s) for s in args.snapshots],
+                                        "variants": list(methods)},
+              write_raw=False)
+    print(f"\n[+] {out_dir}")
+    return out_dir
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -265,6 +327,10 @@ def main():
 
     if args.experiment == "noise-ladder":
         run_ladder(args, records, manifest)
+        return 0
+
+    if args.experiment == "component-ablation":
+        run_ablation(args, records, manifest)
         return 0
 
     run_main(args, records, manifest)
