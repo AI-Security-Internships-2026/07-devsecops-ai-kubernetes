@@ -1,0 +1,508 @@
+#!/usr/bin/env bash
+#
+# bootstrap_machine.sh - bring a bare Linux host to a state where every experiment
+#                        in this repository can be run.
+#
+# Written for a freshly imaged NVIDIA DGX Spark (ARM64 / Ubuntu), but it detects the
+# architecture and works on x86_64 without modification. Nothing here is DGX-specific.
+#
+# What it installs
+# ----------------
+#   base      apt packages, Python venv + this project's requirements
+#   docker    container runtime, for building the images Dataset B deploys
+#   k3s       single-node Kubernetes (real kubelet, survives reboot, good eBPF support)
+#   trivy     the scanner the pipeline consumes
+#   falco     runtime security, delegated to scripts/falco_setup.sh
+#   ollama    self-hosted LLM runtime, so vulnerability data never leaves the host
+#
+# Design notes
+# ------------
+# **Idempotent.** Every step checks for an existing installation first and skips it.
+# Re-running after a failure is the intended recovery path, not a risk.
+#
+# **Nothing is assumed to have worked.** Each step is followed by a verification that
+# exercises the thing installed, not merely `command -v`. A binary on PATH that cannot
+# reach its daemon is the failure mode that wastes an afternoon.
+#
+# **Failures do not abort the run.** A step that fails is recorded and the script
+# continues, because the steps are largely independent and one missing component should
+# not hide the state of the other six. The summary at the end is the actual output.
+#
+# **No credentials are written.** The .env scaffold contains placeholders only. Fill it
+# in by hand afterwards; it is gitignored and must stay that way.
+#
+# Usage
+# -----
+#   bash scripts/bootstrap_machine.sh                 # everything
+#   bash scripts/bootstrap_machine.sh base k3s trivy  # only these steps
+#   bash scripts/bootstrap_machine.sh verify          # check an existing install
+#   bash scripts/bootstrap_machine.sh --list          # show the steps
+#
+# Options
+#   --model NAME     Ollama model to pull       (default: qwen2.5:7b; "none" to skip)
+#   --no-ollama      skip the LLM runtime entirely
+#   --yes            do not prompt
+#
+# CRLF note: if you see "$'\r': command not found", run:
+#   sed -i 's/\r$//' scripts/bootstrap_machine.sh
+#
+set -uo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+OLLAMA_MODEL="qwen2.5:7b"
+ASSUME_YES="false"
+WITH_OLLAMA="true"
+STEPS=()
+
+RESULTS=()   # "step|status|detail"
+
+# ------------------------------------------------------------------ output helpers
+
+if [ -t 1 ]; then
+  C_OK=$'\033[32m'; C_WARN=$'\033[33m'; C_ERR=$'\033[31m'; C_DIM=$'\033[2m'; C_0=$'\033[0m'
+else
+  C_OK=""; C_WARN=""; C_ERR=""; C_DIM=""; C_0=""
+fi
+
+say()  { printf '%s\n' "$*"; }
+head2() { printf '\n%s\n%s\n' "== $* " "$(printf '%.0s-' {1..66})"; }
+ok()   { printf '  %s[ ok ]%s %s\n' "$C_OK" "$C_0" "$*"; }
+warn() { printf '  %s[warn]%s %s\n' "$C_WARN" "$C_0" "$*"; }
+err()  { printf '  %s[fail]%s %s\n' "$C_ERR" "$C_0" "$*"; }
+info() { printf '  %s%s%s\n' "$C_DIM" "$*" "$C_0"; }
+
+record() { RESULTS+=("$1|$2|$3"); }
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# sudo that works both as root and as a normal user, and fails loudly if neither.
+SUDO=""
+setup_sudo() {
+  if [ "$(id -u)" -eq 0 ]; then SUDO=""
+  elif have sudo; then SUDO="sudo"
+  else
+    err "not root and sudo is unavailable; install sudo or run as root"
+    exit 1
+  fi
+}
+
+confirm() {
+  [ "$ASSUME_YES" = "true" ] && return 0
+  read -r -p "  $1 [y/N] " reply </dev/tty || return 1
+  [[ "$reply" =~ ^[Yy]$ ]]
+}
+
+# ------------------------------------------------------------------ preflight
+
+ARCH=""; ARCH_DEB=""; OS_ID=""; OS_VER=""
+
+preflight() {
+  head2 "Preflight"
+
+  ARCH="$(uname -m)"
+  case "$ARCH" in
+    aarch64|arm64) ARCH_DEB="arm64" ;;
+    x86_64|amd64)  ARCH_DEB="amd64" ;;
+    *) err "unsupported architecture: $ARCH"; record preflight fail "arch $ARCH"; return 1 ;;
+  esac
+
+  if [ -r /etc/os-release ]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    OS_ID="${ID:-unknown}"; OS_VER="${VERSION_ID:-unknown}"
+  fi
+
+  info "arch      : $ARCH ($ARCH_DEB)"
+  info "os        : $OS_ID $OS_VER"
+  info "kernel    : $(uname -r)"
+  info "user      : $(id -un)"
+  info "repo      : $REPO_ROOT"
+
+  if [ "$OS_ID" != "ubuntu" ] && [ "$OS_ID" != "debian" ]; then
+    warn "this script uses apt; $OS_ID is untested. Steps may fail individually."
+  fi
+
+  # Falco's modern_ebpf driver needs BTF. Knowing this now saves diagnosing "no alerts"
+  # later, which is the single most time-consuming failure in this project's history.
+  if [ -r /sys/kernel/btf/vmlinux ]; then
+    ok "BTF present - Falco modern_ebpf (CO-RE) driver is available"
+  else
+    warn "no /sys/kernel/btf/vmlinux - Falco will fall back to the legacy ebpf or kmod driver"
+  fi
+
+  local free_gb
+  free_gb="$(df -BG --output=avail "$REPO_ROOT" 2>/dev/null | tail -1 | tr -dc '0-9')"
+  if [ -n "$free_gb" ] && [ "$free_gb" -lt 25 ]; then
+    warn "only ${free_gb}G free; k3s + images + an LLM model want ~25G"
+  else
+    info "disk free : ${free_gb:-?}G"
+  fi
+
+  record preflight ok "$ARCH / $OS_ID $OS_VER"
+}
+
+# ------------------------------------------------------------------ steps
+
+step_base() {
+  head2 "Base packages and Python environment"
+
+  $SUDO apt-get update -qq || { err "apt update failed"; record base fail "apt update"; return 1; }
+  $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+      ca-certificates curl gnupg git jq wget unzip make \
+      python3 python3-venv python3-pip build-essential \
+    || { err "apt install failed"; record base fail "apt install"; return 1; }
+  ok "apt packages installed"
+
+  local py
+  py="$(python3 --version 2>&1)"
+  info "$py"
+  # The codebase uses PEP 604 unions (X | None) in annotations evaluated at runtime by
+  # dataclasses, so 3.10 is a hard floor rather than a style preference.
+  if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)'; then
+    err "Python >= 3.10 required, found $py"
+    record base fail "python too old"
+    return 1
+  fi
+
+  if [ ! -d "$REPO_ROOT/.venv" ]; then
+    python3 -m venv "$REPO_ROOT/.venv" || { err "venv creation failed"; record base fail venv; return 1; }
+    ok "virtualenv created at .venv"
+  else
+    info "virtualenv already present"
+  fi
+
+  # shellcheck disable=SC1091
+  "$REPO_ROOT/.venv/bin/pip" install --quiet --upgrade pip
+  if [ -f "$REPO_ROOT/requirements.txt" ]; then
+    "$REPO_ROOT/.venv/bin/pip" install --quiet -r "$REPO_ROOT/requirements.txt" \
+      || { err "pip install failed"; record base fail "pip install"; return 1; }
+    ok "project requirements installed"
+  fi
+  "$REPO_ROOT/.venv/bin/pip" install --quiet pytest pytest-cov || true
+
+  scaffold_env
+  record base ok "python $(python3 -c 'import platform;print(platform.python_version())')"
+}
+
+scaffold_env() {
+  local env_file="$REPO_ROOT/.env"
+  if [ -f "$env_file" ]; then
+    info ".env already exists - left untouched"
+    return 0
+  fi
+  # Placeholders only. Never write a real credential from a script.
+  cat > "$env_file" <<'ENVEOF'
+# Local configuration. This file is gitignored and must stay that way.
+# Replace the placeholders below; do not commit real values.
+
+# Explanation provider: local | groq | gemini | none
+# "none" uses deterministic templates and needs no credential at all.
+LLM_PROVIDER=local
+
+# Self-hosted model over the OpenAI protocol (Ollama default shown).
+# Keeping this local is why vulnerability data never leaves the host.
+LLM_BASE_URL=http://localhost:11434/v1
+LLM_MODEL=qwen2.5:7b
+
+# Only needed if LLM_PROVIDER is set to a hosted service.
+GROQ_API_KEY=YOUR_API_KEY
+GOOGLE_API_KEY=YOUR_API_KEY
+
+# Optional: raises the NVD bulk-index rate limit when building the dataset.
+NVD_API_KEY=YOUR_API_KEY
+ENVEOF
+  chmod 600 "$env_file"
+  ok ".env scaffold written with placeholders (chmod 600)"
+  warn "fill in .env by hand; never commit it"
+}
+
+step_docker() {
+  head2 "Docker"
+  if have docker && $SUDO docker info >/dev/null 2>&1; then
+    ok "docker already working: $(docker --version)"
+    record docker ok "already present"
+  else
+    if ! have docker; then
+      curl -fsSL https://get.docker.com -o /tmp/get-docker.sh \
+        || { err "could not download the docker installer"; record docker fail download; return 1; }
+      $SUDO sh /tmp/get-docker.sh >/dev/null 2>&1 \
+        || { err "docker install failed"; record docker fail install; return 1; }
+      rm -f /tmp/get-docker.sh
+    fi
+    $SUDO systemctl enable --now docker >/dev/null 2>&1 || true
+    if $SUDO docker info >/dev/null 2>&1; then
+      ok "docker installed: $(docker --version)"
+      record docker ok installed
+    else
+      err "docker installed but the daemon is not responding"
+      record docker fail "daemon down"
+      return 1
+    fi
+  fi
+
+  # Running docker without sudo needs a group change that only takes effect on a new
+  # login, so this is reported rather than worked around.
+  if ! id -nG "$(id -un)" | grep -qw docker; then
+    $SUDO usermod -aG docker "$(id -un)" 2>/dev/null || true
+    warn "added $(id -un) to the docker group - log out and back in for it to apply"
+  fi
+}
+
+step_k3s() {
+  head2 "Kubernetes (k3s)"
+  if have kubectl && kubectl get nodes >/dev/null 2>&1; then
+    ok "a working cluster is already reachable"
+    kubectl get nodes 2>/dev/null | sed 's/^/      /'
+    record k3s ok "already present"
+    return 0
+  fi
+
+  if ! have k3s; then
+    # --write-kubeconfig-mode 644 so kubectl works without sudo. This is a single-node
+    # research box; on a shared host use a copy under ~/.kube instead.
+    curl -sfL https://get.k3s.io | \
+      INSTALL_K3S_EXEC="--write-kubeconfig-mode 644" $SUDO sh - >/dev/null 2>&1 \
+      || { err "k3s install failed"; record k3s fail install; return 1; }
+    ok "k3s installed"
+  fi
+
+  $SUDO systemctl enable --now k3s >/dev/null 2>&1 || true
+
+  # k3s takes a few seconds to bring the API server up; polling beats a fixed sleep.
+  local waited=0
+  until $SUDO k3s kubectl get nodes >/dev/null 2>&1; do
+    waited=$((waited + 3))
+    [ "$waited" -ge 90 ] && { err "k3s did not become ready within 90s"; record k3s fail "not ready"; return 1; }
+    sleep 3
+  done
+
+  mkdir -p "$HOME/.kube"
+  $SUDO cat /etc/rancher/k3s/k3s.yaml > "$HOME/.kube/config" 2>/dev/null \
+    && chmod 600 "$HOME/.kube/config" \
+    && ok "kubeconfig written to ~/.kube/config"
+
+  if ! have kubectl; then
+    $SUDO ln -sf "$(command -v k3s)" /usr/local/bin/kubectl 2>/dev/null \
+      || warn "could not symlink kubectl; use 'k3s kubectl' instead"
+  fi
+
+  if kubectl get nodes >/dev/null 2>&1; then
+    kubectl get nodes 2>/dev/null | sed 's/^/      /'
+    ok "cluster reachable as $(id -un)"
+    record k3s ok "$(kubectl get nodes --no-headers 2>/dev/null | wc -l) node(s)"
+  else
+    warn "cluster is up but not reachable without sudo; try: export KUBECONFIG=\$HOME/.kube/config"
+    record k3s warn "sudo required"
+  fi
+}
+
+step_trivy() {
+  head2 "Trivy"
+  if have trivy; then
+    ok "already installed: $(trivy --version 2>/dev/null | head -1)"
+    record trivy ok "already present"
+    return 0
+  fi
+
+  # The official apt repository, so `apt upgrade` keeps the scanner current. The
+  # install-script fallback covers hosts where the repo is unreachable.
+  $SUDO install -m 0755 -d /usr/share/keyrings
+  if curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key \
+       | $SUDO gpg --dearmor --yes -o /usr/share/keyrings/trivy.gpg 2>/dev/null; then
+    echo "deb [signed-by=/usr/share/keyrings/trivy.gpg arch=$ARCH_DEB] https://aquasecurity.github.io/trivy-repo/deb generic main" \
+      | $SUDO tee /etc/apt/sources.list.d/trivy.list >/dev/null
+    $SUDO apt-get update -qq && $SUDO apt-get install -y -qq trivy
+  fi
+
+  if ! have trivy; then
+    warn "apt route failed, falling back to the install script"
+    curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+      | $SUDO sh -s -- -b /usr/local/bin >/dev/null 2>&1
+  fi
+
+  if have trivy; then
+    ok "installed: $(trivy --version 2>/dev/null | head -1)"
+    info "warming the vulnerability database (first scan is slow otherwise)..."
+    trivy image --download-db-only >/dev/null 2>&1 \
+      && ok "vulnerability database downloaded" \
+      || warn "database download failed; the first scan will retry"
+    record trivy ok installed
+  else
+    err "trivy could not be installed"
+    record trivy fail install
+    return 1
+  fi
+}
+
+step_falco() {
+  head2 "Falco"
+  local setup="$REPO_ROOT/scripts/falco_setup.sh"
+  if [ ! -f "$setup" ]; then
+    err "scripts/falco_setup.sh not found"
+    record falco fail missing
+    return 1
+  fi
+  if ! kubectl get nodes >/dev/null 2>&1; then
+    warn "no reachable cluster - skipping Falco (it is deployed into Kubernetes)"
+    record falco skip "no cluster"
+    return 0
+  fi
+
+  # falco_setup.sh already handles driver selection, JSON output and verification
+  # across architectures. Duplicating any of that here would create a second source of
+  # truth for the hardest part of this stack.
+  info "delegating to scripts/falco_setup.sh install"
+  bash "$setup" install --yes 2>&1 | sed 's/^/      /'
+  if kubectl get pods -n falco --no-headers 2>/dev/null | grep -q Running; then
+    ok "Falco is running"
+    record falco ok running
+  else
+    warn "Falco did not reach Running; check: bash scripts/falco_setup.sh doctor"
+    record falco warn "not running"
+  fi
+}
+
+step_ollama() {
+  head2 "Ollama (self-hosted LLM)"
+  if [ "$WITH_OLLAMA" != "true" ]; then
+    info "skipped (--no-ollama)"
+    record ollama skip "disabled"
+    return 0
+  fi
+
+  if ! have ollama; then
+    curl -fsSL https://ollama.com/install.sh | sh >/dev/null 2>&1 \
+      || { err "ollama install failed"; record ollama fail install; return 1; }
+    ok "ollama installed"
+  else
+    ok "already installed: $(ollama --version 2>/dev/null | head -1)"
+  fi
+
+  $SUDO systemctl enable --now ollama >/dev/null 2>&1 || true
+
+  local waited=0
+  until curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; do
+    waited=$((waited + 2))
+    [ "$waited" -ge 30 ] && break
+    sleep 2
+  done
+
+  if ! curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
+    warn "ollama is installed but not serving on :11434"
+    record ollama warn "not serving"
+    return 0
+  fi
+
+  if [ "$OLLAMA_MODEL" = "none" ]; then
+    info "model pull skipped (--model none)"
+    record ollama ok "serving, no model pulled"
+    return 0
+  fi
+
+  if ollama list 2>/dev/null | grep -q "^${OLLAMA_MODEL%%:*}"; then
+    ok "model $OLLAMA_MODEL already present"
+  else
+    info "pulling $OLLAMA_MODEL - this downloads several GB"
+    ollama pull "$OLLAMA_MODEL" 2>&1 | tail -1 | sed 's/^/      /' \
+      || warn "model pull failed; set LLM_PROVIDER=none to run without explanations"
+  fi
+  record ollama ok "serving $OLLAMA_MODEL"
+}
+
+# ------------------------------------------------------------------ verification
+
+step_verify() {
+  head2 "Verification"
+  local py="$REPO_ROOT/.venv/bin/python"
+  [ -x "$py" ] || py="python3"
+
+  check() {  # name, command
+    if eval "$2" >/dev/null 2>&1; then ok "$1"; return 0; else err "$1"; return 1; fi
+  }
+
+  check "python imports the package"      "cd '$REPO_ROOT' && $py -c 'import src.triage.ssvc'"
+  check "offline test suite passes"       "cd '$REPO_ROOT' && $py -m pytest tests/ -q"
+  check "trivy responds"                  "trivy --version"
+  check "docker daemon responds"          "$SUDO docker info"
+  check "kubernetes api responds"         "kubectl get --raw /healthz"
+  check "falco pod is running"            "kubectl get pods -n falco --no-headers | grep -q Running"
+  check "ollama is serving"               "curl -sf http://localhost:11434/api/tags"
+
+  # The dataset is what every publication experiment reads, so its absence is worth
+  # calling out separately from a tool failure - it is rebuilt, not installed.
+  if [ -f "$REPO_ROOT/datasets/historical/manifest.json" ]; then
+    ok "historical dataset present"
+  else
+    warn "historical dataset absent - rebuild with: python scripts/build_dataset.py --historical"
+  fi
+}
+
+# ------------------------------------------------------------------ driver
+
+ALL_STEPS=(preflight base docker k3s trivy falco ollama verify)
+
+usage() {
+  sed -n '2,45p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --model)     OLLAMA_MODEL="${2:-}"; shift 2 ;;
+    --no-ollama) WITH_OLLAMA="false"; shift ;;
+    --yes|-y)    ASSUME_YES="true"; shift ;;
+    --list)      printf '%s\n' "${ALL_STEPS[@]}"; exit 0 ;;
+    -h|--help)   usage; exit 0 ;;
+    -*)          err "unknown option: $1"; exit 2 ;;
+    *)           STEPS+=("$1"); shift ;;
+  esac
+done
+
+setup_sudo
+[ ${#STEPS[@]} -eq 0 ] && STEPS=("${ALL_STEPS[@]}")
+
+say "=================================================================="
+say " bootstrap_machine.sh - $(date -Iseconds)"
+say " steps: ${STEPS[*]}"
+say "=================================================================="
+
+# preflight always runs first: later steps branch on ARCH_DEB.
+if [[ ! " ${STEPS[*]} " =~ " preflight " ]]; then preflight; fi
+
+for step in "${STEPS[@]}"; do
+  case "$step" in
+    preflight) preflight ;;
+    base)      step_base ;;
+    docker)    step_docker ;;
+    k3s)       step_k3s ;;
+    trivy)     step_trivy ;;
+    falco)     step_falco ;;
+    ollama)    step_ollama ;;
+    verify)    step_verify ;;
+    *)         err "unknown step: $step" ;;
+  esac
+done
+
+head2 "Summary"
+failed=0
+for row in "${RESULTS[@]}"; do
+  IFS='|' read -r name status detail <<< "$row"
+  case "$status" in
+    ok)   printf '  %s%-10s%s %-6s %s\n' "$C_OK"   "$name" "$C_0" "$status" "$detail" ;;
+    warn|skip) printf '  %s%-10s%s %-6s %s\n' "$C_WARN" "$name" "$C_0" "$status" "$detail" ;;
+    *)    printf '  %s%-10s%s %-6s %s\n' "$C_ERR"  "$name" "$C_0" "$status" "$detail"; failed=1 ;;
+  esac
+done
+
+say ""
+if [ "$failed" -eq 0 ]; then
+  say "Next:"
+  say "  1. fill in $REPO_ROOT/.env        (placeholders only right now)"
+  say "  2. log out and back in            (docker group membership)"
+  say "  3. source $REPO_ROOT/.venv/bin/activate"
+  say "  4. python -m pytest tests/ -q     (expect 400 passed)"
+  say "  5. follow Final-Documents/06-VM-Runbook.md"
+else
+  say "One or more steps failed. Re-run just those steps, e.g.:"
+  say "  bash scripts/bootstrap_machine.sh k3s falco"
+fi
+exit "$failed"

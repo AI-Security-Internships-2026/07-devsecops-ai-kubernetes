@@ -1,0 +1,204 @@
+# Dataset B -- controlled Kubernetes scenario matrix (issues #21, #24, #25).
+#
+# This file is the experiment's PRE-REGISTRATION. Every expected direction is recorded
+# here before the run, and `src/dataset/controlled.py` refuses to load a scenario that
+# omits one. Editing an expectation after seeing a result invalidates the experiment;
+# if an expectation turns out to be wrong, record the new one as a separate scenario and
+# report both.
+#
+# Reading the matrix
+# ------------------
+# `expect` is the direction a finding should move RELATIVE TO THE SAME FINDING in the
+# scenario named by `compare_to` -- never an absolute priority. Expecting an absolute
+# priority would restate the implementation as the ground truth and every check would
+# pass by construction.
+#
+# A reference scenario is one whose `compare_to` is its own name. Each is deliberately
+# the dullest configuration for its image: deployed, internal-only, unprivileged, so
+# both escalation and de-escalation are measurable from it.
+#
+# **Comparisons are same-image, and this is enforced.** Two different images share
+# almost no CVEs, so comparing across images would score a handful of coincidental
+# overlaps as a context effect. Every image therefore carries its own reference.
+#
+# `exempt_cves` marks findings expected to behave differently from the rest of their
+# scenario, with `exempt_expect` giving their direction. That is how the KEV exemption
+# is tested: within one not-deployed scan, ordinary findings de-escalate while the
+# confirmed-exploited one does not. Modelling that as a second scenario would not work --
+# it is the same scan, so it would produce identical decisions and score identically.
+#
+# Images
+# ------
+# Pinned by tag and chosen because they carry large, well-documented vulnerability sets,
+# including confirmed-exploited CVEs:
+#   nginx:1.21        ~493 CVEs; the volume case
+#   httpd:2.4.49      CVE-2021-41773 (CISA KEV, path traversal); the KEV case
+#   python:3.9-slim   language-ecosystem packages; exercises non-OS attribution
+#
+# They are scanned, not attacked. No exploitation is performed against any of them.
+
+scenarios:
+
+  # --------------------------------------------------------------- references
+  - name: baseline
+    image: nginx:1.21
+    compare_to: baseline
+    description: Deployed, internal-only, unprivileged
+    expect: unchanged
+    deployed: true
+    exposed: false
+    privileged: false
+    rationale: >-
+      The reference point for nginx:1.21. Every expectation on that image is expressed
+      relative to this configuration, so it must itself be neutral: running (so the
+      finding is live), unreachable from outside (so exposure cannot escalate) and
+      unprivileged (so privilege cannot escalate).
+
+  - name: baseline-httpd
+    image: httpd:2.4.49
+    compare_to: baseline-httpd
+    description: Deployed, internal-only, unprivileged
+    expect: unchanged
+    deployed: true
+    exposed: false
+    privileged: false
+    rationale: >-
+      httpd:2.4.49 needs its own reference because it shares almost no CVEs with nginx.
+      Without it, the not-deployed scenario below would be scored against an unrelated
+      package set and the handful of coincidental overlaps would be misread as a context
+      effect.
+
+  - name: baseline-python
+    image: python:3.9-slim
+    compare_to: baseline-python
+    description: Deployed, internal-only, unprivileged
+    expect: unchanged
+    deployed: true
+    exposed: false
+    privileged: false
+    rationale: >-
+      The reference for the language-ecosystem image, for the same same-image reason.
+
+  # ---------------------------------------------------- RQ2: context escalates
+  - name: exposed-nodeport
+    image: nginx:1.21
+    compare_to: baseline
+    description: Same image, reachable from outside the cluster via NodePort
+    expect: escalate
+    deployed: true
+    exposed: true
+    exposure_type: NodePort
+    privileged: false
+    rationale: >-
+      Reachability from outside the cluster is the single largest change in real
+      exploitability for a network-facing service, and it is the case every commercial
+      tool markets as reachability analysis. If context escalation does not fire here it
+      does not work at all.
+
+  - name: exposed-loadbalancer
+    image: nginx:1.21
+    compare_to: baseline
+    description: Same image, exposed via LoadBalancer rather than NodePort
+    expect: escalate
+    deployed: true
+    exposed: true
+    exposure_type: LoadBalancer
+    privileged: false
+    rationale: >-
+      Included to confirm the escalation follows *exposure* rather than one specific
+      Service type. A result that held for NodePort but not LoadBalancer would indicate
+      the context provider is pattern-matching on type strings instead of deriving
+      reachability.
+
+  - name: privileged-internal
+    image: nginx:1.21
+    compare_to: baseline
+    description: Internal-only but running as a privileged container
+    expect: escalate
+    deployed: true
+    exposed: false
+    privileged: true
+    rationale: >-
+      Privilege escalates independently of network exposure: a compromise in a privileged
+      pod reaches the node. Separating this from the exposed scenarios is what shows the
+      two signals are independent rather than one standing in for the other.
+
+  # -------------------------------------------------- RQ2: context de-escalates
+  - name: not-deployed
+    image: httpd:2.4.49
+    compare_to: baseline-httpd
+    description: Image scanned but running nowhere in the cluster
+    expect: de-escalate
+    deployed: false
+    exempt_cves:
+      - CVE-2021-41773    # path traversal / RCE, CISA KEV
+      - CVE-2021-42013    # the incomplete-fix follow-up, also CISA KEV
+    exempt_expect: unchanged
+    rationale: >-
+      An image absent from the cluster poses no current risk there, so findings should
+      fall to Track -- EXCEPT those under confirmed active exploitation, which must stay
+      actionable because the usual reason to scan an un-deployed image is that someone is
+      about to deploy it. Both halves are tested in one scan: the exempt CVEs are the
+      regression test for a defect that previously gave 0% KEV recall on this exact
+      image. This scenario also pairs with the mode check in the runbook -- the same
+      scan in pre-deployment mode must de-escalate nothing at all.
+
+  # --------------------------------------------- RQ3: runtime attribution
+  - name: runtime-attributable
+    image: nginx:1.21
+    compare_to: baseline
+    description: Deployed, with runtime behaviour touching a package the CVEs affect
+    expect: escalate
+    deployed: true
+    exposed: false
+    privileged: false
+    runtime_actions:
+      - action: read-sensitive-file
+        command: ["cat", "/etc/shadow"]
+        attributed_package: coreutils
+        expect_falco_rule: Read sensitive file untrusted
+        note: >-
+          /usr/bin/cat resolves to coreutils, and coreutils findings exist in this image,
+          so this alert has a genuine causal link to specific findings.
+    rationale: >-
+      The positive case for package-level attribution. Only findings affecting coreutils
+      should escalate; every other finding on the same image must be untouched, which is
+      the property issue #17 was opened about.
+
+  - name: runtime-unattributable
+    image: nginx:1.21
+    compare_to: baseline
+    description: Deployed, with runtime behaviour that maps to no vulnerable package
+    expect: unchanged
+    deployed: true
+    exposed: false
+    privileged: false
+    runtime_actions:
+      - action: spawn-shell
+        command: ["/bin/sh", "-c", "true"]
+        attributed_package: null
+        expect_falco_rule: Terminal shell in container
+        note: >-
+          A shell spawn is real runtime activity with no link to any specific finding's
+          packages. It must be recorded in the rationale and must not change any
+          decision.
+    rationale: >-
+      The negative case, and the more important of the two. Unattributable evidence
+      annotating rather than escalating is what separates this design from image-wide
+      runtime scoring; a failure here reproduces the original defect where one alert
+      escalated 20 of 22 findings.
+
+  # ------------------------------------------------- non-OS package attribution
+  - name: language-packages
+    image: python:3.9-slim
+    compare_to: baseline-python
+    description: Deployed, language-ecosystem dependencies rather than OS packages
+    expect: unchanged
+    deployed: true
+    exposed: false
+    privileged: false
+    rationale: >-
+      Attribution maps site-packages paths to distribution names, which is a different
+      code path from the OS binary map. Expected unchanged because no runtime action is
+      provoked; the scenario exists to confirm the pipeline derives context correctly for
+      a non-OS package set rather than to test escalation.
