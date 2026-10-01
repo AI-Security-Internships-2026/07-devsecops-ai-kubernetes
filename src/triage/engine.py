@@ -15,6 +15,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 from src.triage import ssvc
+from src.triage.thresholds import Thresholds
 from src.triage.explain import get_llm, llm_analyze_cve, static_explanation
 
 
@@ -68,6 +69,7 @@ def analyze_cves(
     llm="auto",
     verbose: bool = True,
     mode: str | None = None,
+    thresholds=None,
 ) -> list[dict]:
     """
     Analyze a list of EPSS-enriched CVE dicts into triage findings.
@@ -83,12 +85,19 @@ def analyze_cves(
             MODE_PRE_DEPLOYMENT explicitly: the deployment-context rules are only
             sound against a cluster that was actually queried. Left as None the mode
             is inferred per finding from whether live evidence was observed.
+        thresholds: a Thresholds instance. Left as None they are read from the
+            K_CAVP_* environment variables, which is what makes a sensitivity sweep a
+            loop over environments rather than a series of source edits.
 
     Returns:
         list of finding dicts (keys consumed by triage.report).
     """
     if llm == "auto":
         llm = get_llm()
+
+    # Resolved once per run, not per finding: a sweep that re-read the environment
+    # mid-run could apply two threshold sets to one report.
+    active_thresholds = thresholds if thresholds is not None else Thresholds.from_env()
 
     # Two passes. The decisions are pure rule arithmetic and stay sequential and
     # deterministic; the explanations are independent network calls, so they are
@@ -122,7 +131,7 @@ def analyze_cves(
 
         result = ssvc.analyze(cve_with_kev, in_kev, context=context,
                               exploit_exists=exploit_exists, runtime=runtime,
-                              mode=mode)
+                              mode=mode, thresholds=active_thresholds)
         decided.append((cve, in_kev, result))
 
     # One explanation per distinct actionable CVE. Findings are per (CVE, package)
