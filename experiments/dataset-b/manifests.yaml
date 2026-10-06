@@ -282,8 +282,8 @@ metadata:
     app: dsb-language-packages
     scenario: language-packages
   annotations:
-    dataset-b/expect: "unchanged"
-    dataset-b/rationale: "Attribution maps site-packages paths to distribution names, which is a different code path from the OS binary map. Expected unchanged because no runtime action is provoked; the scenario exists to confirm the pipeline derives context correctly for a non-OS package set rather than to test escalation."
+    dataset-b/expect: "escalate"
+    dataset-b/rationale: "Confirms contextual escalation behaves identically when the findings come from language-ecosystem packages (site-packages distributions) rather than OS packages, which reach the engine through a different enrichment and attribution path. It was originally written as an internal-only scenario, which made it configuration- identical to baseline-python -- the same scan scored against itself, testing nothing. Exposure is the independent variable that gives it something to measure."
 spec:
   replicas: 1
   selector:
@@ -302,3 +302,18 @@ spec:
         resources:
           requests: {cpu: 50m, memory: 64Mi}
           limits: {cpu: 500m, memory: 512Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dsb-language-packages
+  namespace: dataset-b
+  labels:
+    scenario: language-packages
+spec:
+  type: NodePort
+  selector:
+    app: dsb-language-packages
+  ports:
+  - port: 80
+    targetPort: 80

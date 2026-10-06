@@ -78,6 +78,16 @@ def cmd_render(args):
 # --------------------------------------------------------------------- deploy
 
 def cmd_deploy(args):
+    """
+    Apply every scenario at once.
+
+    NOTE: this is for inspection and debugging only. Do not collect from a cluster
+    deployed this way -- deployment context is resolved by image, and the six scenarios
+    sharing nginx:1.21 would all observe the union of each other's exposure and
+    privilege. `collect` manages its own deploy/teardown, one scenario at a time.
+    """
+    print("[*] NOTE: this deploys everything at once, which is only valid for")
+    print("    inspection. `collect` deploys one scenario at a time; see its docstring.")
     if not MANIFEST_PATH.exists():
         print("[!] manifests not rendered yet: python scripts/build_dataset_b.py render")
         return 1
@@ -114,13 +124,50 @@ def cmd_deploy(args):
 
 # -------------------------------------------------------------------- collect
 
+def triage_run_path(image: str) -> Path:
+    """Where `run.py pipeline` leaves its compact per-image output."""
+    safe = image.replace("/", "_").replace(":", "_").replace("@", "_")
+    return Path("experiments/results") / f"triage_run_{safe}.json"
+
+
+def apply_scenario(scenario):
+    """Apply just this scenario's objects."""
+    manifest = controlled.render_manifests([scenario])
+    p = subprocess.run(["kubectl", "apply", "-f", "-"], input=manifest,
+                       capture_output=True, text=True, timeout=120)
+    return p.returncode == 0, (p.stdout or p.stderr).strip()
+
+
+def delete_scenario(scenario):
+    """Remove this scenario's workload so the next one starts from a clean cluster."""
+    sh(["kubectl", "delete", "deployment,service", "-n", scenario.namespace,
+        "-l", f"scenario={scenario.name}", "--ignore-not-found", "--wait=true"],
+       timeout=180)
+
+
 def cmd_collect(args):
     """
-    Scan and triage every scenario, saving one decision file each.
+    Scan and triage every scenario, one at a time, saving one decision file each.
 
-    The pipeline is invoked exactly as an operator would invoke it, rather than by
-    calling the engine directly: the thing under test includes the context provider and
-    the scanner integration, and bypassing them would test less than the paper claims.
+    Why strictly one scenario is live at a time
+    -------------------------------------------
+    The context provider resolves deployment context **by image**: it finds every pod
+    running that image and aggregates with `any()` over exposure and privilege. Six of
+    our scenarios run `nginx:1.21`. Deployed simultaneously, every nginx scan would
+    therefore observe `exposed=True` *and* `privileged=True` -- the union of all six --
+    and every scenario would receive identical context.
+
+    That failure is silent. The scans succeed, the decisions look plausible, and the
+    scoring reports that context had no differential effect, which is indistinguishable
+    from the method not working. So each scenario is deployed, scanned and torn down in
+    turn, and the cluster holds at most one scenario at any moment.
+
+    It is also simply what a controlled experiment means here: the independent variable
+    is the deployment context, so nothing else may vary -- including other scenarios.
+
+    The pipeline is invoked exactly as an operator would invoke it rather than by calling
+    the engine directly, because the thing under test includes the context provider and
+    the scanner integration.
     """
     scenarios = controlled.load_scenarios()
     DECISIONS_DIR.mkdir(parents=True, exist_ok=True)
@@ -132,26 +179,58 @@ def cmd_collect(args):
             print("    Install it first: bash scripts/falco_setup.sh install")
             return 1
 
+    # Nothing from a previous run may still be standing, for the same reason.
+    print("[*] clearing any existing scenario workloads...")
+    for s in scenarios:
+        delete_scenario(s)
+
     collected, failed = [], []
     for s in scenarios:
-        print(f"\n=== {s.name} ({s.image}) " + "=" * (44 - len(s.name)))
+        print(f"\n=== {s.name} ({s.image}) " + "=" * max(4, 44 - len(s.name)))
+
+        if s.deployed:
+            ok, msg = apply_scenario(s)
+            if not ok:
+                print(f"[!] apply failed: {msg[:300]}")
+                failed.append(s.name)
+                continue
+            rc, _, _ = sh(["kubectl", "rollout", "status",
+                           f"deployment/{s.workload_name}", "-n", s.namespace,
+                           f"--timeout={args.ready_timeout}s"],
+                          timeout=args.ready_timeout + 30)
+            if rc != 0:
+                print(f"[!] {s.workload_name} did not become ready")
+                failed.append(s.name)
+                delete_scenario(s)
+                continue
+            print(f"[+] {s.workload_name} ready")
+        else:
+            # The condition under test is the image's *absence*, so the correct action
+            # is to deploy nothing and confirm nothing else is running it.
+            print("[*] deliberately not deployed; confirming the image is absent")
 
         if s.runtime_actions and args.runtime:
             provoke_runtime(s)
 
-        cmd = [sys.executable, "run.py", "pipeline", s.image,
-               "--json", str(DECISIONS_DIR / f"{s.name}.json")]
-        if s.runtime_actions and args.runtime:
-            cmd.append("--runtime")
-        # A not-deployed scenario must still be scanned *in cluster mode*: the finding
-        # under test is precisely that the cluster reports the image as absent.
-        rc, out, err = sh(cmd, timeout=args.timeout)
-        if rc != 0:
-            print(f"[!] pipeline failed for {s.name}: {(err or out).strip()[:400]}")
+        rc, out, err = sh([sys.executable, "run.py", "pipeline", s.image]
+                          + (["--falco-live"] if (s.runtime_actions and args.runtime)
+                             else []),
+                          timeout=args.timeout)
+        produced = triage_run_path(s.image)
+        if rc != 0 or not produced.exists():
+            print(f"[!] pipeline failed for {s.name}: {(err or out).strip()[-400:]}")
             failed.append(s.name)
+            delete_scenario(s)
             continue
+
+        # Copied immediately: the pipeline's output path is keyed on the image, so the
+        # next scenario sharing this image would overwrite it.
+        target = DECISIONS_DIR / f"{s.name}.json"
+        target.write_text(produced.read_text(encoding="utf-8"), encoding="utf-8")
         collected.append(s.name)
-        print(f"[+] decisions -> {DECISIONS_DIR / (s.name + '.json')}")
+        print(f"[+] decisions -> {target}")
+
+        delete_scenario(s)
 
     meta = {
         "collected_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -296,7 +375,10 @@ def main():
     p = sub.add_parser("collect", help="scan + triage every scenario")
     p.add_argument("--runtime", action="store_true",
                    help="provoke the declared runtime actions and read Falco alerts")
-    p.add_argument("--timeout", type=int, default=900)
+    p.add_argument("--timeout", type=int, default=900,
+                   help="per-scenario pipeline timeout")
+    p.add_argument("--ready-timeout", type=int, default=180,
+                   help="how long to wait for a scenario workload to become ready")
 
     sub.add_parser("score", help="compare against the pre-registered expectations")
     sub.add_parser("teardown", help="delete the scenario namespaces")

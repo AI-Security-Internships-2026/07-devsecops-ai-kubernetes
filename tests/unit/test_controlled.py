@@ -270,6 +270,66 @@ class TestRenderedManifests:
                 assert container["image"] == s.image
 
 
+class TestImageSharingRequiresIsolation:
+    """
+    Several scenarios deliberately share an image, and that is only safe because
+    collection deploys one scenario at a time.
+
+    `k8s_context.derive_context` resolves context by image and aggregates with `any()`
+    across every matching pod. With the six nginx scenarios up simultaneously, each one
+    observes `exposed=True` and `privileged=True` -- the union of all six -- so every
+    scenario receives identical context and the comparison measures nothing.
+
+    The failure is silent: the scans succeed and the decisions look plausible. These
+    tests record the constraint so a future change to batch the deployment has to
+    confront it.
+    """
+
+    def test_images_really_are_shared(self):
+        images = [s.image for s in C.load_scenarios()]
+        shared = {i for i in images if images.count(i) > 1}
+        assert shared, ("if no image is shared this constraint has gone away and the "
+                        "collect docstring should be revisited")
+
+    def test_scenarios_sharing_an_image_differ_in_context(self):
+        """Exactly why they cannot be observed at the same time."""
+        by_image = {}
+        for s in C.load_scenarios():
+            by_image.setdefault(s.image, []).append(s)
+        for image, group in by_image.items():
+            if len(group) < 2:
+                continue
+            shapes = {(s.deployed, s.exposed, s.privileged) for s in group}
+            assert len(shapes) > 1, (
+                f"all scenarios on {image} have identical context; at least one pair "
+                f"must differ or the image is not testing anything")
+
+    def test_every_deployed_scenario_is_individually_renderable(self):
+        """
+        Collection renders one scenario at a time, so each must produce a complete,
+        self-sufficient manifest -- namespace included.
+        """
+        import yaml as _yaml
+        for s in C.load_scenarios():
+            docs = [d for d in _yaml.safe_load_all(C.render_manifests([s])) if d]
+            kinds = {d["kind"] for d in docs}
+            assert "Namespace" in kinds, s.name
+            if s.deployed:
+                assert "Deployment" in kinds, s.name
+
+    def test_scenario_labels_allow_targeted_teardown(self):
+        """
+        Teardown selects on `scenario=<name>`. Without that label on every object,
+        deleting one scenario would either miss objects or take out its neighbours.
+        """
+        import yaml as _yaml
+        for s in C.load_scenarios():
+            for d in _yaml.safe_load_all(C.render_manifests([s])):
+                if not d or d["kind"] not in ("Deployment", "Service"):
+                    continue
+                assert d["metadata"]["labels"].get("scenario") == s.name
+
+
 class TestDirection:
 
     @pytest.mark.parametrize("before,after,expected", [

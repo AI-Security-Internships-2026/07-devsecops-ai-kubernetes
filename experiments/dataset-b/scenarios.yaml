@@ -192,15 +192,18 @@ scenarios:
   # ------------------------------------------------- non-OS package attribution
   - name: language-packages
     image: python:3.9-slim
-    command: ["sleep", "infinity"]
     compare_to: baseline-python
-    description: Deployed, language-ecosystem dependencies rather than OS packages
-    expect: unchanged
+    command: ["sleep", "infinity"]
+    description: Language-ecosystem dependencies, exposed via NodePort
+    expect: escalate
     deployed: true
-    exposed: false
+    exposed: true
+    exposure_type: NodePort
     privileged: false
     rationale: >-
-      Attribution maps site-packages paths to distribution names, which is a different
-      code path from the OS binary map. Expected unchanged because no runtime action is
-      provoked; the scenario exists to confirm the pipeline derives context correctly for
-      a non-OS package set rather than to test escalation.
+      Confirms contextual escalation behaves identically when the findings come from
+      language-ecosystem packages (site-packages distributions) rather than OS packages,
+      which reach the engine through a different enrichment and attribution path. It was
+      originally written as an internal-only scenario, which made it configuration-
+      identical to baseline-python -- the same scan scored against itself, testing
+      nothing. Exposure is the independent variable that gives it something to measure.
