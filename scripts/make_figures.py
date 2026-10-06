@@ -39,7 +39,7 @@ INK, MUTED, GRID = "#1a1a1a", "#595959", "#d4d4d4"
 
 plt.rcParams.update({
     "font.family": "serif",
-    "font.serif": ["DejaVu Serif"],
+    "font.serif": ["Times New Roman", "Nimbus Roman", "DejaVu Serif"],
     "font.size": 8,
     "axes.labelsize": 8,
     "axes.titlesize": 8,
@@ -56,9 +56,11 @@ plt.rcParams.update({
     "figure.dpi": 400,
     "savefig.bbox": "tight",
     "savefig.pad_inches": 0.02,
+    "pdf.fonttype": 42,
+    "ps.fonttype": 42,
 })
 
-COL, WIDE = 3.4, 7.16
+COL, WIDE = 3.5, 7.16
 
 
 def save(fig, name):
@@ -208,10 +210,10 @@ def fig_sweep(run="paper-sweep-90d"):
     ax.plot(t, red, color=BLUE, lw=2, marker="o", ms=4, label="Workload reduction")
     ax.plot(t, rec, color=RUST, lw=2, ls="--", marker="^", ms=4, label="Recall")
     ax.axvline(0.10, color=MUTED, lw=0.9, ls=":")
-    ax.annotate("operating point\n$\\tau_a = 0.10$", (0.10, 62),
+    ax.annotate("operating\npoint 0.10", (0.10, 27.5),
                 textcoords="offset points", xytext=(6, 0), fontsize=6.5, color=MUTED)
-    ax.set_xlabel("EPSS threshold $\\tau_a$")
-    ax.set_ylabel("Percent")
+    ax.set_xlabel("EPSS threshold for Act")
+    ax.set_ylabel("Percentage")
     ax.set_ylim(25, 100)
     ax.grid(True, color=GRID, linewidth=0.5)
     ax.set_axisbelow(True)
