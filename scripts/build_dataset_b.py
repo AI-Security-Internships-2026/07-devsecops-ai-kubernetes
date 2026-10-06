@@ -124,6 +124,51 @@ def cmd_deploy(args):
 
 # -------------------------------------------------------------------- collect
 
+def preflight_context() -> bool:
+    """
+    Refuse to collect unless the pipeline can actually read deployment context.
+
+    Why this is a hard failure rather than a warning
+    ------------------------------------------------
+    The production pipeline degrades gracefully when no cluster is reachable: it prints
+    "skipping K8s context" and triages on intrinsic signals alone. For an operator that
+    is correct -- a scan without a cluster is still useful.
+
+    For *this* harness it is the worst possible behaviour. Dataset B exists solely to
+    measure the effect of deployment context. Without context every scenario returns the
+    same decisions, every comparison scores 0%, and the output is a clean-looking table
+    of null results that is indistinguishable from "contextual prioritization does not
+    work". That exact run happened: `kubectl` worked throughout, because the snap wrapper
+    reads MicroK8s's own credentials, while the Python client found no ~/.kube/config and
+    silently reported no cluster.
+
+    So the harness checks the path the measurement actually depends on -- the Python
+    context provider -- rather than trusting that a working `kubectl` implies one.
+    """
+    try:
+        from src.context.k8s_context import discover_pods
+    except Exception as e:                                  # pragma: no cover
+        print(f"[!] cannot import the context provider: {e}")
+        return False
+
+    ctx = discover_pods()
+    if ctx.get("available"):
+        print(f"[+] context provider reachable ({len(ctx.get('pods', []))} pods visible)")
+        return True
+
+    print("[!] REFUSING TO COLLECT: the Python context provider cannot reach a cluster.")
+    print("    Every scenario would return identical decisions and score 0%, which looks")
+    print("    like a real null result. That is worse than failing.")
+    print()
+    print("    `kubectl` working is not sufficient -- a snap/wrapper client may read")
+    print("    credentials the Python client never looks at. Fix the kubeconfig:")
+    print()
+    print("      MicroK8s : microk8s config > ~/.kube/config && chmod 600 ~/.kube/config")
+    print("      k3s      : sudo cat /etc/rancher/k3s/k3s.yaml > ~/.kube/config")
+    print("      other    : export KUBECONFIG=/path/to/config")
+    return False
+
+
 def triage_run_path(image: str) -> Path:
     """Where `run.py pipeline` leaves its compact per-image output."""
     safe = image.replace("/", "_").replace(":", "_").replace("@", "_")
@@ -171,6 +216,9 @@ def cmd_collect(args):
     """
     scenarios = controlled.load_scenarios()
     DECISIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+    if not preflight_context():
+        return 1
 
     if args.runtime:
         rc, _, _ = sh(["kubectl", "get", "ns", "falco"])
@@ -319,6 +367,20 @@ def cmd_score(args):
         if r["exempt_cves_missing"]:
             print(f"    [!] exempt CVEs absent from the scan: "
                   f"{', '.join(r['exempt_cves_missing'])}")
+
+    # If every scenario that should have moved findings moved none at all, the likely
+    # cause is a systematically absent signal rather than a method that does nothing.
+    # Saying so here matters because results.json outlives the run that produced it.
+    movers = [r for r in results if r["expected_direction"] != controlled.SAME]
+    if movers and all(r["moved_as_expected"] == 0 and r["wrong_direction"] == 0
+                      for r in movers):
+        print()
+        print("[!] EVERY scenario that should have moved findings moved NONE.")
+        print("    Before reporting this as a null result, check that the signal was")
+        print("    present at all -- a context provider that cannot reach the cluster")
+        print("    produces exactly this table. Verify with:")
+        print("      python -c \"from src.context.k8s_context import discover_pods;"
+              " print(discover_pods()['available'])\"")
 
     wrong = [r for r in results
              if r["wrong_direction"] or r["exempt_wrong_direction"]]
