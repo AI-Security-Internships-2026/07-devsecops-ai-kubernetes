@@ -92,3 +92,10 @@ data/cache/
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Dataset B run output. results.json is the finding and IS committed;
+# decisions/ is regenerable per-scenario scan output and collection.json
+# is run metadata, so neither belongs in history.
+experiments/dataset-b/decisions/
+experiments/dataset-b/collection.json
+!experiments/dataset-b/results.json

@@ -131,17 +131,18 @@ scenarios:
     description: Image scanned but running nowhere in the cluster
     expect: de-escalate
     deployed: false
-    exempt_cves:
-      - CVE-2021-41773    # path traversal / RCE, CISA KEV
-      - CVE-2021-42013    # the incomplete-fix follow-up, also CISA KEV
+    exempt_when_kev: true
     exempt_expect: unchanged
     rationale: >-
       An image absent from the cluster poses no current risk there, so findings should
       fall to Track -- EXCEPT those under confirmed active exploitation, which must stay
       actionable because the usual reason to scan an un-deployed image is that someone is
-      about to deploy it. Both halves are tested in one scan: the exempt CVEs are the
-      regression test for a defect that previously gave 0% KEV recall on this exact
-      image. This scenario also pairs with the mode check in the runbook -- the same
+      about to deploy it. Both halves are tested in one scan, and the exemption is
+      expressed as a predicate on KEV membership rather than as a list of CVE ids: an
+      earlier version named two ids that Trivy does not report for this image, and
+      replacing them after seeing the results would be choosing the test to fit the
+      outcome. This is the regression test for a defect that previously gave 0% KEV
+      recall on this exact image. This scenario also pairs with the mode check in the runbook -- the same
       scan in pre-deployment mode must de-escalate nothing at all.
 
   # --------------------------------------------- RQ3: runtime attribution

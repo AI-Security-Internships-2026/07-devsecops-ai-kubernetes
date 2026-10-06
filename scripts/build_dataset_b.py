@@ -329,13 +329,15 @@ def provoke_runtime(scenario):
 
 def cmd_score(args):
     scenarios = controlled.load_scenarios()
-    decisions = {}
+    decisions, kev = {}, {}
     for s in scenarios:
         path = DECISIONS_DIR / f"{s.name}.json"
         if not path.exists():
             print(f"[!] missing decisions for {s.name}; run collect first")
             return 1
-        decisions[s.name] = priorities_from(json.loads(path.read_text(encoding="utf-8")))
+        report = json.loads(path.read_text(encoding="utf-8"))
+        decisions[s.name] = priorities_from(report)
+        kev[s.name] = kev_from(report)
 
     print(f"\nDataset B -- {len(scenarios)} scenarios "
           f"({sum(1 for s in scenarios if s.is_reference)} references)")
@@ -351,12 +353,16 @@ def cmd_score(args):
     for s in scenarios:
         if s.is_reference:
             continue
-        r = controlled.score(decisions[s.compare_to], decisions[s.name], s)
+        r = controlled.score(decisions[s.compare_to], decisions[s.name], s,
+                             kev_cves=kev[s.name])
         results.append(r)
         rate = "n/a" if r["agreement_rate"] is None else f"{r['agreement_rate']:.1%}"
+        mrate = ("n/a" if r["movable_agreement_rate"] is None
+                 else f"{r['movable_agreement_rate']:.1%}")
         print(f"{r['scenario']:<24}{r['expected_direction']:<14}"
               f"{r['findings_compared']:>6}{r['moved_as_expected']:>13}"
-              f"{r['wrong_direction']:>8}{r['unchanged']:>7}{rate:>8}")
+              f"{r['wrong_direction']:>8}{r['unchanged']:>7}{rate:>8}"
+              f"{r['movable']:>9}{mrate:>9}")
         if r["exempt_findings_compared"]:
             er = ("n/a" if r["exempt_agreement_rate"] is None
                   else f"{r['exempt_agreement_rate']:.1%}")
@@ -394,6 +400,16 @@ def cmd_score(args):
          "results": results}, indent=2), encoding="utf-8")
     print(f"\n[+] {RESULTS_PATH}")
     return 0
+
+
+def kev_from(report: dict) -> set:
+    """CVEs the scan flagged as being in CISA KEV."""
+    out = set()
+    for f in report.get("findings", report.get("results", [])) or []:
+        cve_id = f.get("cve_id") or f.get("id")
+        if cve_id and f.get("kev_status"):
+            out.add(cve_id)
+    return out
 
 
 def priorities_from(report: dict) -> dict:

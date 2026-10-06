@@ -158,10 +158,24 @@ class TestCommittedMatrix:
         It cannot be a scenario of its own: it would be the same scan as not-deployed
         and would score identically, testing nothing.
         """
-        exempting = [s for s in C.load_scenarios() if s.exempt_cves]
+        exempting = [s for s in C.load_scenarios()
+                     if s.exempt_cves or s.exempt_when_kev]
         assert exempting, "no scenario tests a carve-out"
         for s in exempting:
             assert s.expect != s.exempt_expect
+
+    def test_the_kev_carve_out_is_a_predicate_not_a_list_of_ids(self):
+        """
+        Naming CVE ids makes the test fragile and, worse, invites fitting: the first
+        version listed two ids that Trivy does not report for httpd:2.4.49, and the
+        tempting fix was to substitute whichever KEV id did appear. The property under
+        test is KEV membership, so the scenario states that instead.
+        """
+        kev_scenarios = [s for s in C.load_scenarios() if s.exempt_when_kev]
+        assert kev_scenarios, "the KEV exemption must be expressed as a predicate"
+        for s in kev_scenarios:
+            assert not s.exempt_cves, (
+                f"{s.name} mixes a KEV predicate with hardcoded ids; keep one")
 
     def test_runtime_scenarios_cover_attributable_and_not(self):
         """
@@ -386,6 +400,54 @@ class TestScoring:
         r = C.score(self.REF, {"CVE-1": "LOW", "CVE-2": "LOW", "CVE-3": "LOW"}, s)
         assert r["exempt_agreement_rate"] == 0.0
         assert r["exempt_wrong_direction"] == 1
+
+    def test_kev_predicate_selects_the_exempt_bucket_from_the_scan(self):
+        """The carve-out is derived from what the scan found, not from a fixed list."""
+        s = scenario(name="x", expect=DOWN, exempt_when_kev=True, exempt_expect=SAME)
+        r = C.score(self.REF, {"CVE-1": "LOW", "CVE-2": "HIGH", "CVE-3": "LOW"}, s,
+                    kev_cves={"CVE-2"})
+        assert r["findings_compared"] == 2
+        assert r["moved_as_expected"] == 2
+        assert r["exempt_findings_compared"] == 1
+        assert r["exempt_moved_as_expected"] == 1
+
+    def test_no_kev_findings_means_an_empty_exempt_bucket(self):
+        s = scenario(name="x", expect=DOWN, exempt_when_kev=True, exempt_expect=SAME)
+        r = C.score(self.REF, {"CVE-1": "LOW"}, s, kev_cves=set())
+        assert r["exempt_findings_compared"] == 0
+        assert r["exempt_agreement_rate"] is None
+
+    def test_movable_excludes_findings_already_at_the_ladder_bound(self):
+        """
+        359 of nginx's 560 findings are already Track; no escalation rule will move
+        them, so counting them as failures measures the image, not the method.
+        """
+        ref = {"a": "CRITICAL", "b": "HIGH", "c": "LOW"}
+        got = {"a": "CRITICAL", "b": "CRITICAL", "c": "LOW"}
+        up = C.score(ref, got, scenario(name="x", expect=UP))
+        assert up["findings_compared"] == 3
+        assert up["movable"] == 2            # the CRITICAL cannot rise
+        assert up["moved_as_expected"] == 1
+        assert up["movable_agreement_rate"] == 0.5
+
+        down = C.score(ref, {"a": "HIGH", "b": "HIGH", "c": "LOW"},
+                       scenario(name="y", expect=DOWN))
+        assert down["movable"] == 2          # the LOW cannot fall
+        assert down["movable_agreement_rate"] == 0.5
+
+    def test_movable_rate_is_none_when_nothing_could_move(self):
+        ref = {"a": "CRITICAL"}
+        r = C.score(ref, {"a": "CRITICAL"}, scenario(name="x", expect=UP))
+        assert r["movable"] == 0
+        assert r["movable_agreement_rate"] is None
+
+    @pytest.mark.parametrize("priority,direction,expected", [
+        ("CRITICAL", UP, False), ("HIGH", UP, True),
+        ("LOW", DOWN, False), ("MEDIUM", DOWN, True),
+        ("HIGH", SAME, True), ("WAT", UP, False),
+    ])
+    def test_movable(self, priority, direction, expected):
+        assert C.movable(priority, direction) is expected
 
     def test_missing_exempt_cves_are_reported(self):
         s = scenario(name="x", expect=DOWN, exempt_cves=["CVE-404"], exempt_expect=SAME)

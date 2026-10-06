@@ -91,6 +91,16 @@ class Scenario:
     # same scan, so it would produce identical decisions and score identically.
     exempt_cves: list[str] = field(default_factory=list)
     exempt_expect: str = SAME
+    # Prefer this over naming CVE ids. The property under test is "a finding under
+    # confirmed active exploitation must not be de-escalated", which is a statement
+    # about KEV membership, not about two particular identifiers.
+    #
+    # Naming ids also invites a subtle fraud: the first version of this scenario listed
+    # CVE-2021-41773 and CVE-2021-42013, neither of which Trivy reports for httpd:2.4.49.
+    # The honest fix is a predicate the scan evaluates, not a better guess at which ids
+    # happen to appear -- replacing the ids after seeing the results would be choosing
+    # the test to match the outcome.
+    exempt_when_kev: bool = False
     # Runtime behaviour to provoke, for RQ3. Each entry names a package the behaviour
     # should be attributed to, so attribution precision has a labelled target.
     runtime_actions: list[dict] = field(default_factory=list)
@@ -108,8 +118,8 @@ class Scenario:
         if not self.deployed and (self.exposed or self.privileged):
             raise ValueError(f"scenario {self.name!r}: a scenario that is not deployed "
                              f"cannot also be exposed or privileged")
-        if self.exempt_cves and self.exempt_expect == self.expect:
-            raise ValueError(f"scenario {self.name!r}: exempt_cves are pointless when "
+        if (self.exempt_cves or self.exempt_when_kev)                 and self.exempt_expect == self.expect:
+            raise ValueError(f"scenario {self.name!r}: an exemption is pointless when "
                              f"exempt_expect equals expect")
         if not self.rationale:
             raise ValueError(f"scenario {self.name!r}: every scenario must record why "
@@ -309,8 +319,31 @@ spec:
     targetPort: 80"""
 
 
+def movable(priority: str, direction: str) -> bool:
+    """
+    Could a finding at `priority` move in `direction` at all?
+
+    The headline agreement rate divides by every shared finding, which badly understates
+    a deliberately narrow rule. nginx:1.21 yields 560 findings of which 359 are already
+    Track: no escalation rule will ever move those, so counting them as failures to
+    escalate measures the image's severity distribution, not the method.
+
+    This denominator is intentionally rule-agnostic -- it asks only whether the ordinal
+    ladder permits movement, never whether a particular threshold was met. Encoding the
+    engine's own conditions here would make the harness agree with the implementation by
+    construction, which is the one thing a measurement must not do.
+    """
+    if priority not in _LADDER:
+        return False
+    if direction == UP:
+        return priority != _LADDER[-1]
+    if direction == DOWN:
+        return priority != _LADDER[0]
+    return True
+
+
 def score(reference_decisions: dict, scenario_decisions: dict,
-          scenario: Scenario) -> dict:
+          scenario: Scenario, kev_cves: set | None = None) -> dict:
     """
     Score one scenario against its reference, per CVE.
 
@@ -325,6 +358,8 @@ def score(reference_decisions: dict, scenario_decisions: dict,
     """
     shared = sorted(set(reference_decisions) & set(scenario_decisions))
     exempt = {c.upper() for c in scenario.exempt_cves}
+    if scenario.exempt_when_kev:
+        exempt |= {c.upper() for c in (kev_cves or set())}
 
     buckets = {"main": {"expected": scenario.expect, "ids": []},
                "exempt": {"expected": scenario.exempt_expect, "ids": []}}
@@ -336,10 +371,15 @@ def score(reference_decisions: dict, scenario_decisions: dict,
 
     for label, bucket in buckets.items():
         agreed = wrong = flat = 0
+        eligible = eligible_agreed = 0
         for cve_id in bucket["ids"]:
             before, after = reference_decisions[cve_id], scenario_decisions[cve_id]
             observed = direction_between(before, after)
             agrees = observed == bucket["expected"]
+            can_move = movable(before, bucket["expected"])
+            if can_move:
+                eligible += 1
+                eligible_agreed += int(agrees)
             if agrees:
                 agreed += 1
             elif observed == SAME:
@@ -361,6 +401,10 @@ def score(reference_decisions: dict, scenario_decisions: dict,
             # Reported as a rate, but the denominator travels with it: these scenarios
             # have tens of findings, not thousands.
             f"{prefix}agreement_rate": (agreed / total) if total else None,
+            # The honest denominator: findings the ladder allowed to move at all.
+            f"{prefix}movable": eligible,
+            f"{prefix}movable_agreement_rate": ((eligible_agreed / eligible)
+                                                if eligible else None),
         }
 
     # A CVE named as exempt but absent from the scan means the scenario is not testing
