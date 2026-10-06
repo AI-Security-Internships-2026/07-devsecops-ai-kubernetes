@@ -1,5 +1,5 @@
 {
-  "scored_at": "2026-10-06T08:03:13+00:00",
+  "scored_at": "2026-10-06T08:00:32+00:00",
   "results": [
     {
       "scenario": "exposed-nodeport",
@@ -91,10 +91,10 @@
           "cve_id": "CVE-2015-3276",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2015-9019",
@@ -154,19 +154,19 @@
           "cve_id": "CVE-2017-16232",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-17740",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-18018",
@@ -217,10 +217,10 @@
           "cve_id": "CVE-2018-20796",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2018-5709",
@@ -388,10 +388,10 @@
           "cve_id": "CVE-2021-22945",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2021-22946",
@@ -892,10 +892,10 @@
           "cve_id": "CVE-2022-32207",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-32208",
@@ -1054,10 +1054,10 @@
           "cve_id": "CVE-2022-40304",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-40674",
@@ -1081,10 +1081,10 @@
           "cve_id": "CVE-2022-42898",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-42916",
@@ -5049,12 +5049,12 @@
       ],
       "expected_direction": "escalate",
       "findings_compared": 560,
-      "moved_as_expected": 14,
+      "moved_as_expected": 6,
       "wrong_direction": 0,
-      "unchanged": 546,
-      "agreement_rate": 0.025,
+      "unchanged": 554,
+      "agreement_rate": 0.010714285714285714,
       "movable": 540,
-      "movable_agreement_rate": 0.025925925925925925,
+      "movable_agreement_rate": 0.011111111111111112,
       "exempt_expected_direction": "unchanged",
       "exempt_findings_compared": 0,
       "exempt_moved_as_expected": 0,
@@ -5155,10 +5155,10 @@
           "cve_id": "CVE-2015-3276",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2015-9019",
@@ -5218,19 +5218,19 @@
           "cve_id": "CVE-2017-16232",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-17740",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-18018",
@@ -5281,10 +5281,10 @@
           "cve_id": "CVE-2018-20796",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2018-5709",
@@ -5452,10 +5452,10 @@
           "cve_id": "CVE-2021-22945",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2021-22946",
@@ -5956,10 +5956,10 @@
           "cve_id": "CVE-2022-32207",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-32208",
@@ -6118,10 +6118,10 @@
           "cve_id": "CVE-2022-40304",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-40674",
@@ -6145,10 +6145,10 @@
           "cve_id": "CVE-2022-42898",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-42916",
@@ -10113,12 +10113,12 @@
       ],
       "expected_direction": "escalate",
       "findings_compared": 560,
-      "moved_as_expected": 14,
+      "moved_as_expected": 6,
       "wrong_direction": 0,
-      "unchanged": 546,
-      "agreement_rate": 0.025,
+      "unchanged": 554,
+      "agreement_rate": 0.010714285714285714,
       "movable": 540,
-      "movable_agreement_rate": 0.025925925925925925,
+      "movable_agreement_rate": 0.011111111111111112,
       "exempt_expected_direction": "unchanged",
       "exempt_findings_compared": 0,
       "exempt_moved_as_expected": 0,
@@ -10219,10 +10219,10 @@
           "cve_id": "CVE-2015-3276",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2015-9019",
@@ -10282,19 +10282,19 @@
           "cve_id": "CVE-2017-16232",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-17740",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2017-18018",
@@ -10345,10 +10345,10 @@
           "cve_id": "CVE-2018-20796",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2018-5709",
@@ -10516,10 +10516,10 @@
           "cve_id": "CVE-2021-22945",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2021-22946",
@@ -11020,10 +11020,10 @@
           "cve_id": "CVE-2022-32207",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-32208",
@@ -11182,10 +11182,10 @@
           "cve_id": "CVE-2022-40304",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-40674",
@@ -11209,10 +11209,10 @@
           "cve_id": "CVE-2022-42898",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2022-42916",
@@ -15177,12 +15177,12 @@
       ],
       "expected_direction": "escalate",
       "findings_compared": 560,
-      "moved_as_expected": 14,
+      "moved_as_expected": 6,
       "wrong_direction": 0,
-      "unchanged": 546,
-      "agreement_rate": 0.025,
+      "unchanged": 554,
+      "agreement_rate": 0.010714285714285714,
       "movable": 540,
-      "movable_agreement_rate": 0.025925925925925925,
+      "movable_agreement_rate": 0.011111111111111112,
       "exempt_expected_direction": "unchanged",
       "exempt_findings_compared": 0,
       "exempt_moved_as_expected": 0,
@@ -26875,10 +26875,10 @@
           "cve_id": "CVE-2018-20796",
           "bucket": "main",
           "reference": "HIGH",
-          "observed": "CRITICAL",
-          "direction": "escalate",
+          "observed": "HIGH",
+          "direction": "unchanged",
           "expected": "escalate",
-          "agrees": true
+          "agrees": false
         },
         {
           "cve_id": "CVE-2019-1010022",
@@ -28422,12 +28422,12 @@
       ],
       "expected_direction": "escalate",
       "findings_compared": 179,
-      "moved_as_expected": 1,
+      "moved_as_expected": 0,
       "wrong_direction": 0,
-      "unchanged": 178,
-      "agreement_rate": 0.00558659217877095,
+      "unchanged": 179,
+      "agreement_rate": 0.0,
       "movable": 178,
-      "movable_agreement_rate": 0.0056179775280898875,
+      "movable_agreement_rate": 0.0,
       "exempt_expected_direction": "unchanged",
       "exempt_findings_compared": 0,
       "exempt_moved_as_expected": 0,
