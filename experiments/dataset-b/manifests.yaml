@@ -88,6 +88,7 @@ spec:
       containers:
       - name: app
         image: python:3.9-slim
+        command: ["sleep", "infinity"]
         resources:
           requests: {cpu: 50m, memory: 64Mi}
           limits: {cpu: 500m, memory: 512Mi}
@@ -297,6 +298,7 @@ spec:
       containers:
       - name: app
         image: python:3.9-slim
+        command: ["sleep", "infinity"]
         resources:
           requests: {cpu: 50m, memory: 64Mi}
           limits: {cpu: 500m, memory: 512Mi}

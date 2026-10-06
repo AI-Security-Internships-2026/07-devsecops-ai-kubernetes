@@ -229,6 +229,37 @@ class TestRenderedManifests:
         created = {d["metadata"]["name"] for d in self.docs() if d["kind"] == "Namespace"}
         assert {s.namespace for s in C.load_scenarios()} <= created
 
+    def test_command_override_is_rendered(self):
+        deployments = {d["metadata"]["name"]: d for d in self.docs()
+                       if d["kind"] == "Deployment"}
+        for s in C.load_scenarios():
+            if not s.deployed:
+                continue
+            container = (deployments[s.workload_name]["spec"]["template"]["spec"]
+                         ["containers"][0])
+            assert container.get("command", []) == list(s.command), s.name
+
+    def test_non_server_images_are_given_a_long_running_command(self):
+        """
+        A pod that exits is not a scenario -- the deployment context under test is
+        derived from *live* pods, so a container that completes immediately scores as
+        "no findings" rather than as an error, which is the silent-failure shape.
+
+        `python:3.9-slim` runs an interactive interpreter by default; with no TTY it
+        reads EOF and exits 0, and Kubernetes reports "Completed", not a crash. Both
+        python scenarios did exactly this on first deploy.
+        """
+        non_servers = ("python", "node", "openjdk", "golang", "ruby", "busybox",
+                       "alpine", "debian", "ubuntu")
+        for s in C.load_scenarios():
+            if not s.deployed:
+                continue
+            base = s.image.split(":")[0].split("/")[-1]
+            if base in non_servers:
+                assert s.command, (
+                    f"scenario {s.name!r} runs {s.image}, which does not stay up on its "
+                    f"own; give it an explicit long-running command")
+
     def test_image_in_the_manifest_matches_the_scenario(self):
         deployments = {d["metadata"]["name"]: d for d in self.docs()
                        if d["kind"] == "Deployment"}

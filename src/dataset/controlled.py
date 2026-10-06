@@ -78,6 +78,12 @@ class Scenario:
     privileged: bool = False
     namespace: str = "dataset-b"
     replicas: int = 1
+    # Overrides the image's default command. Needed for any image that is not a
+    # long-running server: `python:3.9-slim` starts an interactive interpreter, which
+    # reads EOF immediately and exits 0, so the pod reports "Completed" and never
+    # becomes Ready. A scenario is only measurable while its pod is running, because the
+    # deployment context being tested is derived from live pods.
+    command: list[str] = field(default_factory=list)
     # CVEs that are expected to behave DIFFERENTLY from the rest of the scenario, with
     # the direction they should move instead. This is how the KEV exemption is tested:
     # in a not-deployed scenario every finding de-escalates except the confirmed-
@@ -252,6 +258,10 @@ def _namespace_doc(namespaces: list[str]) -> str:
 def _deployment_doc(s: Scenario) -> str:
     security = ("        securityContext:\n          privileged: true\n"
                 if s.privileged else "")
+    command = ""
+    if s.command:
+        rendered = ", ".join(f'"{part}"' for part in s.command)
+        command = f"        command: [{rendered}]\n"
     return f"""apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -277,7 +287,7 @@ spec:
       containers:
       - name: app
         image: {s.image}
-{security}        resources:
+{command}{security}        resources:
           requests: {{cpu: 50m, memory: 64Mi}}
           limits: {{cpu: 500m, memory: 512Mi}}"""
 

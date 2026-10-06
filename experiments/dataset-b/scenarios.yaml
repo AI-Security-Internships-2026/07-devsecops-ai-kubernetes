@@ -70,6 +70,7 @@ scenarios:
 
   - name: baseline-python
     image: python:3.9-slim
+    command: ["sleep", "infinity"]
     compare_to: baseline-python
     description: Deployed, internal-only, unprivileged
     expect: unchanged
@@ -191,6 +192,7 @@ scenarios:
   # ------------------------------------------------- non-OS package attribution
   - name: language-packages
     image: python:3.9-slim
+    command: ["sleep", "infinity"]
     compare_to: baseline-python
     description: Deployed, language-ecosystem dependencies rather than OS packages
     expect: unchanged
