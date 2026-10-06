@@ -263,6 +263,46 @@ step_k3s() {
     return 0
   fi
 
+  # Checking only for a usable `kubectl` is not enough, and assuming otherwise is
+  # dangerous on a shared host. A cluster can be running while kubectl is absent or
+  # while this user lacks the group membership to reach it -- MicroK8s is exactly that
+  # case: it ships its own wrapped client and gates access behind the `microk8s` group,
+  # so `kubectl get nodes` fails in a way indistinguishable from "no cluster here".
+  #
+  # Installing k3s on top of a running cluster is not a recoverable mistake. Both want
+  # the kubelet port and their own containerd, so the likely outcome is two broken
+  # clusters -- one of which belongs to somebody else.
+  local found=""
+  command -v microk8s >/dev/null 2>&1 && found="MicroK8s (snap)"
+  [ -z "$found" ] && systemctl is-active --quiet snap.microk8s.daemon-kubelite 2>/dev/null \
+    && found="MicroK8s (kubelite running)"
+  [ -z "$found" ] && command -v kubeadm >/dev/null 2>&1 \
+    && systemctl is-active --quiet kubelet 2>/dev/null && found="kubeadm cluster"
+  # Any API server answering on a well-known port means something owns this node.
+  if [ -z "$found" ]; then
+    for port in 6443 16443 8443; do
+      if curl -sk --max-time 3 "https://127.0.0.1:$port/version" 2>/dev/null \
+           | grep -q gitVersion; then
+        found="an API server on :$port"
+        break
+      fi
+    done
+  fi
+
+  if [ -n "$found" ]; then
+    err "refusing to install k3s: $found is already running on this host"
+    info "Installing a second distribution would fight over the kubelet port and"
+    info "containerd, and on a shared machine that breaks other people's work."
+    info ""
+    info "Use the existing cluster instead. For MicroK8s:"
+    info "    sudo usermod -a -G microk8s \$(id -un)"
+    info "    sudo chown -f -R \$(id -un) ~/.kube"
+    info "    newgrp microk8s        # or log out and back in"
+    info "    sudo snap alias microk8s.kubectl kubectl"
+    record k3s skip "existing cluster: $found"
+    return 0
+  fi
+
   if ! have k3s; then
     # --write-kubeconfig-mode 644 so kubectl works without sudo. This is a single-node
     # research box; on a shared host use a copy under ~/.kube instead.
